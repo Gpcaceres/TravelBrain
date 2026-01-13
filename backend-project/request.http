@@ -3,7 +3,7 @@
 # Use ### to separate requests
 
 # Variables
-@baseUrl = http://localhost:3004
+@baseUrl = http://35.239.79.6:3004
 @contentType = application/json
 @token = 
 
