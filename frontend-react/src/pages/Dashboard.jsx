@@ -179,6 +179,15 @@ export default function Dashboard() {
                     My Profile
                   </Link>
                   
+                  {user?.role === 'ADMIN' && (
+                    <Link to="/admin" className="dropdown-item" onClick={() => setShowMenu(false)}>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M1.5 1.5A.5.5 0 012 1h12a.5.5 0 01.5.5v2a.5.5 0 01-.128.334L10 8.692V13.5a.5.5 0 01-.342.474l-3 1A.5.5 0 016 14.5V8.692L1.628 3.834A.5.5 0 011.5 3.5v-2z"/>
+                      </svg>
+                      Admin Panel
+                    </Link>
+                  )}
+                  
                   <button className="dropdown-item" onClick={() => setShowMenu(false)}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                       <path d="M8 4.754a3.246 3.246 0 100 6.492 3.246 3.246 0 000-6.492zM5.754 8a2.246 2.246 0 114.492 0 2.246 2.246 0 01-4.492 0z"/>

@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import Trips from './pages/Trips'
 import Destinations from './pages/Destinations'
+import Admin from './pages/Admin'
 import './App.css'
 
 function App() {
@@ -44,6 +45,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Destinations />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin" 
+        element={
+          <ProtectedRoute>
+            <Admin />
           </ProtectedRoute>
         } 
       />

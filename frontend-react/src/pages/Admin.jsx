@@ -1,0 +1,392 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
+import '../styles/Admin.css';
+
+function Admin() {
+  const [users, setUsers] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
+  const [filters, setFilters] = useState({
+    status: '',
+    role: ''
+  });
+  const navigate = useNavigate();
+  const usersPerPage = 10;
+
+  useEffect(() => {
+    fetchData();
+  }, [currentPage, searchTerm, filters]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      // Build query params
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: usersPerPage.toString()
+      });
+      
+      if (searchTerm) {
+        params.append('search', searchTerm);
+      }
+      
+      if (filters.status) {
+        params.append('status', filters.status);
+      }
+      
+      if (filters.role) {
+        params.append('role', filters.role);
+      }
+      
+      const [usersResponse, statsResponse] = await Promise.all([
+        api.get(`/users?${params.toString()}`),
+        api.get('/users/stats')
+      ]);
+      
+      setUsers(usersResponse.data.data || []);
+      setPagination(usersResponse.data.pagination);
+      setStats(statsResponse.data.stats);
+      setError('');
+    } catch (err) {
+      console.error('Error al cargar datos:', err);
+      if (err.response?.status === 403) {
+        setError('No tienes permisos de administrador');
+        setTimeout(() => navigate('/dashboard'), 2000);
+      } else {
+        setError('Error al cargar los datos de usuarios');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleActivateUser = async (userId) => {
+    try {
+      const response = await api.patch(`/users/${userId}/activate`);
+      setSuccessMessage(response.data.message);
+      setTimeout(() => setSuccessMessage(''), 3000);
+      fetchData();
+    } catch (err) {
+      console.error('Error al activar usuario:', err);
+      setError(err.response?.data?.message || 'Error al activar usuario');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  const handleDeactivateUser = async (userId) => {
+    try {
+      const response = await api.patch(`/users/${userId}/deactivate`);
+      setSuccessMessage(response.data.message);
+      setTimeout(() => setSuccessMessage(''), 3000);
+      fetchData();
+    } catch (err) {
+      console.error('Error al desactivar usuario:', err);
+      setError(err.response?.data?.message || 'Error al desactivar usuario');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  const handleChangeRole = async (userId, newRole) => {
+    try {
+      const response = await api.patch(`/users/${userId}/role`, { role: newRole });
+      setSuccessMessage(response.data.message);
+      setTimeout(() => setSuccessMessage(''), 3000);
+      fetchData();
+    } catch (err) {
+      console.error('Error al cambiar rol:', err);
+      setError(err.response?.data?.message || 'Error al cambiar rol de usuario');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page on search
+  };
+
+  const handleFilterChange = (filterType, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }));
+    setCurrentPage(1); // Reset to first page on filter
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const getRoleColor = (role) => {
+    switch (role) {
+      case 'ADMIN': return 'role-admin';
+      case 'REGISTERED': return 'role-registered';
+      case 'USER': return 'role-user';
+      default: return '';
+    }
+  };
+
+  const getStatusColor = (status) => {
+    return status === 'ACTIVE' ? 'status-active' : 'status-inactive';
+  };
+
+  if (loading) {
+    return (
+      <div className="admin-container">
+        <div className="loading">Cargando panel de administración...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-container">
+      <div className="admin-header">
+        <h1>Panel de Administración</h1>
+        <button className="btn-back" onClick={() => navigate('/dashboard')}>
+          Volver al Dashboard
+        </button>
+      </div>
+
+      {error && <div className="alert alert-error">{error}</div>}
+      {successMessage && <div className="alert alert-success">{successMessage}</div>}
+
+      {/* Estadísticas */}
+      {stats && (
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>Total de Usuarios</h3>
+            <p className="stat-number">{stats.total}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Usuarios Activos</h3>
+            <p className="stat-number stat-active">{stats.byStatus.active}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Usuarios Inactivos</h3>
+            <p className="stat-number stat-inactive">{stats.byStatus.inactive}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Administradores</h3>
+            <p className="stat-number stat-admin">{stats.byRole.admin}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Tabla de Usuarios */}
+      <div className="users-section">
+        <h2>Gestión de Usuarios</h2>
+        
+        {/* Search and Filters */}
+        <div className="search-filter-container">
+          <div className="search-box">
+            <svg className="search-icon" width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.1zM12 6.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z"/>
+            </svg>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Buscar por email, nombre o username..."
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+            {searchTerm && (
+              <button 
+                className="clear-search-btn"
+                onClick={() => setSearchTerm('')}
+                title="Limpiar búsqueda"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          
+          <div className="filters">
+            <select 
+              className="filter-select"
+              value={filters.status}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
+            >
+              <option value="">Todos los estados</option>
+              <option value="ACTIVE">Activos</option>
+              <option value="INACTIVE">Inactivos</option>
+            </select>
+            
+            <select 
+              className="filter-select"
+              value={filters.role}
+              onChange={(e) => handleFilterChange('role', e.target.value)}
+            >
+              <option value="">Todos los roles</option>
+              <option value="ADMIN">Administrador</option>
+              <option value="REGISTERED">Registrado</option>
+              <option value="USER">Usuario</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Results Info */}
+        {pagination && (
+          <div className="results-info">
+            Mostrando {users.length} de {pagination.totalUsers} usuarios
+            {searchTerm && ` (filtrado por "${searchTerm}")`}
+          </div>
+        )}
+
+        <div className="table-container">
+          <table className="users-table">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Nombre</th>
+                <th>Username</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Fecha Creación</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map(user => (
+                <tr key={user._id}>
+                  <td>{user.email}</td>
+                  <td>{user.name || '-'}</td>
+                  <td>{user.username || '-'}</td>
+                  <td>
+                    <select
+                      value={user.role}
+                      onChange={(e) => handleChangeRole(user._id, e.target.value)}
+                      className={`role-select ${getRoleColor(user.role)}`}
+                    >
+                      <option value="USER">Usuario</option>
+                      <option value="REGISTERED">Registrado</option>
+                      <option value="ADMIN">Administrador</option>
+                    </select>
+                  </td>
+                  <td>
+                    <span className={`status-badge ${getStatusColor(user.status)}`}>
+                      {user.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </td>
+                  <td>
+                    {user.createdAt 
+                      ? new Date(user.createdAt).toLocaleDateString('es-ES')
+                      : '-'
+                    }
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      {user.status === 'ACTIVE' ? (
+                        <button
+                          className="btn-deactivate"
+                          onClick={() => handleDeactivateUser(user._id)}
+                          title="Desactivar usuario"
+                        >
+                          Desactivar
+                        </button>
+                      ) : (
+                        <button
+                          className="btn-activate"
+                          onClick={() => handleActivateUser(user._id)}
+                          title="Activar usuario"
+                        >
+                          Activar
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="pagination">
+            <button
+              className="pagination-btn"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={!pagination.hasPrevPage}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z"/>
+              </svg>
+              Anterior
+            </button>
+            
+            <div className="pagination-info">
+              {/* First page */}
+              {currentPage > 3 && (
+                <>
+                  <button
+                    className="pagination-number"
+                    onClick={() => handlePageChange(1)}
+                  >
+                    1
+                  </button>
+                  {currentPage > 4 && <span className="pagination-ellipsis">...</span>}
+                </>
+              )}
+              
+              {/* Pages around current */}
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                .filter(page => {
+                  return page === currentPage ||
+                         page === currentPage - 1 ||
+                         page === currentPage + 1 ||
+                         page === currentPage - 2 ||
+                         page === currentPage + 2;
+                })
+                .map(page => (
+                  <button
+                    key={page}
+                    className={`pagination-number ${page === currentPage ? 'active' : ''}`}
+                    onClick={() => handlePageChange(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+              
+              {/* Last page */}
+              {currentPage < pagination.totalPages - 2 && (
+                <>
+                  {currentPage < pagination.totalPages - 3 && <span className="pagination-ellipsis">...</span>}
+                  <button
+                    className="pagination-number"
+                    onClick={() => handlePageChange(pagination.totalPages)}
+                  >
+                    {pagination.totalPages}
+                  </button>
+                </>
+              )}
+              
+              <span className="pagination-text">
+                Página {currentPage} de {pagination.totalPages}
+              </span>
+            </div>
+            
+            <button
+              className="pagination-btn"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={!pagination.hasNextPage}
+            >
+              Siguiente
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z"/>
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default Admin;

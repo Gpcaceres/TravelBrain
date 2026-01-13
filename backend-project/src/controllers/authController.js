@@ -72,6 +72,14 @@ exports.simpleLogin = async (req, res) => {
       });
     }
 
+    // Verificar si el usuario está activo
+    if (user.status !== 'ACTIVE') {
+      return res.status(403).json({
+        success: false,
+        message: 'Tu cuenta ha sido desactivada. Contacta al administrador.'
+      });
+    }
+
     // Generar JWT token
     const token = jwt.sign(
       {

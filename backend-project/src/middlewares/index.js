@@ -7,6 +7,7 @@ const { cacheMiddleware, invalidateCache, invalidateCacheKey, clearCache, getCac
 const corsMiddleware = require('./cors');
 const { notFoundHandler, errorHandler } = require('./errorHandler');
 const requestLogger = require('./requestLogger');
+const { authenticate, isAdmin, isAdminOrOwner } = require('./auth');
 
 module.exports = {
   cacheMiddleware,
@@ -17,5 +18,8 @@ module.exports = {
   corsMiddleware,
   notFoundHandler,
   errorHandler,
-  requestLogger
+  requestLogger,
+  authenticate,
+  isAdmin,
+  isAdminOrOwner
 };
