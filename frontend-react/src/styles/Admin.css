@@ -65,15 +65,15 @@
 }
 
 .alert-error {
-  background: #fee;
-  color: #c33;
-  border-left: 4px solid #c33;
+  background: rgba(245, 71, 167, 0.1);
+  color: #F547A7;
+  border-left: 4px solid #F547A7;
 }
 
 .alert-success {
-  background: #efe;
-  color: #383;
-  border-left: 4px solid #383;
+  background: rgba(71, 245, 154, 0.1);
+  color: #47F59A;
+  border-left: 4px solid #47F59A;
 }
 
 /* Stats Grid */
@@ -95,9 +95,10 @@
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(71, 245, 154, 0.25);
-  border-color: rgba(71, 245, 154, 0.3);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(71, 245, 154, 0.25);
+  border-color: #47F59A;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.2) 0%, rgba(71, 245, 154, 0.05) 100%);
 }
 
 .stat-card h3 {
@@ -117,11 +118,11 @@
 }
 
 .stat-active {
-  color: #10b981;
+  color: #47F59A;
 }
 
 .stat-inactive {
-  color: #ef4444;
+  color: #F547A7;
 }
 
 .stat-admin {
@@ -194,7 +195,7 @@
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  background: #ef4444;
+  background: #F547A7;
   color: white;
   border: none;
   border-radius: 50%;
@@ -209,7 +210,7 @@
 }
 
 .clear-search-btn:hover {
-  background: #dc2626;
+  background: #e03592;
   transform: translateY(-50%) scale(1.1);
 }
 
@@ -342,19 +343,25 @@
 }
 
 .status-active {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(71, 245, 154, 0.2);
+  color: #47F59A;
+  font-weight: 700;
 }
 
 .status-inactive {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgba(245, 71, 167, 0.2);
+  color: #F547A7;
+  font-weight: 700;
 }
 
 /* Action Buttons */
 .action-buttons {
   display: flex;
   gap: 0.5rem;
+}
+
+.action-buttons button {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .btn-activate,
@@ -369,25 +376,27 @@
 }
 
 .btn-activate {
-  background: #10b981;
-  color: white;
+  background: #47F59A;
+  color: #0f172a;
+  font-weight: 700;
 }
 
 .btn-activate:hover {
-  background: #059669;
+  background: #2ecc71;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px rgba(71, 245, 154, 0.4);
 }
 
 .btn-deactivate {
-  background: #ef4444;
+  background: #F547A7;
   color: white;
+  font-weight: 700;
 }
 
 .btn-deactivate:hover {
-  background: #dc2626;
+  background: #e03592;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 12px rgba(245, 71, 167, 0.4);
 }
 
 /* Loading */

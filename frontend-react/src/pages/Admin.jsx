@@ -10,6 +10,7 @@ function Admin() {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState(null);
   const [filters, setFilters] = useState({
@@ -18,6 +19,16 @@ function Admin() {
   });
   const navigate = useNavigate();
   const usersPerPage = 10;
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+      setCurrentPage(1);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   useEffect(() => {
     fetchData();
@@ -107,8 +118,7 @@ function Admin() {
   };
 
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page on search
+    setSearchInput(e.target.value);
   };
 
   const handleFilterChange = (filterType, value) => {
@@ -193,13 +203,16 @@ function Admin() {
               type="text"
               className="search-input"
               placeholder="Buscar por email, nombre o username..."
-              value={searchTerm}
+              value={searchInput}
               onChange={handleSearch}
             />
-            {searchTerm && (
+            {searchInput && (
               <button 
                 className="clear-search-btn"
-                onClick={() => setSearchTerm('')}
+                onClick={() => {
+                  setSearchInput('');
+                  setSearchTerm('');
+                }}
                 title="Limpiar búsqueda"
               >
                 ✕
