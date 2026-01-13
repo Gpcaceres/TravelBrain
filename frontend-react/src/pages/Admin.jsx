@@ -25,7 +25,7 @@ function Admin() {
     const timer = setTimeout(() => {
       setSearchTerm(searchInput);
       setCurrentPage(1);
-    }, 500);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [searchInput]);
