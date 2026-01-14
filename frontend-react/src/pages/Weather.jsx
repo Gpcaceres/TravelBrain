@@ -16,9 +16,6 @@ export default function Weather() {
   const [savedSearches, setSavedSearches] = useState([])
   const [showMenu, setShowMenu] = useState(false)
 
-  const navigate = useNavigate()
-  const { logout } = useAuth()
-
   useEffect(() => {
     loadSavedSearches()
   }, [])
