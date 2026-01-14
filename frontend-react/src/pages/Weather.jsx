@@ -21,9 +21,20 @@ export default function Weather() {
   const searchTimeoutRef = useRef(null)
   const suggestionsRef = useRef(null)
 
+  // Update user state when auth changes
   useEffect(() => {
-    loadSavedSearches()
+    const currentUser = getUser()
+    if (currentUser && currentUser._id !== user?._id) {
+      setUser(currentUser)
+    }
   }, [])
+
+  // Load saved searches when component mounts or user changes
+  useEffect(() => {
+    if (user && user._id) {
+      loadSavedSearches()
+    }
+  }, [user?._id])
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -48,9 +59,12 @@ export default function Weather() {
   const loadSavedSearches = async () => {
     try {
       const searches = await weatherService.getAllWeatherSearches()
-      setSavedSearches(searches)
+      console.log('Loaded searches:', searches)
+      // Ensure we're setting the most recent data
+      setSavedSearches(searches || [])
     } catch (error) {
       console.error('Error loading saved searches:', error)
+      setSavedSearches([])
     }
   }
 
@@ -168,8 +182,8 @@ export default function Weather() {
     
     try {
       await weatherService.deleteWeather(id)
-      // Update the list immediately
-      setSavedSearches(savedSearches.filter(search => search._id !== id))
+      // Reload from server to ensure sync
+      await loadSavedSearches()
       setMessage({ type: 'success', text: 'Weather search deleted successfully!' })
       setTimeout(() => setMessage({ type: '', text: '' }), 3000)
     } catch (error) {
