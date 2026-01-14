@@ -227,37 +227,55 @@ function Admin() {
       {/* Navbar */}
       <nav className="admin-navbar">
         <div className="container navbar-content">
-          <div className="admin-page">
-            <nav className="admin-navbar">
-              {/* ...navbar content aquí... */}
-            </nav>
-            <div className="container admin-container">
-              <h1 className="admin-title">Gestión de Usuarios</h1>
-              <form onSubmit={handleSearch} className="admin-search-form">
-                <UserFilters
-                  searchInput={searchInput}
-                  setSearchInput={setSearchInput}
-                  filters={filters}
-                      {/* Menú de usuario */}
-                      <div className="user-menu" onClick={() => setShowMenu(!showMenu)}>
-                        <div className="user-avatar">
-                          {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
-                        </div>
-                        {showMenu && (
-                          <div className="dropdown-menu">
-                            <div>
-                              <p className="dropdown-name">{user?.name || user?.username || 'User'}</p>
-                              <p className="dropdown-email">{user?.email}</p>
-                            </div>
-                            <div className="dropdown-divider"></div>
-                            <Link to="/profile" className="dropdown-item">Perfil</Link>
-                            <button onClick={handleLogout} className="dropdown-item logout-item">Cerrar sesión</button>
-                          </div>
-                        )}
-                      </div>
-                </div>
-              )}
+          {/* Menú de usuario */}
+          <div className="user-menu" onClick={() => setShowMenu(!showMenu)}>
+            <div className="user-avatar">
+              {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
             </div>
+            {showMenu && (
+              <div className="dropdown-menu">
+                <div>
+                  <p className="dropdown-name">{user?.name || user?.username || 'User'}</p>
+                  <p className="dropdown-email">{user?.email}</p>
+                </div>
+                <div className="dropdown-divider"></div>
+                <Link to="/profile" className="dropdown-item">Perfil</Link>
+                <button onClick={handleLogout} className="dropdown-item logout-item">Cerrar sesión</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+      <div className="container admin-container">
+        <h1 className="admin-title">Gestión de Usuarios</h1>
+        <form onSubmit={handleSearch} className="admin-search-form">
+          <UserFilters
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+            filters={filters}
+            setFilters={setFilters}
+            roles={roles}
+            statuses={statuses}
+          />
+          <button type="submit" className="search-btn">Buscar</button>
+        </form>
+        <UserTable
+          users={users}
+          onToggleStatus={handleToggleUserStatus}
+          onDelete={handleDeleteUser}
+          onChangeRole={handleChangeRole}
+          updatingUserId={updatingUserId}
+          deletingUserId={deletingUserId}
+        />
+        <UserPagination
+          pagination={pagination}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+        />
+        {error && <div className="alert alert-error">{error}</div>}
+        {successMessage && <div className="alert alert-success">{successMessage}</div>}
+        {/* Estadísticas y otros bloques aquí si es necesario */}
+      </div>
 
       {error && <div className="alert alert-error">{error}</div>}
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
