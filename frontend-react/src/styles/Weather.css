@@ -357,7 +357,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .search-grid-item.info {
@@ -395,12 +395,13 @@
 }
 
 .search-icon {
-  font-size: 2rem;
+  font-size: 1.8rem;
   flex-shrink: 0;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 2rem;
 }
 
 .search-temp {
@@ -408,6 +409,9 @@
   font-weight: 700;
   color: #47F59A;
   margin: 0;
+  line-height: 1;
+  padding-left: 0.25rem;
+}
   line-height: 1;
 }
 
