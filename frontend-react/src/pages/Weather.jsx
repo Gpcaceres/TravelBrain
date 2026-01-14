@@ -279,27 +279,32 @@ export default function Weather() {
                       </button>
                     </div>
                     
-                    <div className="search-grid-item temp">
-                      <span className="search-icon">{getWeatherIcon(search.condition)}</span>
-                      <span className="search-temp">{search.temp}°C</span>
+                    <div className="search-grid-item info-box">
+                      <span className="info-icon">{getWeatherIcon(search.condition)}</span>
+                      <div className="info-content">
+                        <p className="info-label">Temperature</p>
+                        <p className="info-value">{search.temp}°C</p>
+                      </div>
                     </div>
                     
-                    <div className="search-grid-item info">
-                      <p className="search-condition-small">{search.condition}</p>
-                      <div className="search-details-row">
-                        <div className="search-info-item">
-                          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M8.5 8.5a.5.5 0 00-1 0v5.793L6.354 13.146a.5.5 0 10-.708.708l2 2a.5.5 0 00.708 0l2-2a.5.5 0 00-.708-.708L8.5 14.293V8.5z"/>
-                            <path d="M6.646 3.646a.5.5 0 01.708 0L8.5 4.793l1.146-1.147a.5.5 0 01.708.708l-1.5 1.5a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 010-.708z"/>
-                          </svg>
-                          <span>{search.humidity}%</span>
-                        </div>
-                        <div className="search-info-item">
-                          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M12.5 2A2.5 2.5 0 0010 4.5a.5.5 0 001 0 1.5 1.5 0 113 0c0 .474-.196.953-.667 1.424a4.488 4.488 0 01-.976.69 2.5 2.5 0 00-1.357 2.22V10.5a.5.5 0 001 0V9.165c.095-.04.19-.084.284-.132a5.5 5.5 0 001.216-.865c.653-.67 1-1.518 1-2.418A2.5 2.5 0 0012.5 2z"/>
-                          </svg>
-                          <span>{Number(search.windSpeed).toFixed(2)} m/s</span>
-                        </div>
+                    <div className="search-grid-item info-box">
+                      <svg className="info-icon" width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8.5 8.5a.5.5 0 00-1 0v5.793L6.354 13.146a.5.5 0 10-.708.708l2 2a.5.5 0 00.708 0l2-2a.5.5 0 00-.708-.708L8.5 14.293V8.5z"/>
+                        <path d="M6.646 3.646a.5.5 0 01.708 0L8.5 4.793l1.146-1.147a.5.5 0 01.708.708l-1.5 1.5a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 010-.708z"/>
+                      </svg>
+                      <div className="info-content">
+                        <p className="info-label">Humidity</p>
+                        <p className="info-value">{search.humidity}%</p>
+                      </div>
+                    </div>
+                    
+                    <div className="search-grid-item info-box">
+                      <svg className="info-icon" width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M12.5 2A2.5 2.5 0 0010 4.5a.5.5 0 001 0 1.5 1.5 0 113 0c0 .474-.196.953-.667 1.424a4.488 4.488 0 01-.976.69 2.5 2.5 0 00-1.357 2.22V10.5a.5.5 0 001 0V9.165c.095-.04.19-.084.284-.132a5.5 5.5 0 001.216-.865c.653-.67 1-1.518 1-2.418A2.5 2.5 0 0012.5 2z"/>
+                      </svg>
+                      <div className="info-content">
+                        <p className="info-label">Wind Speed</p>
+                        <p className="info-value">{Number(search.windSpeed).toFixed(2)} m/s</p>
                       </div>
                     </div>
                     

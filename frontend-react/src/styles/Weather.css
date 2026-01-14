@@ -335,11 +335,11 @@
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-rows: auto auto auto;
-  gap: 0.75rem 1rem;
+  gap: 0.75rem;
   height: 100%;
   grid-template-areas:
     "city delete"
-    "temp info"
+    "boxes boxes"
     "date date";
 }
 
@@ -357,22 +357,34 @@
   justify-content: flex-end;
 }
 
-.search-grid-item.temp {
-  grid-area: temp;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.75rem;
-}
-
-.search-grid-item.info {
-  grid-area: info;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+.search-grid-item.info-box {
   background: rgba(0, 0, 0, 0.3);
   padding: 0.75rem;
   border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.search-grid-item.info-box:hover {
+  background: rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.search-card-content > .search-grid-item.info-box {
+  grid-column: span 2;
+}
+
+.search-card-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 0.75rem;
+  height: 100%;
+  grid-template-areas:
+    "city city city delete"
+    "date date date date";
 }
 
 .search-grid-item.date {
@@ -391,52 +403,38 @@
   line-height: 1.3;
 }
 
-.search-condition-small {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
-  text-transform: capitalize;
-  margin: 0 0 0.35rem 0;
-}
-
-.search-icon {
-  font-size: 1.6rem;
+.info-icon {
+  font-size: 2rem;
+  color: #47F59A;
   flex-shrink: 0;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 2.5rem;
-  width: 2.5rem;
-  margin-right: 0.25rem;
+  min-width: 2rem;
 }
 
-.search-temp {
-  font-size: 2.2rem;
+.info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.info-value {
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #47F59A;
+  color: white;
   margin: 0;
   line-height: 1;
-  white-space: nowrap;
-}
-
-.search-details-row {
-  display: flex;
-  gap: 1rem;
-}
-
-.search-info-item {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.search-info-item svg {
-  color: #47F59A;
-  flex-shrink: 0;
-  width: 13px;
-  height: 13px;
 }
 
 .search-date {
@@ -552,6 +550,28 @@
 
   .searches-grid {
     grid-template-columns: 1fr;
+  }
+
+  .search-card-content {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "city delete"
+      "box1 box1"
+      "box2 box2"
+      "box3 box3"
+      "date date";
+  }
+
+  .search-card-content > .search-grid-item.info-box:nth-of-type(3) {
+    grid-area: box1;
+  }
+
+  .search-card-content > .search-grid-item.info-box:nth-of-type(4) {
+    grid-area: box2;
+  }
+
+  .search-card-content > .search-grid-item.info-box:nth-of-type(5) {
+    grid-area: box3;
   }
 }
 
