@@ -134,6 +134,14 @@ function Admin() {
     }
   };
 
+  const handleToggleUserStatus = async (userId, currentStatus) => {
+    if (currentStatus === 'ACTIVE') {
+      await handleDeactivateUser(userId);
+    } else {
+      await handleActivateUser(userId);
+    }
+  };
+
   const handleChangeRole = async (userId, newRole) => {
     try {
       const response = await api.patch(`/users/${userId}/role`, { role: newRole });
@@ -390,9 +398,16 @@ function Admin() {
                     </select>
                   </td>
                   <td>
-                    <span className={`status-badge ${getStatusColor(user.status)}`}>
-                      {user.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
-                    </span>
+                    <div className="toggle-switch-container">
+                      <label className="toggle-switch">
+                        <input
+                          type="checkbox"
+                          checked={user.status === 'ACTIVE'}
+                          onChange={() => handleToggleUserStatus(user._id, user.status)}
+                        />
+                        <span className="toggle-slider"></span>
+                      </label>
+                    </div>
                   </td>
                   <td>
                     {user.createdAt 
@@ -402,23 +417,13 @@ function Admin() {
                   </td>
                   <td>
                     <div className="action-buttons">
-                      {user.status === 'ACTIVE' ? (
-                        <button
-                          className="btn-deactivate"
-                          onClick={() => handleDeactivateUser(user._id)}
-                          title="Desactivar usuario"
-                        >
-                          Desactivar
-                        </button>
-                      ) : (
-                        <button
-                          className="btn-activate"
-                          onClick={() => handleActivateUser(user._id)}
-                          title="Activar usuario"
-                        >
-                          Activar
-                        </button>
-                      )}
+                      <button
+                        className="btn-delete"
+                        onClick={() => handleDeactivateUser(user._id)}
+                        title="Quitar usuario"
+                      >
+                        Quitar
+                      </button>
                     </div>
                   </td>
                 </tr>
