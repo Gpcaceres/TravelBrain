@@ -9,6 +9,7 @@ function Admin() {
   const [user, setUser] = useState(getUser());
   const [users, setUsers] = useState([]);
   const [updatingUserId, setUpdatingUserId] = useState(null);
+  const [deletingUserId, setDeletingUserId] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -142,7 +143,7 @@ function Admin() {
     // Eliminar usuario
     const handleDeleteUser = async (userId) => {
       if (!window.confirm('¿Seguro que deseas eliminar este usuario?')) return;
-      setUpdatingUserId(userId);
+      setDeletingUserId(userId);
       try {
         const response = await api.delete(`/users/${userId}`);
         setSuccessMessage(response.data.message || 'Usuario eliminado');
@@ -153,7 +154,7 @@ function Admin() {
         setError(err.response?.data?.message || 'Error al eliminar usuario');
         setTimeout(() => setError(''), 3000);
       } finally {
-        setUpdatingUserId(null);
+        setDeletingUserId(null);
       }
     };
   };
@@ -430,9 +431,7 @@ function Admin() {
                           disabled={updatingUserId === user._id}
                         />
                         <span className="toggle-slider">
-                          {updatingUserId === user._id && (
-                            <span className="toggle-spinner"></span>
-                          )}
+                          {updatingUserId === user._id && <span className="toggle-spinner"></span>}
                         </span>
                       </label>
                     </div>
@@ -449,9 +448,9 @@ function Admin() {
                         className="btn-delete"
                         onClick={() => handleDeleteUser(user._id)}
                         title="Quitar usuario"
-                        disabled={updatingUserId === user._id}
+                        disabled={deletingUserId === user._id}
                       >
-                        {updatingUserId === user._id ? 'Eliminando...' : 'Quitar'}
+                        {deletingUserId === user._id ? 'Eliminando...' : 'Quitar'}
                       </button>
                     </div>
                   </td>
