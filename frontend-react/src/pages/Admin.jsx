@@ -7,6 +7,7 @@ function Admin() {
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,6 +20,7 @@ function Admin() {
   });
   const navigate = useNavigate();
   const usersPerPage = 10;
+  const isInitialLoad = !users.length && loading;
 
   // Debounce search input
   useEffect(() => {
@@ -36,7 +38,12 @@ function Admin() {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
+      // Use updating state for non-initial loads to avoid full page reload appearance
+      if (users.length > 0) {
+        setUpdating(true);
+      } else {
+        setLoading(true);
+      }
       
       // Build query params
       const params = new URLSearchParams({
@@ -75,6 +82,7 @@ function Admin() {
       }
     } finally {
       setLoading(false);
+      setUpdating(false);
     }
   };
 
@@ -131,7 +139,6 @@ function Admin() {
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const getRoleColor = (role) => {
@@ -147,7 +154,7 @@ function Admin() {
     return status === 'ACTIVE' ? 'status-active' : 'status-inactive';
   };
 
-  if (loading) {
+  if (isInitialLoad) {
     return (
       <div className="admin-container">
         <div className="loading">Cargando panel de administración...</div>
@@ -255,7 +262,12 @@ function Admin() {
           </div>
         )}
 
-        <div className="table-container">
+        <div className={`table-container ${updating ? 'updating' : ''}`}>
+          {updating && (
+            <div className="table-updating-indicator">
+              <div className="spinner-small"></div>
+            </div>
+          )}
           <table className="users-table">
             <thead>
               <tr>
