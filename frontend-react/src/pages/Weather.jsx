@@ -85,11 +85,18 @@ export default function Weather() {
   }
 
   const deleteSearch = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this weather search?')) return
+    
     try {
       await weatherService.deleteWeather(id)
-      await loadSavedSearches()
+      // Update the list immediately
+      setSavedSearches(savedSearches.filter(search => search._id !== id))
+      setMessage({ type: 'success', text: 'Weather search deleted successfully!' })
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000)
     } catch (error) {
       console.error('Error deleting search:', error)
+      setMessage({ type: 'error', text: 'Failed to delete weather search' })
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000)
     }
   }
 
@@ -254,11 +261,17 @@ export default function Weather() {
                   <div className="search-card-header">
                     <div className="search-location">
                       <span className="search-icon">{getWeatherIcon(search.condition)}</span>
-                      <h3>{search.label}</h3>
+                      <div>
+                        <h3>{search.label}</h3>
+                        <p className="search-condition">{search.condition}</p>
+                      </div>
                     </div>
                     <button
                       className="delete-btn"
-                      onClick={() => deleteSearch(search._id)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        deleteSearch(search._id)
+                      }}
                       title="Delete search"
                     >
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -271,21 +284,18 @@ export default function Weather() {
                   <div className="search-temp">
                     {search.temp}°C
                   </div>
-
-                  <p className="search-condition">{search.condition}</p>
                   
                   <div className="search-details">
                     <span>💧 {search.humidity}%</span>
                     <span>💨 {Number(search.windSpeed).toFixed(2)} m/s</span>
+                    <p className="search-date">
+                      {new Date(search.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </p>
                   </div>
-
-                  <p className="search-date">
-                    {new Date(search.createdAt).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric'
-                    })}
-                  </p>
                 </div>
               ))}
             </div>
