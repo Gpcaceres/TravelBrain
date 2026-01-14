@@ -215,7 +215,7 @@ export default function Trips() {
                     </svg>
                     Profile Settings
                   </Link>
-                  {user?.role === 'admin' && (
+                  {user?.role === 'ADMIN' && (
                     <Link to="/admin" className="dropdown-item">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
