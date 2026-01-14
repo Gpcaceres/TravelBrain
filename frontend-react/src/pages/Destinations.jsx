@@ -191,41 +191,34 @@ export default function Destinations() {
 
     setSearchingPlaces(true)
     try {
-      // Use Google Places Text Search API
+      // Use OpenStreetMap Nominatim (free, no API key required)
       const response = await fetch(
-        `${API_ENDPOINTS.GOOGLE_PLACES}/textsearch/json?query=${encodeURIComponent(placeSearchQuery)}&key=${API_KEYS.GOOGLE_MAPS}`,
-        { mode: 'cors' }
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeSearchQuery)}&limit=5`,
+        {
+          headers: {
+            'User-Agent': 'TravelBrain App'
+          }
+        }
       )
       
       if (!response.ok) throw new Error('Failed to search places')
       
       const data = await response.json()
-      setPlaceSearchResults(data.results?.slice(0, 5) || [])
+      const results = data.map(item => ({
+        name: item.display_name,
+        formatted_address: item.display_name,
+        geometry: {
+          location: {
+            lat: parseFloat(item.lat),
+            lng: parseFloat(item.lon)
+          }
+        },
+        place_id: item.place_id
+      }))
+      setPlaceSearchResults(results)
     } catch (error) {
       console.error('Error searching places:', error)
-      setMessage({ type: 'error', text: 'Failed to search places. Using geocoding fallback...' })
-      
-      // Fallback to OpenStreetMap Nominatim (free alternative)
-      try {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeSearchQuery)}&limit=5`
-        )
-        const data = await response.json()
-        const results = data.map(item => ({
-          name: item.display_name,
-          formatted_address: item.display_name,
-          geometry: {
-            location: {
-              lat: parseFloat(item.lat),
-              lng: parseFloat(item.lon)
-            }
-          },
-          place_id: item.place_id
-        }))
-        setPlaceSearchResults(results)
-      } catch (fallbackError) {
-        console.error('Fallback search failed:', fallbackError)
-      }
+      setMessage({ type: 'error', text: 'Failed to search places. Please try again.' })
     } finally {
       setSearchingPlaces(false)
     }
@@ -251,36 +244,7 @@ export default function Destinations() {
 
     setCalculatingDistance(true)
     try {
-      const origin = `${selectedOrigin.lat},${selectedOrigin.lng}`
-      const destination = `${selectedDestination.lat},${selectedDestination.lng}`
-      
-      // Try Google Distance Matrix API first
-      try {
-        const response = await fetch(
-          `${API_ENDPOINTS.GOOGLE_DISTANCE}/json?origins=${origin}&destinations=${destination}&key=${API_KEYS.GOOGLE_MAPS}`,
-          { mode: 'cors' }
-        )
-        
-        if (response.ok) {
-          const data = await response.json()
-          const result = data.rows[0]?.elements[0]
-          
-          if (result?.status === 'OK') {
-            setDistanceInfo({
-              distance: result.distance.text,
-              duration: result.duration.text,
-              origin: selectedOrigin.name,
-              destination: selectedDestination.name
-            })
-            setCalculatingDistance(false)
-            return
-          }
-        }
-      } catch (error) {
-        console.log('Google API failed, using Haversine formula')
-      }
-
-      // Fallback: Calculate using Haversine formula
+      // Calculate using Haversine formula (accurate for straight-line distance)
       const R = 6371 // Earth radius in km
       const dLat = (selectedDestination.lat - selectedOrigin.lat) * Math.PI / 180
       const dLon = (selectedDestination.lng - selectedOrigin.lng) * Math.PI / 180
@@ -676,7 +640,7 @@ export default function Destinations() {
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.1zM12 6.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z"/>
                   </svg>
-                  Search Places (Google Maps / OpenStreetMap)
+                  Search Places (OpenStreetMap)
                 </label>
                 <div className="place-search-input">
                   <input
