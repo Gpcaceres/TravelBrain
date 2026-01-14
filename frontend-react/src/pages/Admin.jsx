@@ -35,25 +35,17 @@ function Admin() {
 
   // Debounce search input
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchTerm(searchInput);
-      setCurrentPage(1);
-    }, 1000);
-
     // Close dropdown when clicking outside
     const handleClickOutside = (event) => {
       if (showMenu && !event.target.closest('.user-menu')) {
         setShowMenu(false);
       }
     };
-
     document.addEventListener('click', handleClickOutside);
-
     return () => {
-      clearTimeout(timer);
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [searchInput, showMenu]);
+  }, [showMenu]);
 
   useEffect(() => {
     fetchData();
@@ -116,6 +108,13 @@ function Admin() {
   };
 
   const handleActivateUser = async (userId) => {
+
+    // Solo buscar cuando se presiona el botón
+    const handleSearch = (e) => {
+      e.preventDefault();
+      setSearchTerm(searchInput);
+      setCurrentPage(1);
+    };
     setUpdatingUserId(userId);
     try {
       const response = await api.patch(`/users/${userId}/activate`);
@@ -228,35 +227,38 @@ function Admin() {
       {/* Navbar */}
       <nav className="admin-navbar">
         <div className="container navbar-content">
-          <div className="navbar-left">
-            <img src="/assets/images/logo.png" alt="Logo" className="navbar-logo" />
-            <span className="navbar-brand">TravelBrain</span>
+          <div className="admin-page">
+            <nav className="admin-navbar">
+              {/* ...navbar content aquí... */}
+            </nav>
+            <div className="container admin-container">
+              <h1 className="admin-title">Gestión de Usuarios</h1>
+              <form onSubmit={handleSearch} className="admin-search-form">
+                <UserFilters
+                  searchInput={searchInput}
+                  setSearchInput={setSearchInput}
+                  filters={filters}
+                  setFilters={setFilters}
+                  roles={roles}
+                  statuses={statuses}
+                />
+                <button type="submit" className="search-btn">Buscar</button>
+              </form>
+              <UserTable
+                users={users}
+                onToggleStatus={handleToggleUserStatus}
+                onDelete={handleDeleteUser}
+                onChangeRole={handleChangeRole}
+                updatingUserId={updatingUserId}
+                deletingUserId={deletingUserId}
+              />
+              <UserPagination
+                pagination={pagination}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+              />
+            </div>
           </div>
-          
-          <div className="navbar-center">
-            <Link to="/dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/trips" className="nav-link">My Trips</Link>
-            <Link to="/destinations" className="nav-link">Destinations</Link>
-            <Link to="/weather" className="nav-link">Weather</Link>
-          </div>
-
-          <div className="navbar-right">
-            <div className="user-menu">
-              <button 
-                className="user-menu-btn"
-                onClick={() => setShowMenu(!showMenu)}
-              >
-                <div className="user-avatar">
-                  {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
-                </div>
-                <span className="user-name">{user?.name || user?.username || 'User'}</span>
-                <span className={`dropdown-arrow ${showMenu ? 'rotated' : ''}`}>▼</span>
-              </button>
-              {showMenu && (
-                <div className="user-menu-dropdown">
-                  <div className="dropdown-header">
-                    <div className="dropdown-user-info">
-                      <div className="dropdown-avatar">
                         {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
                       </div>
                       <div>
