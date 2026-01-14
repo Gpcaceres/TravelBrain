@@ -300,42 +300,42 @@ function Admin() {
       )}
 
       {/* Tabla de Usuarios */}
-      <div className="users-section">
-        <h2>Gestión de Usuarios</h2>
-        
-        {/* Search and Filters */}
-        <div className="search-filter-container">
-          <div className="search-box">
-            <svg className="search-icon" width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.1zM12 6.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z"/>
-            </svg>
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Buscar por email, nombre o username..."
-              value={searchInput}
-              onChange={handleSearch}
-            />
-            {searchInput && (
-              <button 
-                className="clear-search-btn"
-                onClick={() => {
-                  setSearchInput('');
-                  setSearchTerm('');
-                }}
-                title="Limpiar búsqueda"
-              >
-                ✕
-              </button>
-            )}
+      <div className="admin-page">
+        {/* Navbar */}
+        <nav className="admin-navbar">
+          <div className="container navbar-content">
+            {/* ...navbar content aquí... */}
           </div>
-          
-          <div className="filters">
-            <select 
-              className="filter-select"
-              value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-            >
+        </nav>
+        <div className="container admin-container">
+          <h1 className="admin-title">Gestión de Usuarios</h1>
+          <form onSubmit={handleSearch} className="admin-search-form">
+            <UserFilters
+              searchInput={searchInput}
+              setSearchInput={setSearchInput}
+              filters={filters}
+              setFilters={setFilters}
+              roles={roles}
+              statuses={statuses}
+            />
+            <button type="submit" className="search-btn">Buscar</button>
+          </form>
+          <UserTable
+            users={users}
+            onToggleStatus={handleToggleUserStatus}
+            onDelete={handleDeleteUser}
+            onChangeRole={handleChangeRole}
+            updatingUserId={updatingUserId}
+            deletingUserId={deletingUserId}
+          />
+          <UserPagination
+            pagination={pagination}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+          {error && <div className="alert alert-error">{error}</div>}
+          {successMessage && <div className="alert alert-success">{successMessage}</div>}
+          {/* Estadísticas y otros bloques aquí si es necesario */}
               <option value="">Todos los estados</option>
               <option value="ACTIVE">Activos</option>
               <option value="INACTIVE">Inactivos</option>

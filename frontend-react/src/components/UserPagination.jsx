@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default function UserPagination({ pagination, currentPage, onPageChange }) {
   if (!pagination || pagination.totalPages <= 1) return null;
@@ -24,3 +25,9 @@ export default function UserPagination({ pagination, currentPage, onPageChange }
     </div>
   );
 }
+ 
+UserPagination.propTypes = {
+  pagination: PropTypes.object.isRequired,
+  currentPage: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+};

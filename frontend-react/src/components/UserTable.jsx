@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default function UserTable({ users, onToggleStatus, onDelete, onChangeRole, updatingUserId, deletingUserId }) {
   return (
@@ -67,3 +68,12 @@ export default function UserTable({ users, onToggleStatus, onDelete, onChangeRol
     </div>
   );
 }
+ 
+UserTable.propTypes = {
+  users: PropTypes.array.isRequired,
+  onToggleStatus: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onChangeRole: PropTypes.func.isRequired,
+  updatingUserId: PropTypes.string,
+  deletingUserId: PropTypes.string,
+};
