@@ -173,8 +173,10 @@ export default function Weather() {
       // Immediately add to the list at the beginning (most recent first)
       setSavedSearches(prevSearches => [savedWeather, ...prevSearches])
       
-      // Also reload from server in background to ensure sync
-      loadSavedSearches()
+      // Wait a bit before reloading to allow backend cache to invalidate
+      setTimeout(() => {
+        loadSavedSearches()
+      }, 1000)
       
       // Clear the search query after successful search
       setSearchQuery('')
