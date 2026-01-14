@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { weatherService } from '../services/weatherService'
+import { API_KEYS, API_ENDPOINTS } from '../config/apiKeys'
 import '../styles/Weather.css'
 
 export default function Weather() {
@@ -38,13 +39,13 @@ export default function Weather() {
 
     try {
       // Use OpenWeatherMap API (free tier)
-      const API_KEY = 'YOUR_API_KEY' // You'll need to get this from openweathermap.org
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${searchQuery}&units=metric&appid=${API_KEY}`
+        `${API_ENDPOINTS.WEATHER}/weather?q=${encodeURIComponent(searchQuery)}&units=metric&appid=${API_KEYS.WEATHER}`
       )
       
       if (!response.ok) {
-        throw new Error('City not found')
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'City not found')
       }
 
       const data = await response.json()

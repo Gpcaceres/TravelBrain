@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { destinationService } from '../services/destinationService'
+import { API_KEYS, API_ENDPOINTS } from '../config/apiKeys'
 import '../styles/Destinations.css'
 
 export default function Destinations() {
@@ -13,6 +14,13 @@ export default function Destinations() {
   const [editingDestination, setEditingDestination] = useState(null)
   const [message, setMessage] = useState({ type: '', text: '' })
   const [searchTerm, setSearchTerm] = useState('')
+  const [placeSearchQuery, setPlaceSearchQuery] = useState('')
+  const [placeSearchResults, setPlaceSearchResults] = useState([])
+  const [searchingPlaces, setSearchingPlaces] = useState(false)
+  const [selectedOrigin, setSelectedOrigin] = useState(null)
+  const [selectedDestination, setSelectedDestination] = useState(null)
+  const [distanceInfo, setDistanceInfo] = useState(null)
+  const [calculatingDistance, setCalculatingDistance] = useState(false)
   
   const [formData, setFormData] = useState({
     name: '',
@@ -37,6 +45,136 @@ export default function Destinations() {
       setMessage({ type: 'error', text: 'Failed to load destinations' })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const searchPlaces = async () => {
+    if (!placeSearchQuery.trim()) return
+
+    setSearchingPlaces(true)
+    try {
+      // Use Google Places Text Search API
+      const response = await fetch(
+        `${API_ENDPOINTS.GOOGLE_PLACES}/textsearch/json?query=${encodeURIComponent(placeSearchQuery)}&key=${API_KEYS.GOOGLE_MAPS}`,
+        { mode: 'cors' }
+      )
+      
+      if (!response.ok) throw new Error('Failed to search places')
+      
+      const data = await response.json()
+      setPlaceSearchResults(data.results?.slice(0, 5) || [])
+    } catch (error) {
+      console.error('Error searching places:', error)
+      setMessage({ type: 'error', text: 'Failed to search places. Using geocoding fallback...' })
+      
+      // Fallback to OpenStreetMap Nominatim (free alternative)
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeSearchQuery)}&limit=5`
+        )
+        const data = await response.json()
+        const results = data.map(item => ({
+          name: item.display_name,
+          formatted_address: item.display_name,
+          geometry: {
+            location: {
+              lat: parseFloat(item.lat),
+              lng: parseFloat(item.lon)
+            }
+          },
+          place_id: item.place_id
+        }))
+        setPlaceSearchResults(results)
+      } catch (fallbackError) {
+        console.error('Fallback search failed:', fallbackError)
+      }
+    } finally {
+      setSearchingPlaces(false)
+    }
+  }
+
+  const selectPlace = (place) => {
+    setFormData({
+      ...formData,
+      name: place.name || place.formatted_address.split(',')[0],
+      country: place.formatted_address.split(',').slice(-1)[0].trim(),
+      lat: place.geometry.location.lat,
+      lng: place.geometry.location.lng
+    })
+    setPlaceSearchResults([])
+    setPlaceSearchQuery('')
+  }
+
+  const calculateDistance = async () => {
+    if (!selectedOrigin || !selectedDestination) {
+      setMessage({ type: 'error', text: 'Please select both origin and destination' })
+      return
+    }
+
+    setCalculatingDistance(true)
+    try {
+      const origin = `${selectedOrigin.lat},${selectedOrigin.lng}`
+      const destination = `${selectedDestination.lat},${selectedDestination.lng}`
+      
+      // Try Google Distance Matrix API first
+      try {
+        const response = await fetch(
+          `${API_ENDPOINTS.GOOGLE_DISTANCE}/json?origins=${origin}&destinations=${destination}&key=${API_KEYS.GOOGLE_MAPS}`,
+          { mode: 'cors' }
+        )
+        
+        if (response.ok) {
+          const data = await response.json()
+          const result = data.rows[0]?.elements[0]
+          
+          if (result?.status === 'OK') {
+            setDistanceInfo({
+              distance: result.distance.text,
+              duration: result.duration.text,
+              origin: selectedOrigin.name,
+              destination: selectedDestination.name
+            })
+            setCalculatingDistance(false)
+            return
+          }
+        }
+      } catch (error) {
+        console.log('Google API failed, using Haversine formula')
+      }
+
+      // Fallback: Calculate using Haversine formula
+      const R = 6371 // Earth radius in km
+      const dLat = (selectedDestination.lat - selectedOrigin.lat) * Math.PI / 180
+      const dLon = (selectedDestination.lng - selectedOrigin.lng) * Math.PI / 180
+      const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(selectedOrigin.lat * Math.PI / 180) * Math.cos(selectedDestination.lat * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2)
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+      const distance = R * c
+
+      // Estimate travel time (assuming average speed of 60 km/h)
+      const hours = Math.floor(distance / 60)
+      const minutes = Math.round((distance / 60 - hours) * 60)
+
+      setDistanceInfo({
+        distance: `${distance.toFixed(2)} km`,
+        duration: `${hours}h ${minutes}m (estimated)`,
+        origin: selectedOrigin.name,
+        destination: selectedDestination.name
+      })
+    } catch (error) {
+      console.error('Error calculating distance:', error)
+      setMessage({ type: 'error', text: 'Failed to calculate distance' })
+    } finally {
+      setCalculatingDistance(false)
     }
   }
 
@@ -167,6 +305,113 @@ export default function Destinations() {
           </button>
         </div>
 
+        {/* Distance Calculator */}
+        <section className="distance-calculator">
+          <h2 className="calculator-title">
+            <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 0a8 8 0 110 16A8 8 0 018 0zM1.5 8a6.5 6.5 0 1013 0 6.5 6.5 0 00-13 0z"/>
+              <path d="M8 3.5a.5.5 0 01.5.5v4a.5.5 0 01-.5.5H6a.5.5 0 010-1h1.5V4a.5.5 0 01.5-.5z"/>
+            </svg>
+            Calculate Distance Between Destinations
+          </h2>
+          
+          <div className="calculator-grid">
+            <div className="calculator-select">
+              <label>Origin</label>
+              <select
+                value={selectedOrigin?.id || ''}
+                onChange={(e) => {
+                  const dest = destinations.find(d => d._id === e.target.value)
+                  setSelectedOrigin(dest ? { id: dest._id, name: dest.name, lat: dest.lat, lng: dest.lng } : null)
+                }}
+              >
+                <option value="">Select origin...</option>
+                {destinations.map(dest => (
+                  <option key={dest._id} value={dest._id}>{dest.name}, {dest.country}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="calculator-icon">
+              <svg width="32" height="32" viewBox="0 0 16 16" fill="currentColor">
+                <path fillRule="evenodd" d="M1 8a.5.5 0 01.5-.5h11.793l-3.147-3.146a.5.5 0 01.708-.708l4 4a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708L13.293 8.5H1.5A.5.5 0 011 8z"/>
+              </svg>
+            </div>
+
+            <div className="calculator-select">
+              <label>Destination</label>
+              <select
+                value={selectedDestination?.id || ''}
+                onChange={(e) => {
+                  const dest = destinations.find(d => d._id === e.target.value)
+                  setSelectedDestination(dest ? { id: dest._id, name: dest.name, lat: dest.lat, lng: dest.lng } : null)
+                }}
+              >
+                <option value="">Select destination...</option>
+                {destinations.map(dest => (
+                  <option key={dest._id} value={dest._id}>{dest.name}, {dest.country}</option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              className="btn-calculate"
+              onClick={calculateDistance}
+              disabled={!selectedOrigin || !selectedDestination || calculatingDistance}
+            >
+              {calculatingDistance ? (
+                <>
+                  <div className="spinner-small"></div>
+                  Calculating...
+                </>
+              ) : (
+                <>
+                  <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 15A7 7 0 118 1a7 7 0 010 14zm0 1A8 8 0 108 0a8 8 0 000 16z"/>
+                    <path d="M5.255 5.786a.237.237 0 00.241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 00.25.246h.811a.25.25 0 00.25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                  </svg>
+                  Calculate Distance
+                </>
+              )}
+            </button>
+          </div>
+
+          {distanceInfo && (
+            <div className="distance-result">
+              <div className="result-content">
+                <div className="result-route">
+                  <span className="route-point">{distanceInfo.origin}</span>
+                  <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                    <path fillRule="evenodd" d="M1 8a.5.5 0 01.5-.5h11.793l-3.147-3.146a.5.5 0 01.708-.708l4 4a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708L13.293 8.5H1.5A.5.5 0 011 8z"/>
+                  </svg>
+                  <span className="route-point">{distanceInfo.destination}</span>
+                </div>
+                <div className="result-stats">
+                  <div className="result-stat">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8 16s6-5.686 6-10A6 6 0 002 6c0 4.314 6 10 6 10zm0-7a3 3 0 110-6 3 3 0 010 6z"/>
+                    </svg>
+                    <div>
+                      <p className="stat-label">Distance</p>
+                      <p className="stat-value">{distanceInfo.distance}</p>
+                    </div>
+                  </div>
+                  <div className="result-stat">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8 3.5a.5.5 0 01.5.5v4a.5.5 0 01-.5.5H6a.5.5 0 010-1h1.5V4a.5.5 0 01.5-.5z"/>
+                      <path d="M8 16A8 8 0 108 0a8 8 0 000 16zm0-1A7 7 0 108 1a7 7 0 000 14z"/>
+                    </svg>
+                    <div>
+                      <p className="stat-label">Travel Time</p>
+                      <p className="stat-value">{distanceInfo.duration}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+
         {/* Search Bar */}
         <div className="search-bar">
           <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
@@ -275,6 +520,55 @@ export default function Destinations() {
             </div>
 
             <form onSubmit={handleSubmit} className="modal-form">
+              {/* Place Search */}
+              <div className="place-search-section">
+                <label>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.1zM12 6.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z"/>
+                  </svg>
+                  Search Places (Google Maps / OpenStreetMap)
+                </label>
+                <div className="place-search-input">
+                  <input
+                    type="text"
+                    value={placeSearchQuery}
+                    onChange={(e) => setPlaceSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), searchPlaces())}
+                    placeholder="Search for a place (e.g., Eiffel Tower, Tokyo Tower)"
+                  />
+                  <button
+                    type="button"
+                    className="search-places-btn"
+                    onClick={searchPlaces}
+                    disabled={searchingPlaces}
+                  >
+                    {searchingPlaces ? 'Searching...' : 'Search'}
+                  </button>
+                </div>
+                
+                {placeSearchResults.length > 0 && (
+                  <div className="place-results">
+                    {placeSearchResults.map((place, index) => (
+                      <button
+                        key={place.place_id || index}
+                        type="button"
+                        className="place-result-item"
+                        onClick={() => selectPlace(place)}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M8 16s6-5.686 6-10A6 6 0 002 6c0 4.314 6 10 6 10zm0-7a3 3 0 110-6 3 3 0 010 6z"/>
+                        </svg>
+                        {place.name || place.formatted_address}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="form-divider">
+                <span>Or enter manually</span>
+              </div>
+
               <div className="form-group">
                 <label htmlFor="name">Destination Name *</label>
                 <input
