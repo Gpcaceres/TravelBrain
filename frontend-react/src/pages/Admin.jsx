@@ -140,23 +140,24 @@ function Admin() {
     } finally {
       setUpdatingUserId(null);
     }
-    // Eliminar usuario
-    const handleDeleteUser = async (userId) => {
-      if (!window.confirm('¿Seguro que deseas eliminar este usuario?')) return;
-      setDeletingUserId(userId);
-      try {
-        const response = await api.delete(`/users/${userId}`);
-        setSuccessMessage(response.data.message || 'Usuario eliminado');
-        setTimeout(() => setSuccessMessage(''), 3000);
-        fetchData();
-      } catch (err) {
-        console.error('Error al eliminar usuario:', err);
-        setError(err.response?.data?.message || 'Error al eliminar usuario');
-        setTimeout(() => setError(''), 3000);
-      } finally {
-        setDeletingUserId(null);
-      }
-    };
+  };
+
+  // Eliminar usuario
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('¿Seguro que deseas eliminar este usuario?')) return;
+    setDeletingUserId(userId);
+    try {
+      const response = await api.delete(`/users/${userId}`);
+      setSuccessMessage(response.data.message || 'Usuario eliminado');
+      setTimeout(() => setSuccessMessage(''), 3000);
+      fetchData();
+    } catch (err) {
+      console.error('Error al eliminar usuario:', err);
+      setError(err.response?.data?.message || 'Error al eliminar usuario');
+      setTimeout(() => setError(''), 3000);
+    } finally {
+      setDeletingUserId(null);
+    }
   };
 
   const handleToggleUserStatus = async (userId, currentStatus) => {
