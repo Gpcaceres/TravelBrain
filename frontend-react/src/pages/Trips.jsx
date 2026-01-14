@@ -149,7 +149,7 @@ export default function Trips() {
       <nav className="trips-navbar">
         <div className="container navbar-content">
           <Link to="/dashboard" className="back-link">
-            ← Back to Dashboard
+            ← Back
           </Link>
           
           <div className="navbar-right">

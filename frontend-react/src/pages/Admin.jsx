@@ -158,7 +158,10 @@ function Admin() {
   return (
     <div className="admin-container">
       <div className="admin-header">
-        <h1>Panel de Administración</h1>
+        <div className="admin-header-left">
+          <img src="/assets/images/logo.png" alt="TravelBrain" className="admin-logo" />
+          <h1>Panel de Administración</h1>
+        </div>
         <button className="btn-back" onClick={() => navigate('/dashboard')}>
           Volver al Dashboard
         </button>

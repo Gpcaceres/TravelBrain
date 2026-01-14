@@ -19,6 +19,18 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
+.admin-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.admin-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
 .admin-header h1 {
   color: #47F59A;
   font-size: 2rem;
