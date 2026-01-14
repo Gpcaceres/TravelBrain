@@ -297,7 +297,6 @@ export default function Destinations() {
     } finally {
       setSearchingPlaces(false)
     }
-    })
   }
 
   const handleLogout = () => {
