@@ -14,6 +14,7 @@ export default function Weather() {
   const [error, setError] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [savedSearches, setSavedSearches] = useState([])
+  const [loadingSearches, setLoadingSearches] = useState(true)
   const [showMenu, setShowMenu] = useState(false)
   const [message, setMessage] = useState({ type: '', text: '' })
   const [suggestions, setSuggestions] = useState([])
@@ -58,6 +59,7 @@ export default function Weather() {
 
   const loadSavedSearches = async () => {
     try {
+      setLoadingSearches(true)
       console.log('Loading saved searches...')
       const searches = await weatherService.getAllWeatherSearches()
       console.log('Loaded searches:', searches)
@@ -70,6 +72,8 @@ export default function Weather() {
       console.error('Error loading saved searches:', error)
       console.error('Error details:', error.response?.data || error.message)
       setSavedSearches([])
+    } finally {
+      setLoadingSearches(false)
     }
   }
 
@@ -448,7 +452,12 @@ export default function Weather() {
         <section className="saved-searches">
           <h2 className="section-title">Recent Searches</h2>
           
-          {savedSearches.length === 0 ? (
+          {loadingSearches ? (
+            <div className="empty-state">
+              <div className="spinner-large"></div>
+              <p>Loading searches...</p>
+            </div>
+          ) : savedSearches.length === 0 ? (
             <div className="empty-state">
               <svg width="64" height="64" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M8 15A7 7 0 118 1a7 7 0 010 14zm0 1A8 8 0 108 0a8 8 0 000 16z"/>
