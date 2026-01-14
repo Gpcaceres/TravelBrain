@@ -8,6 +8,7 @@ function Admin() {
   const { getUser, logout } = useAuth();
   const [user, setUser] = useState(getUser());
   const [users, setUsers] = useState([]);
+  const [updatingUserId, setUpdatingUserId] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -109,6 +110,7 @@ function Admin() {
   };
 
   const handleActivateUser = async (userId) => {
+    setUpdatingUserId(userId);
     try {
       const response = await api.patch(`/users/${userId}/activate`);
       setSuccessMessage(response.data.message);
@@ -118,10 +120,13 @@ function Admin() {
       console.error('Error al activar usuario:', err);
       setError(err.response?.data?.message || 'Error al activar usuario');
       setTimeout(() => setError(''), 3000);
+    } finally {
+      setUpdatingUserId(null);
     }
   };
 
   const handleDeactivateUser = async (userId) => {
+    setUpdatingUserId(userId);
     try {
       const response = await api.patch(`/users/${userId}/deactivate`);
       setSuccessMessage(response.data.message);
@@ -131,7 +136,26 @@ function Admin() {
       console.error('Error al desactivar usuario:', err);
       setError(err.response?.data?.message || 'Error al desactivar usuario');
       setTimeout(() => setError(''), 3000);
+    } finally {
+      setUpdatingUserId(null);
     }
+    // Eliminar usuario
+    const handleDeleteUser = async (userId) => {
+      if (!window.confirm('¿Seguro que deseas eliminar este usuario?')) return;
+      setUpdatingUserId(userId);
+      try {
+        const response = await api.delete(`/users/${userId}`);
+        setSuccessMessage(response.data.message || 'Usuario eliminado');
+        setTimeout(() => setSuccessMessage(''), 3000);
+        fetchData();
+      } catch (err) {
+        console.error('Error al eliminar usuario:', err);
+        setError(err.response?.data?.message || 'Error al eliminar usuario');
+        setTimeout(() => setError(''), 3000);
+      } finally {
+        setUpdatingUserId(null);
+      }
+    };
   };
 
   const handleToggleUserStatus = async (userId, currentStatus) => {
@@ -403,8 +427,13 @@ function Admin() {
                           type="checkbox"
                           checked={user.status === 'ACTIVE'}
                           onChange={() => handleToggleUserStatus(user._id, user.status)}
+                          disabled={updatingUserId === user._id}
                         />
-                        <span className="toggle-slider"></span>
+                        <span className="toggle-slider">
+                          {updatingUserId === user._id && (
+                            <span className="toggle-spinner"></span>
+                          )}
+                        </span>
                       </label>
                     </div>
                   </td>
@@ -418,10 +447,11 @@ function Admin() {
                     <div className="action-buttons">
                       <button
                         className="btn-delete"
-                        onClick={() => handleDeactivateUser(user._id)}
+                        onClick={() => handleDeleteUser(user._id)}
                         title="Quitar usuario"
+                        disabled={updatingUserId === user._id}
                       >
-                        Quitar
+                        {updatingUserId === user._id ? 'Eliminando...' : 'Quitar'}
                       </button>
                     </div>
                   </td>
