@@ -165,9 +165,16 @@ export default function Weather() {
 
       setWeatherData(weatherInfo)
       
-      // Save to database and reload recent searches
-      await weatherService.createWeatherSearch(weatherInfo)
-      await loadSavedSearches() // This will update Recent Searches immediately
+      // Save to database
+      console.log('Saving weather search...')
+      const savedWeather = await weatherService.createWeatherSearch(weatherInfo)
+      console.log('Weather search saved:', savedWeather)
+      
+      // Immediately add to the list at the beginning (most recent first)
+      setSavedSearches(prevSearches => [savedWeather, ...prevSearches])
+      
+      // Also reload from server in background to ensure sync
+      loadSavedSearches()
       
       // Clear the search query after successful search
       setSearchQuery('')
