@@ -208,9 +208,9 @@ function Admin() {
                 onClick={() => setShowMenu(!showMenu)}
               >
                 <div className="user-avatar">
-                  {user?.firstName?.[0]}{user?.lastName?.[0]}
+                  {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
                 </div>
-                <span className="user-name">{user?.firstName}</span>
+                <span className="user-name">{user?.name || user?.username || 'User'}</span>
                 <span className={`dropdown-arrow ${showMenu ? 'rotated' : ''}`}>▼</span>
               </button>
 
@@ -219,10 +219,10 @@ function Admin() {
                   <div className="dropdown-header">
                     <div className="dropdown-user-info">
                       <div className="dropdown-avatar">
-                        {user?.firstName?.[0]}{user?.lastName?.[0]}
+                        {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
                       </div>
                       <div>
-                        <p className="dropdown-name">{user?.firstName} {user?.lastName}</p>
+                        <p className="dropdown-name">{user?.name || user?.username || 'User'}</p>
                         <p className="dropdown-email">{user?.email}</p>
                       </div>
                     </div>

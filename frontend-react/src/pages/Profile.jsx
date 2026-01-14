@@ -191,9 +191,9 @@ export default function Profile() {
                 onClick={() => setShowMenu(!showMenu)}
               >
                 <div className="user-avatar">
-                  {currentUser?.firstName?.[0]}{currentUser?.lastName?.[0]}
+                  {(currentUser?.name || currentUser?.username || 'U').substring(0, 2).toUpperCase()}
                 </div>
-                <span className="user-name">{currentUser?.firstName}</span>
+                <span className="user-name">{currentUser?.name || currentUser?.username || 'User'}</span>
                 <span className={`dropdown-arrow ${showMenu ? 'rotated' : ''}`}>▼</span>
               </button>
 
@@ -202,10 +202,10 @@ export default function Profile() {
                   <div className="dropdown-header">
                     <div className="dropdown-user-info">
                       <div className="dropdown-avatar">
-                        {currentUser?.firstName?.[0]}{currentUser?.lastName?.[0]}
+                        {(currentUser?.name || currentUser?.username || 'U').substring(0, 2).toUpperCase()}
                       </div>
                       <div>
-                        <p className="dropdown-name">{currentUser?.firstName} {currentUser?.lastName}</p>
+                        <p className="dropdown-name">{currentUser?.name || currentUser?.username || 'User'}</p>
                         <p className="dropdown-email">{currentUser?.email}</p>
                       </div>
                     </div>
