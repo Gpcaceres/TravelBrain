@@ -328,28 +328,21 @@
 
 .search-card-content {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto;
   grid-template-rows: auto auto auto;
   gap: 0.75rem 1rem;
   height: 100%;
   grid-template-areas:
-    "icon city delete"
-    "temp info info"
-    "date date date";
-}
-
-.search-grid-item.icon {
-  grid-area: icon;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    "city delete"
+    "temp info"
+    "date date";
 }
 
 .search-grid-item.city {
   grid-area: city;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .search-grid-item.delete {
@@ -363,7 +356,8 @@
   grid-area: temp;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
 }
 
 .search-grid-item.info {
@@ -374,6 +368,7 @@
   background: rgba(0, 0, 0, 0.3);
   padding: 0.75rem;
   border-radius: 8px;
+  max-width: 200px;
 }
 
 .search-grid-item.date {

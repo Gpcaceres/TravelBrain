@@ -259,10 +259,6 @@ export default function Weather() {
               {savedSearches.map((search) => (
                 <div key={search._id} className="search-card">
                   <div className="search-card-content">
-                    <div className="search-grid-item icon">
-                      <span className="search-icon">{getWeatherIcon(search.condition)}</span>
-                    </div>
-                    
                     <div className="search-grid-item city">
                       <h3 className="search-city">{search.label}</h3>
                     </div>
@@ -284,6 +280,7 @@ export default function Weather() {
                     </div>
                     
                     <div className="search-grid-item temp">
+                      <span className="search-icon">{getWeatherIcon(search.condition)}</span>
                       <span className="search-temp">{search.temp}°C</span>
                     </div>
                     
