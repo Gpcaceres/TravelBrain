@@ -273,17 +273,33 @@ export default function Weather() {
                   </button>
                   
                   <div className="search-card-content">
-                    <div className="search-header-info">
+                    <div className="search-grid-item city">
                       <h3 className="search-city">{search.label}</h3>
+                    </div>
+                    
+                    <div className="search-grid-item condition">
                       <p className="search-condition-small">{search.condition}</p>
                     </div>
                     
-                    <div className="search-main">
+                    <div className="search-grid-item date">
+                      <p className="search-date">
+                        {new Date(search.createdAt).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                    
+                    <div className="search-grid-item icon">
                       <span className="search-icon">{getWeatherIcon(search.condition)}</span>
+                    </div>
+                    
+                    <div className="search-grid-item temp">
                       <span className="search-temp">{search.temp}°C</span>
                     </div>
                     
-                    <div className="search-info">
+                    <div className="search-grid-item info">
                       <div className="search-info-item">
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
                           <path d="M8.5 8.5a.5.5 0 00-1 0v5.793L6.354 13.146a.5.5 0 10-.708.708l2 2a.5.5 0 00.708 0l2-2a.5.5 0 00-.708-.708L8.5 14.293V8.5z"/>
@@ -298,14 +314,6 @@ export default function Weather() {
                         <span>{Number(search.windSpeed).toFixed(2)} m/s</span>
                       </div>
                     </div>
-                    
-                    <p className="search-date">
-                      {new Date(search.createdAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
-                    </p>
                   </div>
                 </div>
               ))}

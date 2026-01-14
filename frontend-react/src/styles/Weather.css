@@ -327,18 +327,51 @@
 }
 
 .search-card-content {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto auto;
   gap: 0.75rem;
   height: 100%;
+  grid-template-areas:
+    "city city city"
+    "icon temp temp"
+    "info info info";
 }
 
-.search-header-info {
+.search-grid-item.city {
+  grid-area: city;
+  text-align: left;
+}
+
+.search-grid-item.condition {
+  grid-area: condition;
+  text-align: center;
+}
+
+.search-grid-item.date {
+  grid-area: date;
+  text-align: right;
+}
+
+.search-grid-item.icon {
+  grid-area: icon;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-grid-item.temp {
+  grid-area: temp;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.search-grid-item.info {
+  grid-area: info;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  align-items: center;
-  text-align: center;
+  gap: 0.4rem;
 }
 
 .search-city {
@@ -356,14 +389,6 @@
   margin: 0;
 }
 
-.search-main {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin: 0.5rem 0;
-}
-
 .search-icon {
   font-size: 2.5rem;
   flex-shrink: 0;
@@ -377,13 +402,6 @@
   margin: 0;
   line-height: 1;
   flex-shrink: 0;
-}
-
-.search-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  align-items: center;
 }
 
 .search-info-item {
