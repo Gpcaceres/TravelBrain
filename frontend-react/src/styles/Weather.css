@@ -127,6 +127,11 @@
   justify-content: center;
   width: 20px;
   height: 20px;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  top: auto !important;
+  pointer-events: auto;
 }
 
 .weather-search-input {
