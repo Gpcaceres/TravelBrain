@@ -258,10 +258,11 @@ function Admin() {
                   <div className="dropdown-header">
                     <div className="dropdown-user-info">
                       <div className="admin-page">
-                        <nav className="weather-navbar">{/* ...navbar... */}</nav>
+                        <nav className="admin-navbar">
+                          {/* ...navbar content aquí... */}
+                        </nav>
                         <div className="container admin-container">
                           <h1 className="admin-title">Gestión de Usuarios</h1>
-                          {/* Filtros y búsqueda */}
                           <UserFilters
                             searchInput={searchInput}
                             setSearchInput={setSearchInput}
@@ -270,7 +271,6 @@ function Admin() {
                             roles={roles}
                             statuses={statuses}
                           />
-                          {/* Tabla de usuarios */}
                           <UserTable
                             users={users}
                             onToggleStatus={handleToggleUserStatus}
@@ -279,7 +279,6 @@ function Admin() {
                             updatingUserId={updatingUserId}
                             deletingUserId={deletingUserId}
                           />
-                          {/* Paginación */}
                           <UserPagination
                             pagination={pagination}
                             currentPage={currentPage}
