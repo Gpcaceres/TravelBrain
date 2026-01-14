@@ -527,14 +527,27 @@
 
 .calculator-select select {
   width: 100%;
-  background: rgba(30, 58, 138, 0.3);
-  border: 1px solid rgba(71, 245, 154, 0.2);
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(71, 245, 154, 0.3);
   border-radius: 8px;
   padding: 0.75rem;
   color: white;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+.calculator-select select option {
+  background: #1e293b;
+  color: white;
+  padding: 0.5rem;
+}
+
+.calculator-select select option:hover,
+.calculator-select select option:focus,
+.calculator-select select option:checked {
+  background: #47F59A;
+  color: #0f172a;
 }
 
 .calculator-select select:focus {
