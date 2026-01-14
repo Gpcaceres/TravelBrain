@@ -65,14 +65,28 @@ export default function Destinations() {
     if (mapInstanceRef.current) return
     
     const L = window.L
-    const map = L.map(mapRef.current).setView([20, 0], 2)
+    if (!L || !mapRef.current) return
     
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 19
-    }).addTo(map)
-    
-    mapInstanceRef.current = map
+    // Wait for container to be visible
+    setTimeout(() => {
+      try {
+        const map = L.map(mapRef.current).setView([20, 0], 2)
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors',
+          maxZoom: 19
+        }).addTo(map)
+        
+        mapInstanceRef.current = map
+        
+        // Force resize
+        setTimeout(() => {
+          if (map) map.invalidateSize()
+        }, 100)
+      } catch (error) {
+        console.error('Error initializing map:', error)
+      }
+    }, 100)
   }
   
   useEffect(() => {
@@ -83,9 +97,24 @@ export default function Destinations() {
   
   const updateMapRoute = () => {
     const L = window.L
-    const map = mapInstanceRef.current
+    if (!L) {
+      console.warn('Leaflet not loaded yet')
+      return
+    }
     
-    if (!L || !map) return
+    // Initialize map if not exists
+    if (!mapInstanceRef.current && mapRef.current) {
+      initializeMap()
+      // Retry after initialization
+      setTimeout(() => updateMapRoute(), 500)
+      return
+    }
+    
+    const map = mapInstanceRef.current
+    if (!map) return
+    
+    // Force resize to ensure map is visible
+    map.invalidateSize()
     
     // Clear previous markers and route
     markersRef.current.forEach(marker => map.removeLayer(marker))

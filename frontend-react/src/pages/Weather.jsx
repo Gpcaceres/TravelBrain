@@ -66,7 +66,7 @@ export default function Weather() {
         temp: Math.round(data.current.temp_c),
         condition: data.current.condition.text,
         humidity: data.current.humidity,
-        windSpeed: data.current.wind_kph / 3.6, // Convert kph to m/s
+        windSpeed: Number((data.current.wind_kph / 3.6).toFixed(2)), // Convert kph to m/s and round to 2 decimals
         description: data.current.condition.text,
         icon: data.current.condition.icon
       }
@@ -180,7 +180,7 @@ export default function Weather() {
           <section className="current-weather">
             <div className="weather-card-main">
               <div className="weather-location">
-                <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M8 16s6-5.686 6-10A6 6 0 002 6c0 4.314 6 10 6 10zm0-7a3 3 0 110-6 3 3 0 010 6z"/>
                 </svg>
                 <h2>{weatherData.label}</h2>
@@ -191,41 +191,42 @@ export default function Weather() {
                   <span className="temp-icon">{getWeatherIcon(weatherData.condition)}</span>
                   <span className="temp-value">{weatherData.temp}°C</span>
                 </div>
+                
                 <p className="weather-condition">{weatherData.description}</p>
-              </div>
 
-              <div className="weather-details">
-                <div className="weather-detail-item">
-                  <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M8.5 8.5a.5.5 0 00-1 0v5.793L6.354 13.146a.5.5 0 10-.708.708l2 2a.5.5 0 00.708 0l2-2a.5.5 0 00-.708-.708L8.5 14.293V8.5z"/>
-                    <path d="M6.646 3.646a.5.5 0 01.708 0L8.5 4.793l1.146-1.147a.5.5 0 01.708.708l-1.5 1.5a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 010-.708z"/>
-                    <path d="M8 1a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 1zM3 7.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5z"/>
-                  </svg>
-                  <div>
-                    <p className="detail-label">Humidity</p>
-                    <p className="detail-value">{weatherData.humidity}%</p>
+                <div className="weather-details">
+                  <div className="weather-detail-item">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8.5 8.5a.5.5 0 00-1 0v5.793L6.354 13.146a.5.5 0 10-.708.708l2 2a.5.5 0 00.708 0l2-2a.5.5 0 00-.708-.708L8.5 14.293V8.5z"/>
+                      <path d="M6.646 3.646a.5.5 0 01.708 0L8.5 4.793l1.146-1.147a.5.5 0 01.708.708l-1.5 1.5a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 010-.708z"/>
+                      <path d="M8 1a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 1zM3 7.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5z"/>
+                    </svg>
+                    <div>
+                      <p className="detail-label">Humidity</p>
+                      <p className="detail-value">{weatherData.humidity}%</p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="weather-detail-item">
-                  <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M12.5 2A2.5 2.5 0 0010 4.5a.5.5 0 001 0 1.5 1.5 0 113 0c0 .474-.196.953-.667 1.424a4.488 4.488 0 01-.976.69 2.5 2.5 0 00-1.357 2.22V10.5a.5.5 0 001 0V9.165c.095-.04.19-.084.284-.132a5.5 5.5 0 001.216-.865c.653-.67 1-1.518 1-2.418A2.5 2.5 0 0012.5 2z"/>
-                    <path d="M8 0a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7A.5.5 0 018 0zM5.5 7.5a.5.5 0 000 1h5a.5.5 0 000-1h-5zM8 12a4 4 0 110-8 4 4 0 010 8z"/>
-                  </svg>
-                  <div>
-                    <p className="detail-label">Wind Speed</p>
-                    <p className="detail-value">{weatherData.windSpeed} m/s</p>
+                  <div className="weather-detail-item">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M12.5 2A2.5 2.5 0 0010 4.5a.5.5 0 001 0 1.5 1.5 0 113 0c0 .474-.196.953-.667 1.424a4.488 4.488 0 01-.976.69 2.5 2.5 0 00-1.357 2.22V10.5a.5.5 0 001 0V9.165c.095-.04.19-.084.284-.132a5.5 5.5 0 001.216-.865c.653-.67 1-1.518 1-2.418A2.5 2.5 0 0012.5 2z"/>
+                      <path d="M8 0a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7A.5.5 0 018 0zM5.5 7.5a.5.5 0 000 1h5a.5.5 0 000-1h-5zM8 12a4 4 0 110-8 4 4 0 010 8z"/>
+                    </svg>
+                    <div>
+                      <p className="detail-label">Wind Speed</p>
+                      <p className="detail-value">{Number(weatherData.windSpeed).toFixed(2)} m/s</p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="weather-detail-item">
-                  <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M8 3a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 3zm8 8a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zm-13 0a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5z"/>
-                    <path d="M5.5 5.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v5a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5v-5z"/>
-                  </svg>
-                  <div>
-                    <p className="detail-label">Condition</p>
-                    <p className="detail-value">{weatherData.condition}</p>
+                  <div className="weather-detail-item">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8 3a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 3zm8 8a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zm-13 0a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5z"/>
+                      <path d="M5.5 5.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v5a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5v-5z"/>
+                    </svg>
+                    <div>
+                      <p className="detail-label">Condition</p>
+                      <p className="detail-value">{weatherData.condition}</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -275,7 +276,7 @@ export default function Weather() {
                   
                   <div className="search-details">
                     <span>💧 {search.humidity}%</span>
-                    <span>💨 {search.windSpeed} m/s</span>
+                    <span>💨 {Number(search.windSpeed).toFixed(2)} m/s</span>
                   </div>
 
                   <p className="search-date">

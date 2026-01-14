@@ -780,7 +780,7 @@
 
 .route-map {
   width: 100%;
-  height: 400px;
+  height: 300px;
   background: #1a1a1a;
 }
 
@@ -914,7 +914,7 @@
   }
   
   .route-map {
-    height: 300px;
+    height: 250px;
   }
   
   .map-legend {
