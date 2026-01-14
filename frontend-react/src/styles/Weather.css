@@ -328,29 +328,14 @@
 
 .search-card-content {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: auto 1fr auto;
   grid-template-rows: auto auto auto;
-  gap: 0.75rem;
+  gap: 0.75rem 1rem;
   height: 100%;
   grid-template-areas:
-    "city city city"
-    "icon temp temp"
-    "info info info";
-}
-
-.search-grid-item.city {
-  grid-area: city;
-  text-align: left;
-}
-
-.search-grid-item.condition {
-  grid-area: condition;
-  text-align: center;
-}
-
-.search-grid-item.date {
-  grid-area: date;
-  text-align: right;
+    "icon city delete"
+    "temp info info"
+    "date date date";
 }
 
 .search-grid-item.icon {
@@ -360,11 +345,25 @@
   justify-content: center;
 }
 
+.search-grid-item.city {
+  grid-area: city;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-grid-item.delete {
+  grid-area: delete;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
 .search-grid-item.temp {
   grid-area: temp;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .search-grid-item.info {
@@ -372,6 +371,17 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.search-grid-item.date {
+  grid-area: date;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.5rem;
+  border-radius: 8px;
+  text-align: center;
 }
 
 .search-city {
@@ -383,10 +393,10 @@
 }
 
 .search-condition-small {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
   text-transform: capitalize;
-  margin: 0;
+  margin: 0 0 0.35rem 0;
 }
 
 .search-icon {
@@ -401,7 +411,11 @@
   color: #47F59A;
   margin: 0;
   line-height: 1;
-  flex-shrink: 0;
+}
+
+.search-details-row {
+  display: flex;
+  gap: 1rem;
 }
 
 .search-info-item {
@@ -420,11 +434,32 @@
 }
 
 .search-date {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin: auto 0 0 0;
-  text-align: center;
-  padding-top: 0.25rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  font-weight: 600;
+}
+
+.search-grid-item.delete .delete-btn {
+  position: static;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.search-grid-item.delete .delete-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  transform: scale(1.1);
 }
 
 .search-icon {
