@@ -178,13 +178,6 @@ export default function Destinations() {
     }
   }
 
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
-
   const openModal = (destination = null) => {
     if (destination) {
       setEditingDestination(destination)
