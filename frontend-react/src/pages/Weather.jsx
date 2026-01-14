@@ -174,10 +174,7 @@ export default function Weather() {
       const savedWeather = await weatherService.createWeatherSearch(weatherInfo)
       console.log('Weather search saved:', savedWeather)
       
-      // Immediately add to the list at the beginning (most recent first)
-      setSavedSearches(prevSearches => [savedWeather, ...prevSearches])
-      
-      // Wait a bit before reloading to allow backend cache to invalidate
+      // Esperar un poco y recargar desde el backend para evitar duplicados
       setTimeout(() => {
         loadSavedSearches()
       }, 1000)
