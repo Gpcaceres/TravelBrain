@@ -8,7 +8,7 @@ import '../styles/Destinations.css'
 export default function Destinations() {
   const { getUser, logout } = useAuth()
   const navigate = useNavigate()
-  const user = getUser()
+  const [user, setUser] = useState(getUser())
   const [destinations, setDestinations] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)

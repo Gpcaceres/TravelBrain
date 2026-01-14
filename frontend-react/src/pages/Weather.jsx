@@ -6,8 +6,9 @@ import { API_KEYS, API_ENDPOINTS } from '../config/apiKeys'
 import '../styles/Weather.css'
 
 export default function Weather() {
-  const { getUser } = useAuth()
-  const user = getUser()
+  const { getUser, logout } = useAuth()
+  const navigate = useNavigate()
+  const [user, setUser] = useState(getUser())
   const [weatherData, setWeatherData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')

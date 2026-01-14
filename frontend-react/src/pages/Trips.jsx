@@ -7,7 +7,7 @@ import '../styles/Trips.css'
 export default function Trips() {
   const { getUser, logout } = useAuth()
   const navigate = useNavigate()
-  const user = getUser()
+  const [user, setUser] = useState(getUser())
   const [trips, setTrips] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -42,8 +42,11 @@ export default function Trips() {
     try {
       setLoading(true)
       const allTrips = await tripService.getAllTrips()
-      const userTrips = allTrips.filter(trip => trip.userId === user._id)
-      setTrips(userTrips)
+      const currentUser = user || getUser()
+      if (currentUser && currentUser._id) {
+        const userTrips = allTrips.filter(trip => trip.userId === currentUser._id)
+        setTrips(userTrips)
+      }
     } catch (error) {
       console.error('Error loading trips:', error)
       setMessage({ type: 'error', text: 'Failed to load trips' })

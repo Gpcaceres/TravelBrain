@@ -6,7 +6,7 @@ import '../styles/Admin.css';
 
 function Admin() {
   const { getUser, logout } = useAuth();
-  const user = getUser();
+  const [user, setUser] = useState(getUser());
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
