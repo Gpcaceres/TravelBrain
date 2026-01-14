@@ -58,7 +58,11 @@ exports.createWeather = async (req, res) => {
 
     const savedWeather = await weather.save();
     console.log('Weather saved successfully:', savedWeather._id);
+    
+    // Invalidate all weather-related cache
     invalidateCache('/weathers');
+    invalidateCache('weathers'); // Also try without leading slash
+    
     res.status(201).json(savedWeather);
   } catch (error) {
     console.error('Error creating weather:', error);
@@ -94,7 +98,11 @@ exports.updateWeather = async (req, res) => {
 
     const updatedWeather = await weather.save();
     console.log('Weather updated successfully');
+    
+    // Invalidate all weather-related cache
     invalidateCache('/weathers');
+    invalidateCache('weathers'); // Also try without leading slash
+    
     res.json(updatedWeather);
   } catch (error) {
     console.error('Error updating weather:', error);
@@ -122,7 +130,11 @@ exports.deleteWeather = async (req, res) => {
 
     await weather.deleteOne();
     console.log('Weather deleted successfully');
+    
+    // Invalidate all weather-related cache
     invalidateCache('/weathers');
+    invalidateCache('weathers'); // Also try without leading slash
+    
     res.json({ message: 'Weather deleted successfully', deletedId: req.params.id });
   } catch (error) {
     console.error('Error deleting weather:', error);

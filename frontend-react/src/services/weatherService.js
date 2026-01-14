@@ -4,10 +4,13 @@ import { API_CONFIG } from '../config'
 export const weatherService = {
   // Get all weather searches (force fresh data)
   getAllWeatherSearches: async () => {
-    const response = await api.get(API_CONFIG.ENDPOINTS.WEATHERS, {
+    // Add timestamp to bypass cache
+    const timestamp = new Date().getTime()
+    const response = await api.get(`${API_CONFIG.ENDPOINTS.WEATHERS}?_t=${timestamp}`, {
       headers: {
         'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
     })
     return response.data
