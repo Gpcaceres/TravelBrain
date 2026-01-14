@@ -2,12 +2,12 @@
 
 .weather-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #0f172a 100%);
 }
 
 /* Navbar */
 .weather-navbar {
-  background: rgba(30, 58, 138, 0.15);
+  background: rgba(15, 23, 42, 0.5);
   backdrop-filter: blur(10px);
   padding: 1rem 0;
   border-bottom: 1px solid rgba(71, 245, 154, 0.1);
@@ -93,10 +93,10 @@
 .search-input-wrapper {
   display: flex;
   align-items: center;
-  background: rgba(30, 58, 138, 0.2);
-  border: 1px solid rgba(71, 245, 154, 0.2);
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(71, 245, 154, 0.3);
   border-radius: 12px;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   gap: 1rem;
   transition: all 0.3s ease;
 }
@@ -107,8 +107,8 @@
 }
 
 .search-icon {
-  margin-left: 1rem;
-  color: rgba(71, 245, 154, 0.6);
+  color: #47F59A;
+  flex-shrink: 0;
 }
 
 .weather-search-input {
@@ -173,9 +173,9 @@
 }
 
 .weather-card-main {
-  background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(15, 23, 42, 0.3) 100%);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(26, 26, 26, 0.4) 100%);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(71, 245, 154, 0.2);
+  border: 1px solid rgba(71, 245, 154, 0.3);
   border-radius: 20px;
   padding: 3rem;
   max-width: 600px;
@@ -284,7 +284,7 @@
 }
 
 .search-card {
-  background: rgba(30, 58, 138, 0.2);
+  background: rgba(15, 23, 42, 0.5);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(71, 245, 154, 0.2);
   border-radius: 15px;
@@ -297,7 +297,7 @@
   transform: translateY(-8px);
   box-shadow: 0 15px 40px rgba(71, 245, 154, 0.25);
   border-color: #47F59A;
-  background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(71, 245, 154, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(71, 245, 154, 0.05) 100%);
 }
 
 .search-card-header {

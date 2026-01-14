@@ -38,29 +38,37 @@ export default function Weather() {
     setError('')
 
     try {
-      // Use OpenWeatherMap API (free tier)
+      // Check if API key is configured
+      if (!API_KEYS.WEATHER || API_KEYS.WEATHER === 'demo_key') {
+        throw new Error('Weather API key not configured. Please contact administrator.')
+      }
+
+      // Use WeatherAPI.com (Free tier: 1M calls/month)
       const response = await fetch(
-        `${API_ENDPOINTS.WEATHER}/weather?q=${encodeURIComponent(searchQuery)}&units=metric&appid=${API_KEYS.WEATHER}`
+        `${API_ENDPOINTS.WEATHER}/current.json?key=${API_KEYS.WEATHER}&q=${encodeURIComponent(searchQuery)}&aqi=no`
       )
       
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'City not found')
+        const errorData = await response.json().catch(() => ({}))
+        if (response.status === 401 || response.status === 403) {
+          throw new Error('Invalid API key. Please configure a valid WeatherAPI.com API key.')
+        }
+        throw new Error(errorData.error?.message || 'City not found')
       }
 
       const data = await response.json()
       
       const weatherInfo = {
         userId: user._id,
-        label: data.name,
-        lat: data.coord.lat,
-        lon: data.coord.lon,
-        temp: Math.round(data.main.temp),
-        condition: data.weather[0].main,
-        humidity: data.main.humidity,
-        windSpeed: data.wind.speed,
-        description: data.weather[0].description,
-        icon: data.weather[0].icon
+        label: data.location.name,
+        lat: data.location.lat,
+        lon: data.location.lon,
+        temp: Math.round(data.current.temp_c),
+        condition: data.current.condition.text,
+        humidity: data.current.humidity,
+        windSpeed: data.current.wind_kph / 3.6, // Convert kph to m/s
+        description: data.current.condition.text,
+        icon: data.current.condition.icon
       }
 
       setWeatherData(weatherInfo)
