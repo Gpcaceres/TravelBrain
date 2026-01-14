@@ -90,8 +90,31 @@ export default function Destinations() {
   }
   
   useEffect(() => {
-    if (distanceInfo && selectedOrigin && selectedDestination && mapInstanceRef.current) {
-      updateMapRoute()
+    // Only update map if we have all required data with valid coordinates
+    if (
+      distanceInfo && 
+      selectedOrigin && 
+      selectedDestination && 
+      selectedOrigin.lat !== undefined && 
+      selectedOrigin.lng !== undefined &&
+      selectedDestination.lat !== undefined &&
+      selectedDestination.lng !== undefined
+    ) {
+      // Wait for Leaflet to be loaded
+      if (typeof window.L !== 'undefined') {
+        // Wait a bit to ensure the container is rendered
+        setTimeout(() => {
+          if (mapRef.current) {
+            if (!mapInstanceRef.current) {
+              initializeMap()
+              // Wait for map initialization
+              setTimeout(() => updateMapRoute(), 600)
+            } else {
+              updateMapRoute()
+            }
+          }
+        }, 200)
+      }
     }
   }, [distanceInfo, selectedOrigin, selectedDestination])
   
@@ -102,68 +125,99 @@ export default function Destinations() {
       return
     }
     
-    // Initialize map if not exists
-    if (!mapInstanceRef.current && mapRef.current) {
-      initializeMap()
-      // Retry after initialization
-      setTimeout(() => updateMapRoute(), 500)
+    // Validate we have the map instance
+    const map = mapInstanceRef.current
+    if (!map) {
+      console.warn('Map instance not available')
       return
     }
     
-    const map = mapInstanceRef.current
-    if (!map) return
-    
-    // Force resize to ensure map is visible
-    map.invalidateSize()
-    
-    // Clear previous markers and route
-    markersRef.current.forEach(marker => map.removeLayer(marker))
-    if (routeLineRef.current) {
-      map.removeLayer(routeLineRef.current)
+    // Validate we have valid coordinates
+    if (!selectedOrigin || !selectedDestination || 
+        selectedOrigin.lat === undefined || selectedOrigin.lng === undefined ||
+        selectedDestination.lat === undefined || selectedDestination.lng === undefined) {
+      console.warn('Invalid coordinates for origin or destination')
+      return
     }
-    markersRef.current = []
     
-    // Add origin marker (green)
-    const originMarker = L.marker([selectedOrigin.lat, selectedOrigin.lng], {
-      icon: L.divIcon({
-        className: 'custom-marker',
-        html: `<div style="background: #47F59A; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span style="color: #1a1a1a; font-weight: bold; font-size: 18px;">A</span></div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
+    try {
+      // Force resize to ensure map is visible
+      map.invalidateSize()
+      
+      // Clear previous markers and route
+      markersRef.current.forEach(marker => {
+        try {
+          map.removeLayer(marker)
+        } catch (e) {
+          console.warn('Error removing marker:', e)
+        }
       })
-    }).addTo(map).bindPopup(`<b>Origin:</b> ${selectedOrigin.name}`)
-    
-    // Add destination marker (pink)
-    const destMarker = L.marker([selectedDestination.lat, selectedDestination.lng], {
-      icon: L.divIcon({
-        className: 'custom-marker',
-        html: `<div style="background: #F547A7; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span style="color: white; font-weight: bold; font-size: 18px;">B</span></div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
-      })
-    }).addTo(map).bindPopup(`<b>Destination:</b> ${selectedDestination.name}`)
-    
-    markersRef.current.push(originMarker, destMarker)
-    
-    // Draw route line
-    const routeLine = L.polyline(
-      [[selectedOrigin.lat, selectedOrigin.lng], [selectedDestination.lat, selectedDestination.lng]],
-      {
-        color: '#47F59A',
-        weight: 3,
-        opacity: 0.7,
-        dashArray: '10, 10'
+      if (routeLineRef.current) {
+        try {
+          map.removeLayer(routeLineRef.current)
+        } catch (e) {
+          console.warn('Error removing route:', e)
+        }
       }
-    ).addTo(map)
-    
-    routeLineRef.current = routeLine
-    
-    // Fit map to show both markers
-    const bounds = L.latLngBounds(
-      [selectedOrigin.lat, selectedOrigin.lng],
-      [selectedDestination.lat, selectedDestination.lng]
-    )
-    map.fitBounds(bounds, { padding: [50, 50] })
+      markersRef.current = []
+      
+      // Validate coordinates are numbers
+      const originLat = Number(selectedOrigin.lat)
+      const originLng = Number(selectedOrigin.lng)
+      const destLat = Number(selectedDestination.lat)
+      const destLng = Number(selectedDestination.lng)
+      
+      if (isNaN(originLat) || isNaN(originLng) || isNaN(destLat) || isNaN(destLng)) {
+        console.error('Invalid coordinate values')
+        return
+      }
+      
+      // Add origin marker (green)
+      const originMarker = L.marker([originLat, originLng], {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: `<div style="background: #47F59A; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span style="color: #1a1a1a; font-weight: bold; font-size: 18px;">A</span></div>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        })
+      }).addTo(map).bindPopup(`<b>Origin:</b> ${selectedOrigin.name}`)
+      
+      // Add destination marker (pink)
+      const destMarker = L.marker([destLat, destLng], {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: `<div style="background: #F547A7; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span style="color: white; font-weight: bold; font-size: 18px;">B</span></div>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        })
+      }).addTo(map).bindPopup(`<b>Destination:</b> ${selectedDestination.name}`)
+      
+      markersRef.current.push(originMarker, destMarker)
+      
+      // Draw route line
+      const routeLine = L.polyline(
+        [[originLat, originLng], [destLat, destLng]],
+        {
+          color: '#47F59A',
+          weight: 3,
+          opacity: 0.7,
+          dashArray: '10, 10'
+        }
+      ).addTo(map)
+      
+      routeLineRef.current = routeLine
+      
+      // Fit map to show both markers
+      const bounds = L.latLngBounds(
+        [originLat, originLng],
+        [destLat, destLng]
+      )
+      map.fitBounds(bounds, { padding: [50, 50] })
+      
+      console.log('Map route updated successfully')
+    } catch (error) {
+      console.error('Error updating map route:', error)
+    }
   }
 
   const loadDestinations = async () => {
