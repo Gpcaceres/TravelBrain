@@ -357,21 +357,24 @@
 .search-main {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 1rem;
   margin: 0.5rem 0;
 }
 
 .search-icon {
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   flex-shrink: 0;
+  line-height: 1;
 }
 
 .search-temp {
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #47F59A;
   margin: 0;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .search-info {
