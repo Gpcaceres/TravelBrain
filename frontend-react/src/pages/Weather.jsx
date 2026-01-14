@@ -15,6 +15,7 @@ export default function Weather() {
   const [searchQuery, setSearchQuery] = useState('')
   const [savedSearches, setSavedSearches] = useState([])
   const [showMenu, setShowMenu] = useState(false)
+  const [message, setMessage] = useState({ type: '', text: '' })
 
   useEffect(() => {
     loadSavedSearches()
