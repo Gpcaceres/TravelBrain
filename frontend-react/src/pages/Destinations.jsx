@@ -272,7 +272,7 @@ export default function Destinations() {
       <nav className="destinations-navbar">
         <div className="container navbar-content">
           <Link to="/dashboard" className="back-link">
-            ← Back to Dashboard
+            ← Back
           </Link>
           
           <div className="navbar-right">
