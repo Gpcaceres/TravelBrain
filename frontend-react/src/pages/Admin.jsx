@@ -35,17 +35,25 @@ function Admin() {
 
   // Debounce search input
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+      setCurrentPage(1);
+    }, 1000);
+
     // Close dropdown when clicking outside
     const handleClickOutside = (event) => {
       if (showMenu && !event.target.closest('.user-menu')) {
         setShowMenu(false);
       }
     };
+
     document.addEventListener('click', handleClickOutside);
+
     return () => {
+      clearTimeout(timer);
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [showMenu]);
+  }, [searchInput, showMenu]);
 
   useEffect(() => {
     fetchData();
@@ -108,13 +116,6 @@ function Admin() {
   };
 
   const handleActivateUser = async (userId) => {
-
-    // Solo buscar cuando se presiona el botón
-    const handleSearch = (e) => {
-      e.preventDefault();
-      setSearchTerm(searchInput);
-      setCurrentPage(1);
-    };
     setUpdatingUserId(userId);
     try {
       const response = await api.patch(`/users/${userId}/activate`);
@@ -227,55 +228,49 @@ function Admin() {
       {/* Navbar */}
       <nav className="admin-navbar">
         <div className="container navbar-content">
-          {/* Menú de usuario */}
-          <div className="user-menu" onClick={() => setShowMenu(!showMenu)}>
-            <div className="user-avatar">
-              {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
-            </div>
-            {showMenu && (
-              <div className="dropdown-menu">
-                <div>
-                  <p className="dropdown-name">{user?.name || user?.username || 'User'}</p>
-                  <p className="dropdown-email">{user?.email}</p>
-                </div>
-                <div className="dropdown-divider"></div>
-                <Link to="/profile" className="dropdown-item">Perfil</Link>
-                <button onClick={handleLogout} className="dropdown-item logout-item">Cerrar sesión</button>
-              </div>
-            )}
+          <div className="navbar-left">
+            <img src="/assets/images/logo.png" alt="Logo" className="navbar-logo" />
+            <span className="navbar-brand">TravelBrain</span>
           </div>
-        </div>
-      </nav>
-      <div className="container admin-container">
-        <h1 className="admin-title">Gestión de Usuarios</h1>
-        <form onSubmit={handleSearch} className="admin-search-form">
-          <UserFilters
-            searchInput={searchInput}
-            setSearchInput={setSearchInput}
-            filters={filters}
-            setFilters={setFilters}
-            roles={roles}
-            statuses={statuses}
-          />
-          <button type="submit" className="search-btn">Buscar</button>
-        </form>
-        <UserTable
-          users={users}
-          onToggleStatus={handleToggleUserStatus}
-          onDelete={handleDeleteUser}
-          onChangeRole={handleChangeRole}
-          updatingUserId={updatingUserId}
-          deletingUserId={deletingUserId}
-        />
-        <UserPagination
-          pagination={pagination}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-        />
-        {error && <div className="alert alert-error">{error}</div>}
-        {successMessage && <div className="alert alert-success">{successMessage}</div>}
-        {/* Estadísticas y otros bloques aquí si es necesario */}
-      </div>
+          
+          <div className="navbar-center">
+            <Link to="/dashboard" className="nav-link">Dashboard</Link>
+            <Link to="/trips" className="nav-link">My Trips</Link>
+            <Link to="/destinations" className="nav-link">Destinations</Link>
+            <Link to="/weather" className="nav-link">Weather</Link>
+          </div>
+
+          <div className="navbar-right">
+            <div className="user-menu">
+              <button 
+                className="user-menu-btn"
+                onClick={() => setShowMenu(!showMenu)}
+              >
+                <div className="user-avatar">
+                  {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
+                </div>
+                <span className="user-name">{user?.name || user?.username || 'User'}</span>
+                <span className={`dropdown-arrow ${showMenu ? 'rotated' : ''}`}>▼</span>
+              </button>
+              {showMenu && (
+                <div className="user-menu-dropdown">
+                  <div className="dropdown-header">
+                    <div className="dropdown-user-info">
+                      <div className="dropdown-avatar">
+                        {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="dropdown-name">{user?.name || user?.username || 'User'}</p>
+                        <p className="dropdown-email">{user?.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="dropdown-divider"></div>
+                  <Link to="/profile" className="dropdown-item">Perfil</Link>
+                  <button onClick={handleLogout} className="dropdown-item logout-item">Cerrar sesión</button>
+                </div>
+              )}
+            </div>
 
       {error && <div className="alert alert-error">{error}</div>}
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
@@ -303,42 +298,42 @@ function Admin() {
       )}
 
       {/* Tabla de Usuarios */}
-      <div className="admin-page">
-        {/* Navbar */}
-        <nav className="admin-navbar">
-          <div className="container navbar-content">
-            {/* ...navbar content aquí... */}
-          </div>
-        </nav>
-        <div className="container admin-container">
-          <h1 className="admin-title">Gestión de Usuarios</h1>
-          <form onSubmit={handleSearch} className="admin-search-form">
-            <UserFilters
-              searchInput={searchInput}
-              setSearchInput={setSearchInput}
-              filters={filters}
-              setFilters={setFilters}
-              roles={roles}
-              statuses={statuses}
+      <div className="users-section">
+        <h2>Gestión de Usuarios</h2>
+        
+        {/* Search and Filters */}
+        <div className="search-filter-container">
+          <div className="search-box">
+            <svg className="search-icon" width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.1zM12 6.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z"/>
+            </svg>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Buscar por email, nombre o username..."
+              value={searchInput}
+              onChange={handleSearch}
             />
-            <button type="submit" className="search-btn">Buscar</button>
-          </form>
-          <UserTable
-            users={users}
-            onToggleStatus={handleToggleUserStatus}
-            onDelete={handleDeleteUser}
-            onChangeRole={handleChangeRole}
-            updatingUserId={updatingUserId}
-            deletingUserId={deletingUserId}
-          />
-          <UserPagination
-            pagination={pagination}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-          />
-          {error && <div className="alert alert-error">{error}</div>}
-          {successMessage && <div className="alert alert-success">{successMessage}</div>}
-          {/* Estadísticas y otros bloques aquí si es necesario */}
+            {searchInput && (
+              <button 
+                className="clear-search-btn"
+                onClick={() => {
+                  setSearchInput('');
+                  setSearchTerm('');
+                }}
+                title="Limpiar búsqueda"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          
+          <div className="filters">
+            <select 
+              className="filter-select"
+              value={filters.status}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
+            >
               <option value="">Todos los estados</option>
               <option value="ACTIVE">Activos</option>
               <option value="INACTIVE">Inactivos</option>
