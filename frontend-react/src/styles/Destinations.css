@@ -525,6 +525,83 @@
   margin-bottom: 0.5rem;
 }
 
+.autocomplete-wrapper {
+  position: relative;
+}
+
+.autocomplete-input {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(71, 245, 154, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.autocomplete-input:focus {
+  outline: none;
+  border-color: #47F59A;
+  box-shadow: 0 0 0 3px rgba(71, 245, 154, 0.1);
+}
+
+.autocomplete-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.autocomplete-loading {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #47F59A;
+  font-size: 0.85rem;
+}
+
+.autocomplete-suggestions {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: #1e293b;
+  border: 1px solid rgba(71, 245, 154, 0.3);
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: 1000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.autocomplete-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(71, 245, 154, 0.1);
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover {
+  background: rgba(71, 245, 154, 0.1);
+  color: #47F59A;
+}
+
+.autocomplete-item svg {
+  color: #47F59A;
+  flex-shrink: 0;
+}
+
 .calculator-select select {
   width: 100%;
   background: rgba(15, 23, 42, 0.7);

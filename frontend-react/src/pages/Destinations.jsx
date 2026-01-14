@@ -21,10 +21,18 @@ export default function Destinations() {
   const [selectedDestination, setSelectedDestination] = useState(null)
   const [distanceInfo, setDistanceInfo] = useState(null)
   const [calculatingDistance, setCalculatingDistance] = useState(false)
+  const [originInput, setOriginInput] = useState('')
+  const [destinationInput, setDestinationInput] = useState('')
+  const [originSuggestions, setOriginSuggestions] = useState([])
+  const [destinationSuggestions, setDestinationSuggestions] = useState([])
+  const [searchingOrigin, setSearchingOrigin] = useState(false)
+  const [searchingDestination, setSearchingDestination] = useState(false)
   const mapRef = useRef(null)
   const mapInstanceRef = useRef(null)
   const markersRef = useRef([])
   const routeLineRef = useRef(null)
+  const originTimeoutRef = useRef(null)
+  const destinationTimeoutRef = useRef(null)
   
   const [formData, setFormData] = useState({
     name: '',
@@ -278,6 +286,126 @@ export default function Destinations() {
     }
   }
 
+  const searchOriginSuggestions = async (query) => {
+    if (!query.trim() || query.length < 3) {
+      setOriginSuggestions([])
+      return
+    }
+
+    setSearchingOrigin(true)
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`,
+        {
+          headers: {
+            'User-Agent': 'TravelBrain App'
+          }
+        }
+      )
+      
+      if (!response.ok) throw new Error('Failed to search places')
+      
+      const data = await response.json()
+      const results = data.map(item => ({
+        name: item.display_name,
+        lat: parseFloat(item.lat),
+        lng: parseFloat(item.lon),
+        place_id: item.place_id
+      }))
+      setOriginSuggestions(results)
+    } catch (error) {
+      console.error('Error searching origin:', error)
+    } finally {
+      setSearchingOrigin(false)
+    }
+  }
+
+  const searchDestinationSuggestions = async (query) => {
+    if (!query.trim() || query.length < 3) {
+      setDestinationSuggestions([])
+      return
+    }
+
+    setSearchingDestination(true)
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`,
+        {
+          headers: {
+            'User-Agent': 'TravelBrain App'
+          }
+        }
+      )
+      
+      if (!response.ok) throw new Error('Failed to search places')
+      
+      const data = await response.json()
+      const results = data.map(item => ({
+        name: item.display_name,
+        lat: parseFloat(item.lat),
+        lng: parseFloat(item.lon),
+        place_id: item.place_id
+      }))
+      setDestinationSuggestions(results)
+    } catch (error) {
+      console.error('Error searching destination:', error)
+    } finally {
+      setSearchingDestination(false)
+    }
+  }
+
+  const handleOriginInputChange = (e) => {
+    const value = e.target.value
+    setOriginInput(value)
+    
+    // Clear previous timeout
+    if (originTimeoutRef.current) {
+      clearTimeout(originTimeoutRef.current)
+    }
+    
+    // Set new timeout for debouncing
+    originTimeoutRef.current = setTimeout(() => {
+      searchOriginSuggestions(value)
+    }, 500)
+  }
+
+  const handleDestinationInputChange = (e) => {
+    const value = e.target.value
+    setDestinationInput(value)
+    
+    // Clear previous timeout
+    if (destinationTimeoutRef.current) {
+      clearTimeout(destinationTimeoutRef.current)
+    }
+    
+    // Set new timeout for debouncing
+    destinationTimeoutRef.current = setTimeout(() => {
+      searchDestinationSuggestions(value)
+    }, 500)
+  }
+
+  const selectOrigin = (suggestion) => {
+    setSelectedOrigin({
+      id: suggestion.place_id,
+      name: suggestion.name,
+      lat: suggestion.lat,
+      lng: suggestion.lng
+    })
+    setOriginInput(suggestion.name)
+    setOriginSuggestions([])
+  }
+
+  const selectDestinationPlace = (suggestion) => {
+    setSelectedDestination({
+      id: suggestion.place_id,
+      name: suggestion.name,
+      lat: suggestion.lat,
+      lng: suggestion.lng
+    })
+    setDestinationInput(suggestion.name)
+    setDestinationSuggestions([])
+  }
+
   const selectPlace = (place) => {
     setFormData({
       ...formData,
@@ -465,18 +593,34 @@ export default function Destinations() {
           <div className="calculator-grid">
             <div className="calculator-select">
               <label>Origin</label>
-              <select
-                value={selectedOrigin?.id || ''}
-                onChange={(e) => {
-                  const dest = destinations.find(d => d._id === e.target.value)
-                  setSelectedOrigin(dest ? { id: dest._id, name: dest.name, lat: dest.lat, lng: dest.lng } : null)
-                }}
-              >
-                <option value="">Select origin...</option>
-                {destinations.map(dest => (
-                  <option key={dest._id} value={dest._id}>{dest.name}, {dest.country}</option>
-                ))}
-              </select>
+              <div className="autocomplete-wrapper">
+                <input
+                  type="text"
+                  value={originInput}
+                  onChange={handleOriginInputChange}
+                  placeholder="Type a city or place..."
+                  className="autocomplete-input"
+                />
+                {searchingOrigin && (
+                  <div className="autocomplete-loading">Searching...</div>
+                )}
+                {originSuggestions.length > 0 && (
+                  <ul className="autocomplete-suggestions">
+                    {originSuggestions.map((suggestion) => (
+                      <li
+                        key={suggestion.place_id}
+                        onClick={() => selectOrigin(suggestion)}
+                        className="autocomplete-item"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M8 16s6-5.686 6-10A6 6 0 002 6c0 4.314 6 10 6 10zm0-7a3 3 0 110-6 3 3 0 010 6z"/>
+                        </svg>
+                        {suggestion.name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
 
             <div className="calculator-icon">
@@ -487,18 +631,34 @@ export default function Destinations() {
 
             <div className="calculator-select">
               <label>Destination</label>
-              <select
-                value={selectedDestination?.id || ''}
-                onChange={(e) => {
-                  const dest = destinations.find(d => d._id === e.target.value)
-                  setSelectedDestination(dest ? { id: dest._id, name: dest.name, lat: dest.lat, lng: dest.lng } : null)
-                }}
-              >
-                <option value="">Select destination...</option>
-                {destinations.map(dest => (
-                  <option key={dest._id} value={dest._id}>{dest.name}, {dest.country}</option>
-                ))}
-              </select>
+              <div className="autocomplete-wrapper">
+                <input
+                  type="text"
+                  value={destinationInput}
+                  onChange={handleDestinationInputChange}
+                  placeholder="Type a city or place..."
+                  className="autocomplete-input"
+                />
+                {searchingDestination && (
+                  <div className="autocomplete-loading">Searching...</div>
+                )}
+                {destinationSuggestions.length > 0 && (
+                  <ul className="autocomplete-suggestions">
+                    {destinationSuggestions.map((suggestion) => (
+                      <li
+                        key={suggestion.place_id}
+                        onClick={() => selectDestinationPlace(suggestion)}
+                        className="autocomplete-item"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M8 16s6-5.686 6-10A6 6 0 002 6c0 4.314 6 10 6 10zm0-7a3 3 0 110-6 3 3 0 010 6z"/>
+                        </svg>
+                        {suggestion.name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
 
             <button
