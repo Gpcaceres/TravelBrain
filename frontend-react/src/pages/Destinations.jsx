@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { destinationService } from '../services/destinationService'
@@ -21,6 +21,10 @@ export default function Destinations() {
   const [selectedDestination, setSelectedDestination] = useState(null)
   const [distanceInfo, setDistanceInfo] = useState(null)
   const [calculatingDistance, setCalculatingDistance] = useState(false)
+  const mapRef = useRef(null)
+  const mapInstanceRef = useRef(null)
+  const markersRef = useRef([])
+  const routeLineRef = useRef(null)
   
   const [formData, setFormData] = useState({
     name: '',
@@ -33,7 +37,105 @@ export default function Destinations() {
 
   useEffect(() => {
     loadDestinations()
+    
+    // Load Leaflet CSS and JS dynamically
+    const loadLeaflet = async () => {
+      if (typeof window.L !== 'undefined') return
+      
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+      document.head.appendChild(link)
+      
+      const script = document.createElement('script')
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+      script.onload = () => {
+        // Leaflet is now loaded
+        if (mapRef.current && !mapInstanceRef.current) {
+          initializeMap()
+        }
+      }
+      document.head.appendChild(script)
+    }
+    
+    loadLeaflet()
   }, [])
+  
+  const initializeMap = () => {
+    if (mapInstanceRef.current) return
+    
+    const L = window.L
+    const map = L.map(mapRef.current).setView([20, 0], 2)
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map)
+    
+    mapInstanceRef.current = map
+  }
+  
+  useEffect(() => {
+    if (distanceInfo && selectedOrigin && selectedDestination && mapInstanceRef.current) {
+      updateMapRoute()
+    }
+  }, [distanceInfo, selectedOrigin, selectedDestination])
+  
+  const updateMapRoute = () => {
+    const L = window.L
+    const map = mapInstanceRef.current
+    
+    if (!L || !map) return
+    
+    // Clear previous markers and route
+    markersRef.current.forEach(marker => map.removeLayer(marker))
+    if (routeLineRef.current) {
+      map.removeLayer(routeLineRef.current)
+    }
+    markersRef.current = []
+    
+    // Add origin marker (green)
+    const originMarker = L.marker([selectedOrigin.lat, selectedOrigin.lng], {
+      icon: L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="background: #47F59A; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span style="color: #1a1a1a; font-weight: bold; font-size: 18px;">A</span></div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      })
+    }).addTo(map).bindPopup(`<b>Origin:</b> ${selectedOrigin.name}`)
+    
+    // Add destination marker (pink)
+    const destMarker = L.marker([selectedDestination.lat, selectedDestination.lng], {
+      icon: L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="background: #F547A7; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span style="color: white; font-weight: bold; font-size: 18px;">B</span></div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      })
+    }).addTo(map).bindPopup(`<b>Destination:</b> ${selectedDestination.name}`)
+    
+    markersRef.current.push(originMarker, destMarker)
+    
+    // Draw route line
+    const routeLine = L.polyline(
+      [[selectedOrigin.lat, selectedOrigin.lng], [selectedDestination.lat, selectedDestination.lng]],
+      {
+        color: '#47F59A',
+        weight: 3,
+        opacity: 0.7,
+        dashArray: '10, 10'
+      }
+    ).addTo(map)
+    
+    routeLineRef.current = routeLine
+    
+    // Fit map to show both markers
+    const bounds = L.latLngBounds(
+      [selectedOrigin.lat, selectedOrigin.lng],
+      [selectedDestination.lat, selectedDestination.lng]
+    )
+    map.fitBounds(bounds, { padding: [50, 50] })
+  }
 
   const loadDestinations = async () => {
     try {
@@ -170,6 +272,11 @@ export default function Destinations() {
         origin: selectedOrigin.name,
         destination: selectedDestination.name
       })
+      
+      // Initialize map if not already done
+      if (mapRef.current && !mapInstanceRef.current && typeof window.L !== 'undefined') {
+        initializeMap()
+      }
     } catch (error) {
       console.error('Error calculating distance:', error)
       setMessage({ type: 'error', text: 'Failed to calculate distance' })
@@ -398,6 +505,27 @@ export default function Destinations() {
                       <p className="stat-label">Travel Time</p>
                       <p className="stat-value">{distanceInfo.duration}</p>
                     </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Route Map */}
+              <div className="route-map-container">
+                <div className="route-map-header">
+                  <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                    <path fillRule="evenodd" d="M15.817.113A.5.5 0 0116 .5v14a.5.5 0 01-.402.49l-5 1a.502.502 0 01-.196 0L5.5 15.01l-4.902.98A.5.5 0 010 15.5v-14a.5.5 0 01.402-.49l5-1a.5.5 0 01.196 0L10.5.99l4.902-.98a.5.5 0 01.415.103zM10 1.91l-4-.8v12.98l4 .8V1.91zm1 12.98l4-.8V1.11l-4 .8v12.98zm-6-.8V1.11l-4 .8v12.98l4-.8z"/>
+                  </svg>
+                  <h3>Route Visualization</h3>
+                </div>
+                <div ref={mapRef} className="route-map"></div>
+                <div className="map-legend">
+                  <div className="legend-item">
+                    <span className="legend-marker" style={{background: '#47F59A'}}>A</span>
+                    <span>Origin</span>
+                  </div>
+                  <div className="legend-item">
+                    <span className="legend-marker" style={{background: '#F547A7'}}>B</span>
+                    <span>Destination</span>
                   </div>
                 </div>
               </div>

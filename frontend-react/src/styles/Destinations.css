@@ -749,6 +749,92 @@
   background: rgba(71, 245, 154, 0.2);
 }
 
+/* Route Map Styles */
+.route-map-container {
+  margin-top: 2rem;
+  background: #2d2d2d;
+  border: 1px solid rgba(71, 245, 154, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.route-map-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: rgba(71, 245, 154, 0.05);
+  border-bottom: 1px solid rgba(71, 245, 154, 0.1);
+}
+
+.route-map-header svg {
+  color: #47F59A;
+}
+
+.route-map-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.route-map {
+  width: 100%;
+  height: 400px;
+  background: #1a1a1a;
+}
+
+.map-legend {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem 1.5rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-top: 1px solid rgba(71, 245, 154, 0.1);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.legend-marker {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Leaflet overrides */
+.leaflet-popup-content-wrapper {
+  background: #1e1e1e;
+  color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.leaflet-popup-content {
+  margin: 12px;
+  font-size: 14px;
+}
+
+.leaflet-popup-tip {
+  background: #1e1e1e;
+}
+
+.leaflet-container a {
+  color: #47F59A;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .destinations-container {
@@ -825,6 +911,14 @@
 
   .search-places-btn {
     width: 100%;
+  }
+  
+  .route-map {
+    height: 300px;
+  }
+  
+  .map-legend {
+    gap: 1rem;
   }
 }
 
