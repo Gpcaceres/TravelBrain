@@ -130,6 +130,7 @@ export default function Dashboard() {
             <Link to="/dashboard" className="nav-link">Dashboard</Link>
             <Link to="/trips" className="nav-link">My Trips</Link>
             <Link to="/destinations" className="nav-link">Destinations</Link>
+            <Link to="/weather" className="nav-link">Weather</Link>
           </div>
 
           <div className="navbar-right">
@@ -311,6 +312,16 @@ export default function Dashboard() {
               </div>
               <h3 className="action-title">Destinations</h3>
               <p className="action-description">Browse and save your favorite places</p>
+            </Link>
+
+            <Link to="/weather" className="action-card">
+              <div className="action-icon">
+                <svg width="32" height="32" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M13.5 7.5A1.5 1.5 0 0012 6h-.5a.5.5 0 010-1h.5a2.5 2.5 0 012.486 2.167A3 3 0 0113.5 13H3a3 3 0 01-.405-5.973A3.5 3.5 0 0110 5.5a.5.5 0 01-1 0 2.5 2.5 0 00-5 0 .5.5 0 01-.5.5h-.5a2 2 0 000 4h10.5a2 2 0 000-4z"/>
+                </svg>
+              </div>
+              <h3 className="action-title">Weather</h3>
+              <p className="action-description">Check weather forecasts for your destinations</p>
             </Link>
           </div>
         </section>

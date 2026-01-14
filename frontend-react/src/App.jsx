@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import Trips from './pages/Trips'
 import Destinations from './pages/Destinations'
+import Weather from './pages/Weather'
 import Admin from './pages/Admin'
 import './App.css'
 
@@ -45,6 +46,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Destinations />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/weather" 
+        element={
+          <ProtectedRoute>
+            <Weather />
           </ProtectedRoute>
         } 
       />
