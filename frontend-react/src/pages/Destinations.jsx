@@ -198,9 +198,9 @@ export default function Destinations() {
       const routeLine = L.polyline(
         [[originLat, originLng], [destLat, destLng]],
         {
-          color: '#47F59A',
-          weight: 3,
-          opacity: 0.7,
+          color: '#FF00FF',
+          weight: 4,
+          opacity: 0.8,
           dashArray: '10, 10'
         }
       ).addTo(map)
