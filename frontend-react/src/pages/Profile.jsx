@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import api from '../services/api'
 import { API_CONFIG } from '../config'
@@ -7,10 +7,12 @@ import '../styles/Profile.css'
 
 export default function Profile() {
   const { getUser, logout } = useAuth()
+  const navigate = useNavigate()
   const currentUser = getUser()
   
   const [isEditing, setIsEditing] = useState(false)
   const [isChangingPassword, setIsChangingPassword] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
   const [user, setUser] = useState({
     name: currentUser?.name || '',
     username: currentUser?.username || '',
@@ -30,7 +32,17 @@ export default function Profile() {
     if (currentUser?._id) {
       loadUserData()
     }
-  }, [currentUser?._id])
+
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event) => {
+      if (showMenu && !event.target.closest('.user-menu')) {
+        setShowMenu(false)
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [currentUser?._id, showMenu])
 
   const loadUserData = async () => {
     try {
@@ -96,6 +108,12 @@ export default function Profile() {
     }
   }
 
+  const handleLogout = () => {
+    setShowMenu(false)
+    logout()
+    navigate('/login')
+  }
+
   const handleChangePassword = async (e) => {
     e.preventDefault()
     
@@ -154,13 +172,71 @@ export default function Profile() {
       {/* Navbar */}
       <nav className="profile-navbar">
         <div className="container navbar-content">
-          <Link to="/dashboard" className="back-link">
-            ← Back
-          </Link>
-          
-          <div className="navbar-right">
+          <div className="navbar-left">
             <img src="/assets/images/logo.png" alt="Logo" className="navbar-logo" />
             <span className="navbar-brand">TravelBrain</span>
+          </div>
+          
+          <div className="navbar-center">
+            <Link to="/dashboard" className="nav-link">Dashboard</Link>
+            <Link to="/trips" className="nav-link">My Trips</Link>
+            <Link to="/destinations" className="nav-link">Destinations</Link>
+            <Link to="/weather" className="nav-link">Weather</Link>
+          </div>
+
+          <div className="navbar-right">
+            <div className="user-menu">
+              <button 
+                className="user-menu-btn"
+                onClick={() => setShowMenu(!showMenu)}
+              >
+                <div className="user-avatar">
+                  {currentUser?.firstName?.[0]}{currentUser?.lastName?.[0]}
+                </div>
+                <span className="user-name">{currentUser?.firstName}</span>
+                <span className={`dropdown-arrow ${showMenu ? 'rotated' : ''}`}>▼</span>
+              </button>
+
+              {showMenu && (
+                <div className="user-menu-dropdown">
+                  <div className="dropdown-header">
+                    <div className="dropdown-user-info">
+                      <div className="dropdown-avatar">
+                        {currentUser?.firstName?.[0]}{currentUser?.lastName?.[0]}
+                      </div>
+                      <div>
+                        <p className="dropdown-name">{currentUser?.firstName} {currentUser?.lastName}</p>
+                        <p className="dropdown-email">{currentUser?.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="dropdown-divider"></div>
+                  <Link to="/profile" className="dropdown-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="12" cy="7" r="4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Profile Settings
+                  </Link>
+                  {currentUser?.role === 'admin' && (
+                    <Link to="/admin" className="dropdown-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Admin Panel
+                    </Link>
+                  )}
+                  <div className="dropdown-divider"></div>
+                  <button onClick={handleLogout} className="dropdown-item logout-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
 import '../styles/Admin.css';
 
 function Admin() {
+  const { getUser, logout } = useAuth();
+  const user = getUser();
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,6 +17,7 @@ function Admin() {
   const [searchInput, setSearchInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
   const [filters, setFilters] = useState({
     status: '',
     role: ''
@@ -29,8 +33,20 @@ function Admin() {
       setCurrentPage(1);
     }, 1000);
 
-    return () => clearTimeout(timer);
-  }, [searchInput]);
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event) => {
+      if (showMenu && !event.target.closest('.user-menu')) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [searchInput, showMenu]);
 
   useEffect(() => {
     fetchData();
@@ -84,6 +100,12 @@ function Admin() {
       setLoading(false);
       setUpdating(false);
     }
+  };
+
+  const handleLogout = () => {
+    setShowMenu(false);
+    logout();
+    navigate('/login');
   };
 
   const handleActivateUser = async (userId) => {
@@ -163,16 +185,86 @@ function Admin() {
   }
 
   return (
-    <div className="admin-container">
-      <div className="admin-header">
-        <div className="admin-header-left">
-          <Link to="/dashboard" className="back-link">
-            ← Back
-          </Link>
-          <img src="/assets/images/logo.png" alt="TravelBrain" className="admin-logo" />
-          <h1>Panel de Administración</h1>
+    <div className="admin-page">
+      {/* Navbar */}
+      <nav className="admin-navbar">
+        <div className="container navbar-content">
+          <div className="navbar-left">
+            <img src="/assets/images/logo.png" alt="Logo" className="navbar-logo" />
+            <span className="navbar-brand">TravelBrain</span>
+          </div>
+          
+          <div className="navbar-center">
+            <Link to="/dashboard" className="nav-link">Dashboard</Link>
+            <Link to="/trips" className="nav-link">My Trips</Link>
+            <Link to="/destinations" className="nav-link">Destinations</Link>
+            <Link to="/weather" className="nav-link">Weather</Link>
+          </div>
+
+          <div className="navbar-right">
+            <div className="user-menu">
+              <button 
+                className="user-menu-btn"
+                onClick={() => setShowMenu(!showMenu)}
+              >
+                <div className="user-avatar">
+                  {user?.firstName?.[0]}{user?.lastName?.[0]}
+                </div>
+                <span className="user-name">{user?.firstName}</span>
+                <span className={`dropdown-arrow ${showMenu ? 'rotated' : ''}`}>▼</span>
+              </button>
+
+              {showMenu && (
+                <div className="user-menu-dropdown">
+                  <div className="dropdown-header">
+                    <div className="dropdown-user-info">
+                      <div className="dropdown-avatar">
+                        {user?.firstName?.[0]}{user?.lastName?.[0]}
+                      </div>
+                      <div>
+                        <p className="dropdown-name">{user?.firstName} {user?.lastName}</p>
+                        <p className="dropdown-email">{user?.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="dropdown-divider"></div>
+                  <Link to="/profile" className="dropdown-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="12" cy="7" r="4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Profile Settings
+                  </Link>
+                  {user?.role === 'admin' && (
+                    <Link to="/admin" className="dropdown-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Admin Panel
+                    </Link>
+                  )}
+                  <div className="dropdown-divider"></div>
+                  <button onClick={handleLogout} className="dropdown-item logout-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="admin-container">
+        <div className="admin-header">
+          <div className="admin-header-left">
+            <h1>Panel de Administración</h1>
+          </div>
+        </div>
 
       {error && <div className="alert alert-error">{error}</div>}
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
@@ -414,6 +506,7 @@ function Admin() {
         )}
       </div>
     </div>
+  </div>
   );
 }
 
