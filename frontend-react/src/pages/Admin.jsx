@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import '../styles/Admin.css';
 
@@ -166,12 +166,12 @@ function Admin() {
     <div className="admin-container">
       <div className="admin-header">
         <div className="admin-header-left">
+          <Link to="/dashboard" className="back-link">
+            ← Back
+          </Link>
           <img src="/assets/images/logo.png" alt="TravelBrain" className="admin-logo" />
           <h1>Panel de Administración</h1>
         </div>
-        <button className="btn-back" onClick={() => navigate('/dashboard')}>
-          Volver al Dashboard
-        </button>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
