@@ -21,15 +21,20 @@
   align-items: center;
 }
 
-.destinations-navbar .back-link {
+.destinations-navbar .navbar-content .back-link {
+  position: static !important;
   color: #a77bf3;
   text-decoration: none;
   font-weight: 500;
   transition: all 0.3s ease;
   font-size: 0.95rem;
+  display: inline-block;
+  top: auto !important;
+  left: auto !important;
+  z-index: auto !important;
 }
 
-.destinations-navbar .back-link:hover {
+.destinations-navbar .navbar-content .back-link:hover {
   color: #c299ff;
   transform: translateX(-3px);
 }

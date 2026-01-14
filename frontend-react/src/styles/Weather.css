@@ -22,7 +22,8 @@
   align-items: center;
 }
 
-.weather-navbar .back-link {
+.weather-navbar .navbar-content .back-link {
+  position: static !important;
   color: #47F59A;
   text-decoration: none;
   font-weight: 600;
@@ -30,9 +31,12 @@
   align-items: center;
   gap: 0.5rem;
   transition: all 0.3s ease;
+  top: auto !important;
+  left: auto !important;
+  z-index: auto !important;
 }
 
-.weather-navbar .back-link:hover {
+.weather-navbar .navbar-content .back-link:hover {
   transform: translateX(-4px);
   color: #2ecc71;
 }
