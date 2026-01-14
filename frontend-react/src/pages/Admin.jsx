@@ -2,9 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
-import UserTable from '../components/UserTable';
-import UserFilters from '../components/UserFilters';
-import UserPagination from '../components/UserPagination';
 import '../styles/Admin.css';
 
 function Admin() {
@@ -30,8 +27,6 @@ function Admin() {
   const navigate = useNavigate();
   const usersPerPage = 10;
   const isInitialLoad = !users.length && loading;
-  const roles = ['USER', 'REGISTERED', 'ADMIN'];
-  const statuses = ['ACTIVE', 'INACTIVE'];
 
   // Debounce search input
   useEffect(() => {
@@ -252,6 +247,7 @@ function Admin() {
                 <span className="user-name">{user?.name || user?.username || 'User'}</span>
                 <span className={`dropdown-arrow ${showMenu ? 'rotated' : ''}`}>▼</span>
               </button>
+
               {showMenu && (
                 <div className="user-menu-dropdown">
                   <div className="dropdown-header">
@@ -266,11 +262,42 @@ function Admin() {
                     </div>
                   </div>
                   <div className="dropdown-divider"></div>
-                  <Link to="/profile" className="dropdown-item">Perfil</Link>
-                  <button onClick={handleLogout} className="dropdown-item logout-item">Cerrar sesión</button>
+                  <Link to="/profile" className="dropdown-item">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm2.5 1h-5A2.5 2.5 0 003 11.5V13a1 1 0 001 1h8a1 1 0 001-1v-1.5A2.5 2.5 0 0010.5 9z"/>
+                    </svg>
+                    Profile Settings
+                  </Link>
+                  {user?.role === 'ADMIN' && (
+                    <Link to="/admin" className="dropdown-item">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M1.5 1.5A.5.5 0 012 1h12a.5.5 0 01.5.5v2a.5.5 0 01-.128.334L10 8.692V13.5a.5.5 0 01-.342.474l-3 1A.5.5 0 016 14.5V8.692L1.628 3.834A.5.5 0 011.5 3.5v-2z"/>
+                      </svg>
+                      Admin Panel
+                    </Link>
+                  )}
+                  <div className="dropdown-divider"></div>
+                  <button onClick={handleLogout} className="dropdown-item logout-item">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 12.5a.5.5 0 01-.5.5h-8a.5.5 0 01-.5-.5v-9a.5.5 0 01.5-.5h8a.5.5 0 01.5.5v2a.5.5 0 001 0v-2A1.5 1.5 0 009.5 2h-8A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h8a1.5 1.5 0 001.5-1.5v-2a.5.5 0 00-1 0v2z"/>
+                      <path fillRule="evenodd" d="M15.854 8.354a.5.5 0 000-.708l-3-3a.5.5 0 00-.708.708L14.293 7.5H5.5a.5.5 0 000 1h8.793l-2.147 2.146a.5.5 0 00.708.708l3-3z"/>
+                    </svg>
+                    Logout
+                  </button>
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="admin-container">
+        <div className="admin-header">
+          <div className="admin-header-left">
+            <h1>Panel de Administración</h1>
+          </div>
+        </div>
 
       {error && <div className="alert alert-error">{error}</div>}
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
