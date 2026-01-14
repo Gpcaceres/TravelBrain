@@ -238,38 +238,23 @@ function Admin() {
                   searchInput={searchInput}
                   setSearchInput={setSearchInput}
                   filters={filters}
-                  setFilters={setFilters}
-                  roles={roles}
-                  statuses={statuses}
-                />
-                <button type="submit" className="search-btn">Buscar</button>
-              </form>
-              <UserTable
-                users={users}
-                onToggleStatus={handleToggleUserStatus}
-                onDelete={handleDeleteUser}
-                onChangeRole={handleChangeRole}
-                updatingUserId={updatingUserId}
-                deletingUserId={deletingUserId}
-              />
-              <UserPagination
-                pagination={pagination}
-                currentPage={currentPage}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          </div>
-                        {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
+                      {/* Menú de usuario */}
+                      <div className="user-menu" onClick={() => setShowMenu(!showMenu)}>
+                        <div className="user-avatar">
+                          {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
+                        </div>
+                        {showMenu && (
+                          <div className="dropdown-menu">
+                            <div>
+                              <p className="dropdown-name">{user?.name || user?.username || 'User'}</p>
+                              <p className="dropdown-email">{user?.email}</p>
+                            </div>
+                            <div className="dropdown-divider"></div>
+                            <Link to="/profile" className="dropdown-item">Perfil</Link>
+                            <button onClick={handleLogout} className="dropdown-item logout-item">Cerrar sesión</button>
+                          </div>
+                        )}
                       </div>
-                      <div>
-                        <p className="dropdown-name">{user?.name || user?.username || 'User'}</p>
-                        <p className="dropdown-email">{user?.email}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="dropdown-divider"></div>
-                  <Link to="/profile" className="dropdown-item">Perfil</Link>
-                  <button onClick={handleLogout} className="dropdown-item logout-item">Cerrar sesión</button>
                 </div>
               )}
             </div>
