@@ -2,9 +2,14 @@ import api from './api'
 import { API_CONFIG } from '../config'
 
 export const weatherService = {
-  // Get all weather searches
+  // Get all weather searches (force fresh data)
   getAllWeatherSearches: async () => {
-    const response = await api.get(API_CONFIG.ENDPOINTS.WEATHERS)
+    const response = await api.get(API_CONFIG.ENDPOINTS.WEATHERS, {
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
+    })
     return response.data
   },
 

@@ -58,12 +58,17 @@ export default function Weather() {
 
   const loadSavedSearches = async () => {
     try {
+      console.log('Loading saved searches...')
       const searches = await weatherService.getAllWeatherSearches()
       console.log('Loaded searches:', searches)
-      // Ensure we're setting the most recent data
-      setSavedSearches(searches || [])
+      // Sort by most recent first
+      const sortedSearches = (searches || []).sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      )
+      setSavedSearches(sortedSearches)
     } catch (error) {
       console.error('Error loading saved searches:', error)
+      console.error('Error details:', error.response?.data || error.message)
       setSavedSearches([])
     }
   }
@@ -147,7 +152,6 @@ export default function Weather() {
       const data = await response.json()
       
       const weatherInfo = {
-        userId: user._id,
         label: data.location.name,
         lat: data.location.lat,
         lon: data.location.lon,
@@ -181,14 +185,19 @@ export default function Weather() {
     if (!window.confirm('Are you sure you want to delete this weather search?')) return
     
     try {
-      await weatherService.deleteWeather(id)
+      console.log('Deleting weather search with ID:', id)
+      const result = await weatherService.deleteWeather(id)
+      console.log('Delete result:', result)
+      
       // Reload from server to ensure sync
       await loadSavedSearches()
+      
       setMessage({ type: 'success', text: 'Weather search deleted successfully!' })
       setTimeout(() => setMessage({ type: '', text: '' }), 3000)
     } catch (error) {
       console.error('Error deleting search:', error)
-      setMessage({ type: 'error', text: 'Failed to delete weather search' })
+      console.error('Error details:', error.response?.data || error.message)
+      setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to delete weather search' })
       setTimeout(() => setMessage({ type: '', text: '' }), 3000)
     }
   }

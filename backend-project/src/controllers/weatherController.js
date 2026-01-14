@@ -7,9 +7,11 @@ const { invalidateCache } = require('../utils/cache');
  */
 exports.getAllWeathers = async (req, res) => {
   try {
-    console.log('Fetching all weathers...');
-    const weathers = await Weather.find();
-    console.log(`Found ${weathers.length} weather records`);
+    console.log('Fetching weathers for user:', req.user._id);
+    // Filter by authenticated user
+    const weathers = await Weather.find({ userId: req.user._id })
+      .sort({ createdAt: -1 }); // Most recent first
+    console.log(`Found ${weathers.length} weather records for user ${req.user._id}`);
     res.json(weathers);
   } catch (error) {
     console.error('Error fetching weathers:', error);
@@ -40,8 +42,9 @@ exports.getWeatherById = async (req, res) => {
  */
 exports.createWeather = async (req, res) => {
   try {
+    console.log('Creating weather for user:', req.user._id);
     const weather = new Weather({
-      userId: req.body.userId,
+      userId: req.user._id, // Use authenticated user ID
       label: req.body.label,
       lat: req.body.lat,
       lon: req.body.lon,
@@ -54,6 +57,7 @@ exports.createWeather = async (req, res) => {
     });
 
     const savedWeather = await weather.save();
+    console.log('Weather saved successfully:', savedWeather._id);
     invalidateCache('/weathers');
     res.status(201).json(savedWeather);
   } catch (error) {
@@ -104,11 +108,15 @@ exports.updateWeather = async (req, res) => {
  */
 exports.deleteWeather = async (req, res) => {
   try {
-    console.log(`Deleting weather with id: ${req.params.id}`);
-    const weather = await Weather.findById(req.params.id);
+    console.log(`Deleting weather with id: ${req.params.id} for user: ${req.user._id}`);
+    // Find weather and verify it belongs to the authenticated user
+    const weather = await Weather.findOne({ 
+      _id: req.params.id, 
+      userId: req.user._id 
+    });
     
     if (!weather) {
-      console.log('Weather not found');
+      console.log('Weather not found or does not belong to user');
       return res.status(404).json({ message: 'Weather not found' });
     }
 
