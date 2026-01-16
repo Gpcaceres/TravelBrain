@@ -242,6 +242,7 @@ export default function Weather() {
             <Link to="/trips" className="nav-link">My Trips</Link>
             <Link to="/destinations" className="nav-link">Destinations</Link>
             <Link to="/weather" className="nav-link active">Weather</Link>
+            <Link to="/itineraries" className="nav-link">Itineraries</Link>
           </div>
 
           <div className="navbar-right">
