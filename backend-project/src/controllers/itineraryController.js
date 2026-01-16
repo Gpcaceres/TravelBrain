@@ -471,3 +471,11 @@ exports.deleteItinerary = async (req, res) => {
     });
   }
 };
+
+module.exports = {
+  generateItinerary,
+  getItineraryById,
+  getItineraryByTripId,
+  getUserItineraries,
+  deleteItinerary
+};
