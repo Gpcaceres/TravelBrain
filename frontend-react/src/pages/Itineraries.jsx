@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUserTrips } from '../services/tripService';
+import { tripService } from '../services/tripService';
 import { generateItinerary, getItineraryByTripId } from '../services/itineraryService';
 import '../styles/Itineraries.css';
 
@@ -24,7 +24,7 @@ const Itineraries = () => {
 
   const fetchTrips = async () => {
     try {
-      const response = await getUserTrips();
+      const response = await tripService.getAllTrips();
       if (response.success) {
         setTrips(response.data);
       }
