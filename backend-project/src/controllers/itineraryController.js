@@ -226,7 +226,7 @@ const getWeatherForecast = async (destination, startDate, endDate) => {
 exports.generateItinerary = async (req, res) => {
   try {
     const { tripId, interestType } = req.body;
-    const userId = req.user.id;
+    const userId = req.user?.id || req.body.userId;
 
     // Validate input
     if (!tripId || !interestType) {
@@ -245,8 +245,8 @@ exports.generateItinerary = async (req, res) => {
       });
     }
 
-    // Verify trip belongs to user
-    if (trip.userId.toString() !== userId) {
+    // Skip user verification if no authentication
+    if (userId && trip.userId && trip.userId.toString() !== userId) {
       return res.status(403).json({
         success: false,
         message: 'No autorizado para generar itinerario de este viaje'
@@ -332,7 +332,6 @@ exports.generateItinerary = async (req, res) => {
 exports.getItineraryById = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
 
     const itinerary = await Itinerary.findById(id).populate('tripId');
 
@@ -340,13 +339,6 @@ exports.getItineraryById = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Itinerario no encontrado'
-      });
-    }
-
-    if (itinerary.userId.toString() !== userId) {
-      return res.status(403).json({
-        success: false,
-        message: 'No autorizado para ver este itinerario'
       });
     }
 
@@ -371,7 +363,6 @@ exports.getItineraryById = async (req, res) => {
 exports.getItineraryByTripId = async (req, res) => {
   try {
     const { tripId } = req.params;
-    const userId = req.user.id;
 
     const itinerary = await Itinerary.findOne({ tripId }).populate('tripId');
 
@@ -409,7 +400,7 @@ exports.getItineraryByTripId = async (req, res) => {
  */
 exports.getUserItineraries = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.query.userId || req.user?.id;
 
     const itineraries = await Itinerary.find({ userId })
       .populate('tripId')
@@ -437,7 +428,6 @@ exports.getUserItineraries = async (req, res) => {
 exports.deleteItinerary = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
 
     const itinerary = await Itinerary.findById(id);
 
@@ -445,13 +435,6 @@ exports.deleteItinerary = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Itinerario no encontrado'
-      });
-    }
-
-    if (itinerary.userId.toString() !== userId) {
-      return res.status(403).json({
-        success: false,
-        message: 'No autorizado para eliminar este itinerario'
       });
     }
 

@@ -1,26 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const itineraryController = require('../controllers/itineraryController');
-const { authenticate } = require('../middlewares/auth');
 
 /**
  * Itinerary Routes
- * All routes require authentication
  */
 
 // Generate new itinerary
-router.post('/generate', authenticate, itineraryController.generateItinerary);
+router.post('/generate', itineraryController.generateItinerary);
 
 // Get all itineraries for current user
-router.get('/', authenticate, itineraryController.getUserItineraries);
+router.get('/', itineraryController.getUserItineraries);
 
 // Get itinerary by ID
-router.get('/:id', authenticate, itineraryController.getItineraryById);
+router.get('/:id', itineraryController.getItineraryById);
 
 // Get itinerary by trip ID
-router.get('/trip/:tripId', authenticate, itineraryController.getItineraryByTripId);
+router.get('/trip/:tripId', itineraryController.getItineraryByTripId);
 
 // Delete itinerary
-router.delete('/:id', authenticate, itineraryController.deleteItinerary);
+router.delete('/:id', itineraryController.deleteItinerary);
 
 module.exports = router;
