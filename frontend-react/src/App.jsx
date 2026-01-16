@@ -9,6 +9,7 @@ import Trips from './pages/Trips'
 import Destinations from './pages/Destinations'
 import Weather from './pages/Weather'
 import Admin from './pages/Admin'
+import Itineraries from './pages/Itineraries'
 import './App.css'
 
 function App() {
@@ -54,6 +55,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Weather />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/itineraries" 
+        element={
+          <ProtectedRoute>
+            <Itineraries />
           </ProtectedRoute>
         } 
       />

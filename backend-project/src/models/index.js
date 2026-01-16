@@ -8,11 +8,13 @@ const Destination = require('./Destination');
 const Trip = require('./Trip');
 const FavoriteRoute = require('./FavoriteRoute');
 const Weather = require('./Weather');
+const Itinerary = require('./Itinerary');
 
 module.exports = {
   User,
   Destination,
   Trip,
   FavoriteRoute,
-  Weather
+  Weather,
+  Itinerary
 };
