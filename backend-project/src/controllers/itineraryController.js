@@ -1,6 +1,5 @@
 const Itinerary = require('../models/Itinerary');
 const Trip = require('../models/Trip');
-const axios = require('axios');
 const config = require('../config/env');
 
 /**
