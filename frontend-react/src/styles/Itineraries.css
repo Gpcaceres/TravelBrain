@@ -1,8 +1,15 @@
+/* Itineraries Page */
+.itineraries-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
 /* Navbar Styles */
 .navbar {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background: #1e1e1e;
   padding: 1rem 0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(71, 245, 154, 0.1);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -18,6 +25,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 2rem;
 }
 
 .navbar-left {
@@ -29,49 +37,41 @@
 .navbar-logo {
   width: 40px;
   height: 40px;
+  filter: drop-shadow(0 2px 8px rgba(71, 245, 154, 0.3));
   object-fit: contain;
 }
 
 .navbar-brand {
-  font-size: 1.5rem;
+  color: #47F59A;
   font-weight: 700;
-  color: white;
-  letter-spacing: -0.5px;
+  font-size: 1.25rem;
 }
 
 .navbar-center {
   display: flex;
-  gap: 2rem;
-  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  justify-content: center;
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
   text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   font-weight: 500;
-  font-size: 1rem;
-  padding: 0.5rem 0;
-  transition: color 0.3s;
-  position: relative;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
 }
 
 .nav-link:hover {
-  color: white;
+  background: rgba(71, 245, 154, 0.1);
+  color: #47F59A;
 }
 
 .nav-link.active {
-  color: white;
-}
-
-.nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: white;
-  border-radius: 2px;
+  background: rgba(71, 245, 154, 0.1);
+  color: #47F59A;
 }
 
 .navbar-right {
@@ -88,40 +88,41 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0.5rem 1rem;
-  border-radius: 25px;
+  border-radius: 2rem;
   cursor: pointer;
-  transition: background 0.3s;
-  color: white;
+  transition: all 0.3s ease;
+  color: #ffffff;
 }
 
 .user-menu-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(71, 245, 154, 0.3);
 }
 
 .user-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #47F59A 0%, #2ecc71 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 0.75rem;
-  color: white;
+  color: #1a1a1a;
+  font-size: 0.9rem;
 }
 
 .user-name {
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.95rem;
 }
 
 .dropdown-arrow {
-  font-size: 0.7rem;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
+  opacity: 0.7;
 }
 
 .dropdown-arrow.rotated {
@@ -132,15 +133,16 @@
   position: absolute;
   top: calc(100% + 0.5rem);
   right: 0;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  background: #2d2d2d;
+  border: 1px solid rgba(71, 245, 154, 0.2);
+  border-radius: 0.75rem;
   min-width: 250px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   overflow: hidden;
-  animation: dropdownSlide 0.2s ease-out;
+  animation: dropdownFadeIn 0.2s ease-out;
 }
 
-@keyframes dropdownSlide {
+@keyframes dropdownFadeIn {
   from {
     opacity: 0;
     transform: translateY(-10px);
@@ -152,9 +154,9 @@
 }
 
 .dropdown-header {
-  padding: 1.25rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  padding: 1rem;
+  background: rgba(71, 245, 154, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .dropdown-user-info {
@@ -164,32 +166,34 @@
 }
 
 .dropdown-avatar {
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #47F59A 0%, #2ecc71 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
+  color: #1a1a1a;
   font-size: 1rem;
 }
 
 .dropdown-name {
+  color: #ffffff;
   font-weight: 600;
+  font-size: 0.95rem;
   margin: 0;
-  font-size: 1rem;
 }
 
 .dropdown-email {
+  color: #a0a0a0;
   font-size: 0.85rem;
-  opacity: 0.9;
-  margin: 0.25rem 0 0 0;
+  margin: 0;
 }
 
 .dropdown-divider {
   height: 1px;
-  background: #e0e0e0;
+  background: rgba(255, 255, 255, 0.05);
   margin: 0.5rem 0;
 }
 
@@ -197,43 +201,44 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1.25rem;
-  color: #555;
-  text-decoration: none;
-  transition: background 0.2s;
-  cursor: pointer;
-  border: none;
-  background: none;
   width: 100%;
-  text-align: left;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
   font-size: 0.95rem;
+  font-weight: 500;
+  text-align: left;
 }
 
 .dropdown-item:hover {
-  background: #f5f5f5;
+  background: rgba(71, 245, 154, 0.1);
+  color: #47F59A;
 }
 
 .dropdown-item svg {
-  color: #666;
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
 }
 
 .logout-item {
-  color: #e74c3c;
+  color: #E54A7A;
 }
 
 .logout-item:hover {
-  background: #fee;
-}
-
-.logout-item svg {
-  color: #e74c3c;
+  background: rgba(229, 74, 122, 0.1);
+  color: #E54A7A;
 }
 
 /* Main Container */
 .itineraries-container {
-  max-width: 1200px;
+  padding: 3rem 1rem;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -243,22 +248,25 @@
 }
 
 .itineraries-header h1 {
-  font-size: 2.5rem;
-  color: #2c3e50;
-  margin-bottom: 0.5rem;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
 }
 
 .itineraries-header p {
-  font-size: 1.1rem;
-  color: #7f8c8d;
+  font-size: 1.05rem;
+  color: #a0a0a0;
+  margin: 0;
 }
 
 /* Form Styles */
 .itinerary-form {
-  background: white;
+  background: #2d2d2d;
+  border: 1px solid rgba(71, 245, 154, 0.1);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   margin-bottom: 2rem;
 }
 
@@ -268,44 +276,53 @@
 
 .form-group label {
   display: block;
-  font-weight: 600;
-  color: #2c3e50;
+  font-weight: 500;
+  color: #ffffff;
   margin-bottom: 0.5rem;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .form-control {
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e0e0e0;
+  padding: 0.875rem 1rem;
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   border-radius: 8px;
   font-size: 1rem;
-  transition: border-color 0.3s;
+  transition: all 0.3s ease;
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: #47F59A;
+  box-shadow: 0 0 0 3px rgba(71, 245, 154, 0.1);
 }
 
 /* Trip Details */
 .trip-details {
-  background: #f8f9fa;
+  background: rgba(71, 245, 154, 0.05);
+  border: 1px solid rgba(71, 245, 154, 0.2);
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
 .trip-details h3 {
-  color: #2c3e50;
+  color: #47F59A;
   margin-bottom: 1rem;
   font-size: 1.3rem;
+  font-weight: 600;
 }
 
 .trip-info p {
   margin: 0.5rem 0;
-  color: #555;
+  color: #a0a0a0;
   line-height: 1.6;
+}
+
+.trip-info strong {
+  color: #ffffff;
 }
 
 /* Interest Types */
@@ -318,87 +335,96 @@
 
 .interest-btn {
   padding: 1rem;
-  border: 2px solid #e0e0e0;
-  background: white;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 0.5rem;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   font-size: 0.95rem;
-  font-weight: 500;
-  color: #555;
+  font-weight: 600;
+  color: #a0a0a0;
 }
 
 .interest-btn:hover {
-  border-color: #3498db;
-  background: #f0f8ff;
+  border-color: rgba(71, 245, 154, 0.5);
+  background: rgba(71, 245, 154, 0.1);
+  color: #47F59A;
 }
 
 .interest-btn.active {
-  border-color: #3498db;
-  background: #3498db;
-  color: white;
+  border-color: #47F59A;
+  background: rgba(71, 245, 154, 0.15);
+  color: #47F59A;
+  box-shadow: 0 0 20px rgba(71, 245, 154, 0.2);
 }
 
 /* Generate Button */
 .generate-btn {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #47F59A;
+  color: #1a1a1a;
   border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: all 0.3s ease;
   margin-top: 1rem;
 }
 
 .generate-btn:hover:not(:disabled) {
+  background: #2ecc71;
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(71, 245, 154, 0.3);
 }
 
 .generate-btn:disabled {
-  background: #bdc3c7;
+  background: rgba(255, 255, 255, 0.1);
+  color: #666;
   cursor: not-allowed;
 }
 
 /* Error Message */
 .error-message {
-  background: #fee;
-  color: #c00;
-  padding: 1rem;
-  border-radius: 8px;
+  background: rgba(229, 74, 122, 0.1);
+  border: 1px solid #E54A7A;
+  color: #E54A7A;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
   margin-top: 1rem;
   text-align: center;
+  font-weight: 500;
 }
 
 /* Itinerary Result */
 .itinerary-result {
-  background: white;
+  background: #2d2d2d;
+  border: 1px solid rgba(71, 245, 154, 0.2);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .itinerary-header-section {
   text-align: center;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 3px solid #3498db;
+  border-bottom: 2px solid rgba(71, 245, 154, 0.3);
 }
 
 .itinerary-header-section h2 {
   font-size: 2rem;
-  color: #2c3e50;
+  color: #47F59A;
   margin-bottom: 0.5rem;
+  font-weight: 700;
 }
 
 .itinerary-header-section h3 {
   font-size: 1.5rem;
-  color: #555;
+  color: #ffffff;
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .itinerary-meta {
@@ -416,13 +442,15 @@
 }
 
 .badge-interest {
-  background: #e8f4fd;
-  color: #2980b9;
+  background: rgba(71, 245, 154, 0.15);
+  color: #47F59A;
+  border: 1px solid rgba(71, 245, 154, 0.3);
 }
 
 .badge-budget {
-  background: #fef5e7;
-  color: #f39c12;
+  background: rgba(229, 74, 122, 0.15);
+  color: #E54A7A;
+  border: 1px solid rgba(229, 74, 122, 0.3);
 }
 
 /* Daily Activities */
@@ -432,22 +460,25 @@
 
 .itinerary-details h4 {
   font-size: 1.5rem;
-  color: #2c3e50;
+  color: #ffffff;
   margin-bottom: 1.5rem;
+  font-weight: 600;
 }
 
 .day-section {
-  background: #f8f9fa;
+  background: rgba(71, 245, 154, 0.05);
+  border: 1px solid rgba(71, 245, 154, 0.2);
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 0.75rem;
   margin-bottom: 1.5rem;
-  border-left: 4px solid #3498db;
+  border-left: 4px solid #47F59A;
 }
 
 .day-section h5 {
-  color: #2c3e50;
+  color: #47F59A;
   font-size: 1.2rem;
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .activities-list {
@@ -459,16 +490,21 @@
 .activity-item {
   display: flex;
   align-items: flex-start;
-  background: white;
+  background: #1e1e1e;
   padding: 1rem;
-  border-radius: 8px;
-  border-left: 3px solid #3498db;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 0.5rem;
+  border-left: 3px solid #47F59A;
+  transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+  background: rgba(71, 245, 154, 0.05);
+  transform: translateX(4px);
 }
 
 .activity-time {
   font-weight: 700;
-  color: #3498db;
+  color: #47F59A;
   font-size: 1rem;
   min-width: 60px;
   margin-right: 1rem;
@@ -483,28 +519,30 @@
 
 .activity-title {
   font-size: 1rem;
-  color: #2c3e50;
+  color: #ffffff;
   font-weight: 500;
 }
 
 .activity-cost {
   font-weight: 700;
-  color: #27ae60;
+  color: #47F59A;
   font-size: 1rem;
 }
 
 /* Weather Section */
 .weather-section {
-  background: #e8f4fd;
+  background: rgba(30, 58, 138, 0.2);
+  border: 1px solid rgba(71, 245, 154, 0.2);
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 0.75rem;
   margin-bottom: 2rem;
 }
 
 .weather-section h4 {
-  color: #2c3e50;
+  color: #47F59A;
   font-size: 1.3rem;
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .weather-summary {
@@ -513,7 +551,11 @@
 
 .weather-summary p {
   margin: 0.5rem 0;
-  color: #555;
+  color: #a0a0a0;
+}
+
+.weather-summary strong {
+  color: #ffffff;
 }
 
 .daily-forecasts {
@@ -524,42 +566,51 @@
 }
 
 .forecast-item {
-  background: white;
+  background: #1e1e1e;
+  border: 1px solid rgba(71, 245, 154, 0.1);
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   text-align: center;
+  transition: all 0.3s ease;
+}
+
+.forecast-item:hover {
+  border-color: rgba(71, 245, 154, 0.3);
+  background: rgba(71, 245, 154, 0.05);
 }
 
 .forecast-date {
   font-size: 0.85rem;
-  color: #7f8c8d;
+  color: #a0a0a0;
   margin-bottom: 0.5rem;
 }
 
 .forecast-temp {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #3498db;
+  color: #47F59A;
   margin: 0.5rem 0;
 }
 
 .forecast-condition {
   font-size: 0.9rem;
-  color: #555;
+  color: #ffffff;
 }
 
 /* Budget Section */
 .budget-section {
-  background: #fef5e7;
+  background: rgba(229, 74, 122, 0.1);
+  border: 1px solid rgba(229, 74, 122, 0.2);
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 0.75rem;
   margin-bottom: 2rem;
 }
 
 .budget-section h4 {
-  color: #2c3e50;
+  color: #E54A7A;
   font-size: 1.3rem;
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .budget-breakdown {
@@ -571,30 +622,43 @@
 .budget-item {
   display: flex;
   justify-content: space-between;
-  padding: 0.75rem;
-  background: white;
-  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
   font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.budget-item:hover {
+  background: rgba(229, 74, 122, 0.05);
+  border-color: rgba(229, 74, 122, 0.2);
 }
 
 .budget-item span:first-child {
-  color: #555;
+  color: #a0a0a0;
 }
 
 .budget-item span:last-child {
-  color: #27ae60;
+  color: #47F59A;
   font-weight: 600;
 }
 
 .budget-total {
-  border-top: 2px solid #f39c12;
+  border-top: 2px solid #E54A7A;
   padding-top: 1rem;
   margin-top: 0.5rem;
   font-size: 1.1rem;
+  background: rgba(229, 74, 122, 0.1) !important;
 }
 
 .budget-total span {
-  color: #2c3e50;
+  color: #ffffff;
+}
+
+.budget-total span:last-child {
+  color: #47F59A;
+  font-size: 1.2rem;
 }
 
 /* Actions */
@@ -603,24 +667,28 @@
   justify-content: center;
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 2px solid #ecf0f1;
+  border-top: 1px solid rgba(71, 245, 154, 0.2);
 }
 
 .download-btn {
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-  color: white;
+  background: #47F59A;
+  color: #1a1a1a;
   border: none;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .download-btn:hover {
+  background: #2ecc71;
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(17, 153, 142, 0.4);
+  box-shadow: 0 8px 25px rgba(71, 245, 154, 0.3);
 }
 
 /* Responsive Design */
