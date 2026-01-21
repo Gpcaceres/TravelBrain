@@ -82,8 +82,8 @@ function Admin() {
       }
       
       const [usersResponse, statsResponse] = await Promise.all([
-        api.get(`/api/users?${params.toString()}`),
-        api.get('/api/users/stats')
+        api.get(`/users?${params.toString()}`),
+        api.get('/users/stats')
       ]);
       
       setUsers(usersResponse.data.data || []);
@@ -113,7 +113,7 @@ function Admin() {
   const handleActivateUser = async (userId) => {
     setUpdatingUserId(userId);
     try {
-      const response = await api.patch(`/api/users/${userId}/activate`);
+      const response = await api.patch(`/users/${userId}/activate`);
       // Update local state immediately
       setUsers(prevUsers => 
         prevUsers.map(u => 
@@ -123,7 +123,7 @@ function Admin() {
       setSuccessMessage(response.data.message);
       setTimeout(() => setSuccessMessage(''), 3000);
       // Refresh stats
-      const statsResponse = await api.get('/api/users/stats');
+      const statsResponse = await api.get('/users/stats');
       setStats(statsResponse.data.stats);
     } catch (err) {
       console.error('Error al activar usuario:', err);
@@ -137,7 +137,7 @@ function Admin() {
   const handleDeactivateUser = async (userId) => {
     setUpdatingUserId(userId);
     try {
-      const response = await api.patch(`/api/users/${userId}/deactivate`);
+      const response = await api.patch(`/users/${userId}/deactivate`);
       // Update local state immediately
       setUsers(prevUsers => 
         prevUsers.map(u => 
@@ -147,7 +147,7 @@ function Admin() {
       setSuccessMessage(response.data.message);
       setTimeout(() => setSuccessMessage(''), 3000);
       // Refresh stats
-      const statsResponse = await api.get('/api/users/stats');
+      const statsResponse = await api.get('/users/stats');
       setStats(statsResponse.data.stats);
     } catch (err) {
       console.error('Error al desactivar usuario:', err);
@@ -163,13 +163,13 @@ function Admin() {
     if (!window.confirm('¿Seguro que deseas eliminar este usuario?')) return;
     setDeletingUserId(userId);
     try {
-      const response = await api.delete(`/api/users/${userId}`);
+      const response = await api.delete(`/users/${userId}`);
       // Remove user from local state immediately
       setUsers(prevUsers => prevUsers.filter(u => u._id !== userId));
       setSuccessMessage(response.data.message || 'Usuario eliminado');
       setTimeout(() => setSuccessMessage(''), 3000);
       // Refresh stats
-      const statsResponse = await api.get('/api/users/stats');
+      const statsResponse = await api.get('/users/stats');
       setStats(statsResponse.data.stats);
     } catch (err) {
       console.error('Error al eliminar usuario:', err);
@@ -192,7 +192,7 @@ function Admin() {
 
   const handleChangeRole = async (userId, newRole) => {
     try {
-      const response = await api.patch(`/api/users/${userId}/role`, { role: newRole });
+      const response = await api.patch(`/users/${userId}/role`, { role: newRole });
       // Update local state immediately
       setUsers(prevUsers => 
         prevUsers.map(u => 
@@ -202,7 +202,7 @@ function Admin() {
       setSuccessMessage(response.data.message);
       setTimeout(() => setSuccessMessage(''), 3000);
       // Refresh stats
-      const statsResponse = await api.get('/api/users/stats');
+      const statsResponse = await api.get('/users/stats');
       setStats(statsResponse.data.stats);
     } catch (err) {
       console.error('Error al cambiar rol:', err);
