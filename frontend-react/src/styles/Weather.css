@@ -472,7 +472,6 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #47F59A;
   width: 3.5rem;
   height: 3.5rem;
 }
@@ -480,6 +479,52 @@
 .temp-icon svg {
   width: 100%;
   height: 100%;
+}
+
+/* Weather icon colors */
+.weather-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.icon-sunny {
+  color: #FFD700;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+}
+
+.icon-cloudy {
+  color: #B0BEC5;
+  filter: drop-shadow(0 0 6px rgba(176, 190, 197, 0.4));
+}
+
+.icon-rainy {
+  color: #64B5F6;
+  filter: drop-shadow(0 0 8px rgba(100, 181, 246, 0.5));
+}
+
+.icon-drizzle {
+  color: #81C784;
+  filter: drop-shadow(0 0 6px rgba(129, 199, 132, 0.4));
+}
+
+.icon-stormy {
+  color: #9575CD;
+  filter: drop-shadow(0 0 10px rgba(149, 117, 205, 0.6));
+}
+
+.icon-snowy {
+  color: #E0F7FA;
+  filter: drop-shadow(0 0 8px rgba(224, 247, 250, 0.5));
+}
+
+.icon-foggy {
+  color: #90A4AE;
+  filter: drop-shadow(0 0 6px rgba(144, 164, 174, 0.4));
+}
+
+.icon-partly-cloudy {
+  color: #FFB74D;
+  filter: drop-shadow(0 0 8px rgba(255, 183, 77, 0.4));
 }
 
 .temp-value {
@@ -717,6 +762,9 @@
   font-size: 2.2rem;
   width: 2.5rem;
   height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .info-icon.weather-emoji svg {
@@ -725,7 +773,7 @@
 }
 
 .info-icon svg {
-  color: #47F59A;
+  /* Color is inherited from weather-icon classes */
 }
 
 .info-content {
