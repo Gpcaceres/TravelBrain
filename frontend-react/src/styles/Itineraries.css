@@ -52,6 +52,8 @@
   gap: 0.5rem;
   flex: 1;
   justify-content: center;
+  align-items: center;
+  min-width: 0;
 }
 
 .nav-link {
@@ -62,6 +64,8 @@
   font-weight: 500;
   transition: all 0.3s ease;
   font-size: 0.95rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .nav-link:hover {

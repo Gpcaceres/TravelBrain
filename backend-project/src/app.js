@@ -56,7 +56,7 @@ const createApp = () => {
   app.use('/', tripRoutes);
   app.use('/', favoriteRouteRoutes);
   app.use('/', weatherRoutes);
-  app.use('/itineraries', itineraryRoutes);
+  app.use('/api/itineraries', itineraryRoutes);
 
   // Root endpoint
   app.get('/', (req, res) => {

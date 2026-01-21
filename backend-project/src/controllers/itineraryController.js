@@ -225,7 +225,7 @@ const getWeatherForecast = async (destination, startDate, endDate) => {
  */
 exports.generateItinerary = async (req, res) => {
   try {
-    const { tripId, interestType } = req.body;
+    const { tripId, interestType, budgetType: requestedBudgetType } = req.body;
     const userId = req.user?.id || req.body.userId;
 
     // Validate input
@@ -256,8 +256,8 @@ exports.generateItinerary = async (req, res) => {
     // Calculate days
     const days = Math.ceil((trip.endDate - trip.startDate) / (1000 * 60 * 60 * 24));
     
-    // Detect budget type
-    const budgetType = detectBudgetType(trip.budget || 500, days);
+    // Use requested budget type or detect from trip budget
+    const budgetType = requestedBudgetType || detectBudgetType(trip.budget || 500, days);
 
     // Get activity templates
     const activities = activityTemplates[interestType][budgetType];
