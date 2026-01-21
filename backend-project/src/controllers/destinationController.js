@@ -47,6 +47,8 @@ exports.createDestination = async (req, res) => {
       lng: req.body.lng,
       img: req.body.img,
       userId: req.body.userId,
+      rating: req.body.rating || 0,
+      review: req.body.review || '',
       createdAt: req.body.createdAt || new Date()
     });
 
@@ -80,6 +82,8 @@ exports.updateDestination = async (req, res) => {
     if (req.body.lng != null) destination.lng = req.body.lng;
     if (req.body.img != null) destination.img = req.body.img;
     if (req.body.userId != null) destination.userId = req.body.userId;
+    if (req.body.rating != null) destination.rating = req.body.rating;
+    if (req.body.review != null) destination.review = req.body.review;
 
     const updatedDestination = await destination.save();
     console.log('Destination updated successfully');

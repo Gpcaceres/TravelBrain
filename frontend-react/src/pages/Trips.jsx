@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { tripService } from '../services/tripService'
@@ -14,6 +14,11 @@ export default function Trips() {
   const [editingTrip, setEditingTrip] = useState(null)
   const [message, setMessage] = useState({ type: '', text: '' })
   const [showMenu, setShowMenu] = useState(false)
+  
+  const [destinationInput, setDestinationInput] = useState('')
+  const [destinationSuggestions, setDestinationSuggestions] = useState([])
+  const [searchingDestination, setSearchingDestination] = useState(false)
+  const destinationTimeoutRef = useRef(null)
   
   const [formData, setFormData] = useState({
     title: '',
@@ -73,6 +78,7 @@ export default function Trips() {
         budget: trip.budget || '',
         description: trip.description || ''
       })
+      setDestinationInput(trip.destination || '')
     } else {
       setEditingTrip(null)
       setFormData({
@@ -83,7 +89,9 @@ export default function Trips() {
         budget: '',
         description: ''
       })
+      setDestinationInput('')
     }
+    setDestinationSuggestions([])
     setShowModal(true)
     setMessage({ type: '', text: '' })
   }
@@ -91,6 +99,8 @@ export default function Trips() {
   const closeModal = () => {
     setShowModal(false)
     setEditingTrip(null)
+    setDestinationInput('')
+    setDestinationSuggestions([])
     setFormData({
       title: '',
       destination: '',
@@ -142,6 +152,64 @@ export default function Trips() {
         text: error.response?.data?.message || 'Failed to delete trip' 
       })
     }
+  }
+
+  // Destination Autocomplete Functions
+  const searchDestinationSuggestions = async (query) => {
+    if (!query.trim() || query.length < 3) {
+      setDestinationSuggestions([])
+      return
+    }
+
+    setSearchingDestination(true)
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`,
+        {
+          headers: {
+            'User-Agent': 'TravelBrain App'
+          }
+        }
+      )
+      
+      if (!response.ok) throw new Error('Failed to search places')
+      
+      const data = await response.json()
+      const results = data.map(item => ({
+        name: item.display_name,
+        lat: parseFloat(item.lat),
+        lng: parseFloat(item.lon),
+        place_id: item.place_id
+      }))
+      setDestinationSuggestions(results)
+    } catch (error) {
+      console.error('Error searching destination:', error)
+    } finally {
+      setSearchingDestination(false)
+    }
+  }
+
+  const handleDestinationInputChange = (e) => {
+    const value = e.target.value
+    setDestinationInput(value)
+    setFormData({ ...formData, destination: value })
+    
+    // Clear previous timeout
+    if (destinationTimeoutRef.current) {
+      clearTimeout(destinationTimeoutRef.current)
+    }
+    
+    // Set new timeout for debouncing
+    destinationTimeoutRef.current = setTimeout(() => {
+      searchDestinationSuggestions(value)
+    }, 500)
+  }
+
+  const selectDestination = (place) => {
+    // Use the full name for better description
+    setDestinationInput(place.name)
+    setFormData({ ...formData, destination: place.name })
+    setDestinationSuggestions([])
   }
 
   const formatDate = (dateString) => {
@@ -381,15 +449,37 @@ export default function Trips() {
 
               <div className="form-group">
                 <label htmlFor="destination">Destination *</label>
-                <input
-                  type="text"
-                  id="destination"
-                  name="destination"
-                  value={formData.destination}
-                  onChange={handleInputChange}
-                  placeholder="e.g., Paris, France"
-                  required
-                />
+                <div className="autocomplete-wrapper">
+                  <input
+                    type="text"
+                    id="destination"
+                    name="destination"
+                    value={destinationInput}
+                    onChange={handleDestinationInputChange}
+                    placeholder="Start typing a destination (e.g., Paris, France)..."
+                    required
+                    className="autocomplete-input"
+                  />
+                  {searchingDestination && (
+                    <div className="autocomplete-loading">Searching...</div>
+                  )}
+                  {destinationSuggestions.length > 0 && (
+                    <ul className="autocomplete-suggestions">
+                      {destinationSuggestions.map((suggestion) => (
+                        <li
+                          key={suggestion.place_id}
+                          onClick={() => selectDestination(suggestion)}
+                          className="autocomplete-item"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 002 6c0 4.314 6 10 6 10zm0-7a3 3 0 110-6 3 3 0 010 6z"/>
+                          </svg>
+                          {suggestion.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
 
               <div className="form-row">

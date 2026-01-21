@@ -35,6 +35,11 @@ export default function Destinations() {
   const routeLineRef = useRef(null)
   const originTimeoutRef = useRef(null)
   const destinationTimeoutRef = useRef(null)
+  const modalSearchTimeoutRef = useRef(null)
+  
+  const [modalPlaceInput, setModalPlaceInput] = useState('')
+  const [modalPlaceSuggestions, setModalPlaceSuggestions] = useState([])
+  const [searchingModalPlaces, setSearchingModalPlaces] = useState(false)
   
   const [formData, setFormData] = useState({
     name: '',
@@ -42,7 +47,9 @@ export default function Destinations() {
     description: '',
     lat: '',
     lng: '',
-    img: ''
+    img: '',
+    rating: 0,
+    review: ''
   })
 
   useEffect(() => {
@@ -488,7 +495,9 @@ export default function Destinations() {
         description: destination.description || '',
         lat: destination.lat || '',
         lng: destination.lng || '',
-        img: destination.img || ''
+        img: destination.img || '',
+        rating: destination.rating || 0,
+        review: destination.review || ''
       })
     } else {
       setEditingDestination(null)
@@ -498,9 +507,14 @@ export default function Destinations() {
         description: '',
         lat: '',
         lng: '',
-        img: ''
+        img: '',
+        rating: 0,
+        review: ''
       })
     }
+    setModalPlaceInput('')
+    setModalPlaceSuggestions([])
+    setPlaceSearchResults([])
     setShowModal(true)
     setMessage({ type: '', text: '' })
   }
@@ -508,13 +522,18 @@ export default function Destinations() {
   const closeModal = () => {
     setShowModal(false)
     setEditingDestination(null)
+    setModalPlaceInput('')
+    setModalPlaceSuggestions([])
+    setPlaceSearchResults([])
     setFormData({
       name: '',
       country: '',
       description: '',
       lat: '',
       lng: '',
-      img: ''
+      img: '',
+      rating: 0,
+      review: ''
     })
   }
 
@@ -526,7 +545,8 @@ export default function Destinations() {
         ...formData,
         userId: user._id,
         lat: formData.lat ? parseFloat(formData.lat) : 0,
-        lng: formData.lng ? parseFloat(formData.lng) : 0
+        lng: formData.lng ? parseFloat(formData.lng) : 0,
+        rating: formData.rating ? parseFloat(formData.rating) : 0
       }
 
       if (editingDestination) {
@@ -560,6 +580,73 @@ export default function Destinations() {
         text: error.response?.data?.message || 'Failed to delete destination' 
       })
     }
+  }
+
+  // Modal Place Autocomplete Functions
+  const searchModalPlaceSuggestions = async (query) => {
+    if (!query.trim() || query.length < 3) {
+      setModalPlaceSuggestions([])
+      return
+    }
+
+    setSearchingModalPlaces(true)
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`,
+        {
+          headers: {
+            'User-Agent': 'TravelBrain App'
+          }
+        }
+      )
+      
+      if (!response.ok) throw new Error('Failed to search places')
+      
+      const data = await response.json()
+      const results = data.map(item => ({
+        name: item.display_name,
+        lat: parseFloat(item.lat),
+        lng: parseFloat(item.lon),
+        place_id: item.place_id
+      }))
+      setModalPlaceSuggestions(results)
+    } catch (error) {
+      console.error('Error searching modal places:', error)
+    } finally {
+      setSearchingModalPlaces(false)
+    }
+  }
+
+  const handleModalPlaceInputChange = (e) => {
+    const value = e.target.value
+    setModalPlaceInput(value)
+    
+    // Clear previous timeout
+    if (modalSearchTimeoutRef.current) {
+      clearTimeout(modalSearchTimeoutRef.current)
+    }
+    
+    // Set new timeout for debouncing
+    modalSearchTimeoutRef.current = setTimeout(() => {
+      searchModalPlaceSuggestions(value)
+    }, 500)
+  }
+
+  const selectModalPlace = (place) => {
+    // Extract location name and country from the display name
+    const parts = place.name.split(',').map(p => p.trim())
+    const locationName = parts[0]
+    const country = parts.length > 1 ? parts[parts.length - 1] : ''
+
+    setFormData({
+      ...formData,
+      name: locationName,
+      country: country,
+      lat: place.lat,
+      lng: place.lng
+    })
+    setModalPlaceInput(place.name)
+    setModalPlaceSuggestions([])
   }
 
   const filteredDestinations = destinations.filter(dest =>
@@ -901,8 +988,36 @@ export default function Destinations() {
                     </svg>
                     {destination.country}
                   </div>
+                  
+                  {/* Rating Display */}
+                  {destination.rating > 0 && (
+                    <div className="destination-rating">
+                      <div className="rating-stars-display">
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <span 
+                            key={star}
+                            className={`star ${destination.rating >= star ? 'filled' : destination.rating >= star - 0.5 ? 'half-filled' : ''}`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      <span className="rating-value">{destination.rating.toFixed(1)}</span>
+                    </div>
+                  )}
+                  
                   {destination.description && (
                     <p className="destination-description">{destination.description}</p>
+                  )}
+                  
+                  {/* Review Display */}
+                  {destination.review && (
+                    <div className="destination-review">
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M2.678 11.894a1 1 0 01.287.801 10.97 10.97 0 01-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 01.71-.074A8.06 8.06 0 008 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 01-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 00.244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 01-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/>
+                      </svg>
+                      <p className="review-text">{destination.review}</p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -925,49 +1040,42 @@ export default function Destinations() {
             </div>
 
             <form onSubmit={handleSubmit} className="modal-form">
-              {/* Place Search */}
+              {/* Place Search with Autocomplete */}
               <div className="place-search-section">
                 <label>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.1zM12 6.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z"/>
                   </svg>
-                  Search Places (OpenStreetMap)
+                  Search Places (Start typing for suggestions)
                 </label>
-                <div className="place-search-input">
+                <div className="autocomplete-wrapper">
                   <input
                     type="text"
-                    value={placeSearchQuery}
-                    onChange={(e) => setPlaceSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), searchPlaces())}
-                    placeholder="Search for a place (e.g., Eiffel Tower, Tokyo Tower)"
+                    value={modalPlaceInput}
+                    onChange={handleModalPlaceInputChange}
+                    placeholder="Type a place name (e.g., Eiffel Tower, Tokyo)..."
+                    className="autocomplete-input"
                   />
-                  <button
-                    type="button"
-                    className="search-places-btn"
-                    onClick={searchPlaces}
-                    disabled={searchingPlaces}
-                  >
-                    {searchingPlaces ? 'Searching...' : 'Search'}
-                  </button>
+                  {searchingModalPlaces && (
+                    <div className="autocomplete-loading">Searching...</div>
+                  )}
+                  {modalPlaceSuggestions.length > 0 && (
+                    <ul className="autocomplete-suggestions">
+                      {modalPlaceSuggestions.map((suggestion) => (
+                        <li
+                          key={suggestion.place_id}
+                          onClick={() => selectModalPlace(suggestion)}
+                          className="autocomplete-item"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 002 6c0 4.314 6 10 6 10zm0-7a3 3 0 110-6 3 3 0 010 6z"/>
+                          </svg>
+                          {suggestion.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-                
-                {placeSearchResults.length > 0 && (
-                  <div className="place-results">
-                    {placeSearchResults.map((place, index) => (
-                      <button
-                        key={place.place_id || index}
-                        type="button"
-                        className="place-result-item"
-                        onClick={() => selectPlace(place)}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                          <path d="M8 16s6-5.686 6-10A6 6 0 002 6c0 4.314 6 10 6 10zm0-7a3 3 0 110-6 3 3 0 010 6z"/>
-                        </svg>
-                        {place.name || place.formatted_address}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
 
               <div className="form-divider">
@@ -1051,6 +1159,58 @@ export default function Destinations() {
                   onChange={handleInputChange}
                   placeholder="Describe this destination..."
                   rows="4"
+                />
+              </div>
+
+              {/* Rating */}
+              <div className="form-group">
+                <label htmlFor="rating">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ marginRight: '5px' }}>
+                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                  </svg>
+                  Rating (0-5 stars)
+                </label>
+                <div className="rating-input-container">
+                  <input
+                    type="number"
+                    id="rating"
+                    name="rating"
+                    value={formData.rating}
+                    onChange={handleInputChange}
+                    placeholder="0"
+                    min="0"
+                    max="5"
+                    step="0.1"
+                  />
+                  <div className="rating-stars">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <span 
+                        key={star}
+                        className={`star ${formData.rating >= star ? 'filled' : ''}`}
+                        onClick={() => setFormData({...formData, rating: star})}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Review */}
+              <div className="form-group">
+                <label htmlFor="review">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ marginRight: '5px' }}>
+                    <path d="M2.678 11.894a1 1 0 01.287.801 10.97 10.97 0 01-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 01.71-.074A8.06 8.06 0 008 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 01-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 00.244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 01-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/>
+                  </svg>
+                  Your Review
+                </label>
+                <textarea
+                  id="review"
+                  name="review"
+                  value={formData.review}
+                  onChange={handleInputChange}
+                  placeholder="Share your experience about this destination..."
+                  rows="3"
                 />
               </div>
 

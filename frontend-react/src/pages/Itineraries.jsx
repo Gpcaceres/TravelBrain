@@ -139,24 +139,15 @@ const Itineraries = () => {
     doc.setFillColor(...primaryColor);
     doc.rect(0, 0, pageWidth, 35, 'F');
     
-    // Logo - Intentar cargar el logo del proyecto
-    try {
-      const logoImg = new Image();
-      logoImg.src = '/assets/images/logo.png';
-      doc.addImage(logoImg, 'PNG', 10, 8, 20, 20);
-    } catch (e) {
-      console.log('Logo no disponible para PDF');
-    }
-    
-    // Logo/Title
+    // Logo/Title (sin intentar cargar imagen para evitar errores CORS)
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text('TravelBrain', 35, 18);
+    doc.text('TravelBrain', 15, 18);
     
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text('Plan de Itinerario', 35, 26);
+    doc.text('Plan de Itinerario', 15, 26);
 
     // Date generated
     doc.setFontSize(9);
@@ -255,9 +246,10 @@ const Itineraries = () => {
         },
         alternateRowStyles: { fillColor: [250, 250, 250] },
         margin: { left: 15, right: 15 },
+        tableWidth: 'auto',
         columnStyles: {
-          0: { cellWidth: 100 },
-          1: { cellWidth: 'auto', halign: 'right' }
+          0: { cellWidth: 90 },
+          1: { cellWidth: 'auto', halign: 'right', minCellWidth: 40 }
         }
       });
 
@@ -328,12 +320,13 @@ const Itineraries = () => {
           textColor: [50, 50, 50]
         },
         alternateRowStyles: { fillColor: [252, 252, 252] },
-        margin: { left: 20, right: 20 },
+        margin: { left: 15, right: 15 },
+        tableWidth: 'auto',
         columnStyles: {
-          0: { cellWidth: 20, fontStyle: 'bold' },
-          1: { cellWidth: 50 },
-          2: { cellWidth: 70 },
-          3: { cellWidth: 25, halign: 'right' }
+          0: { cellWidth: 18, fontStyle: 'bold' },
+          1: { cellWidth: 45, minCellWidth: 35 },
+          2: { cellWidth: 65, minCellWidth: 45 },
+          3: { cellWidth: 25, halign: 'right', minCellWidth: 20 }
         }
       });
 

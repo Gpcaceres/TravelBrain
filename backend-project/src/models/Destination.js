@@ -41,6 +41,17 @@ const destinationSchema = new mongoose.Schema(
       ref: 'User',
       required: false
     },
+    rating: {
+      type: Number,
+      min: 0,
+      max: 5,
+      default: 0
+    },
+    review: {
+      type: String,
+      trim: true,
+      default: ''
+    },
     createdAt: {
       type: Date,
       default: Date.now
