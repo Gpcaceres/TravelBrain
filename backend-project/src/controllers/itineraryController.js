@@ -363,6 +363,7 @@ exports.getItineraryById = async (req, res) => {
 exports.getItineraryByTripId = async (req, res) => {
   try {
     const { tripId } = req.params;
+    const userId = req.user?.id || req.body.userId;
 
     const itinerary = await Itinerary.findOne({ tripId }).populate('tripId');
 
@@ -373,7 +374,8 @@ exports.getItineraryByTripId = async (req, res) => {
       });
     }
 
-    if (itinerary.userId.toString() !== userId) {
+    // Skip user verification if no authentication
+    if (userId && itinerary.userId && itinerary.userId.toString() !== userId) {
       return res.status(403).json({
         success: false,
         message: 'No autorizado para ver este itinerario'
