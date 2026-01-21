@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { tripService } from '../services/tripService';
 import { generateItinerary, getItineraryByTripId } from '../services/itineraryService';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import '../styles/Itineraries.css';
 
 const Itineraries = () => {
@@ -13,6 +15,7 @@ const Itineraries = () => {
   const [trips, setTrips] = useState([]);
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [interestType, setInterestType] = useState('');
+  const [budgetType, setBudgetType] = useState('');
   const [loading, setLoading] = useState(false);
   const [itinerary, setItinerary] = useState(null);
   const [error, setError] = useState('');
@@ -24,6 +27,12 @@ const Itineraries = () => {
     'Deportes y Aventura'
   ];
 
+  const budgetTypes = [
+    'Económico',
+    'Medio',
+    'Alto'
+  ];
+
   useEffect(() => {
     fetchTrips();
   }, []);
@@ -32,7 +41,6 @@ const Itineraries = () => {
     try {
       const response = await tripService.getAllTrips();
       console.log('Response from tripService:', response);
-      console.log('Current user:', user);
       
       // Handle different response formats
       let allTrips = [];
@@ -42,14 +50,8 @@ const Itineraries = () => {
         allTrips = response;
       }
       
-      // Filter trips by current user
-      const userTrips = allTrips.filter(trip => {
-        console.log(`Comparing trip.userId (${trip.userId}) with user._id (${user._id})`);
-        return String(trip.userId) === String(user._id);
-      });
-      
-      console.log(`Found ${userTrips.length} trips for user ${user._id} out of ${allTrips.length} total trips`);
-      setTrips(userTrips);
+      console.log(`Found ${allTrips.length} trips`);
+      setTrips(Array.isArray(allTrips) ? allTrips : []);
     } catch (err) {
       console.error('Error fetching trips:', err);
       setError('Error al cargar los viajes');
@@ -87,12 +89,20 @@ const Itineraries = () => {
       setError('Por favor selecciona un tipo de interés');
       return;
     }
+    if (!budgetType) {
+      setError('Por favor selecciona un tipo de presupuesto');
+      return;
+    }
 
     setLoading(true);
     setError('');
 
     try {
-      const response = await generateItinerary(selectedTrip._id, interestType);
+      const response = await generateItinerary({
+        tripId: selectedTrip._id,
+        interestType: interestType,
+        budgetType: budgetType
+      });
       if (response.success) {
         setItinerary(response.data);
       }
@@ -105,24 +115,238 @@ const Itineraries = () => {
   };
 
   const handleDownloadPDF = () => {
-    if (!itinerary) return;
+    if (!itinerary || !selectedTrip) return;
 
-    // Using html2pdf library
-    const element = document.getElementById('itinerary-content');
-    const opt = {
-      margin: 1,
-      filename: `itinerario-${selectedTrip?.destination || 'viaje'}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    let yPos = 20;
 
-    // Check if html2pdf is available
-    if (window.html2pdf) {
-      window.html2pdf().set(opt).from(element).save();
-    } else {
-      alert('Por favor instala html2pdf para descargar el PDF');
+    // Colors
+    const primaryColor = [71, 245, 154]; // #47F59A
+    const darkBg = [26, 26, 26];
+    const lightText = [160, 160, 160];
+    const whiteText = [255, 255, 255];
+
+    // ========== HEADER ==========
+    doc.setFillColor(...primaryColor);
+    doc.rect(0, 0, pageWidth, 35, 'F');
+    
+    // Logo/Title
+    doc.setTextColor(26, 26, 26);
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TravelBrain', 15, 15);
+    
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Plan de Itinerario', 15, 25);
+
+    // Date generated
+    doc.setFontSize(9);
+    doc.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, pageWidth - 15, 15, { align: 'right' });
+
+    yPos = 45;
+
+    // ========== TRIP INFORMATION ==========
+    doc.setFillColor(245, 245, 245);
+    doc.rect(15, yPos, pageWidth - 30, 35, 'F');
+    
+    doc.setTextColor(26, 26, 26);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Destino: ${selectedTrip.destination}`, 20, yPos + 8);
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Fechas: ${formatDate(selectedTrip.startDate)} - ${formatDate(selectedTrip.endDate)}`, 20, yPos + 16);
+    doc.text(`Presupuesto Total: ${formatCurrency(selectedTrip.budget)}`, 20, yPos + 23);
+    doc.text(`Tipo de Interés: ${itinerary.interestType}`, 20, yPos + 30);
+    doc.text(`Categoría: ${itinerary.budgetType}`, pageWidth - 20, yPos + 30, { align: 'right' });
+
+    yPos += 42;
+
+    // ========== USER INFORMATION ==========
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 245, 154);
+    doc.text('Información del Usuario', 15, yPos);
+    
+    yPos += 7;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Nombre: ${user?.name || user?.username || 'Usuario'}`, 20, yPos);
+    doc.text(`Email: ${user?.email || 'N/A'}`, 20, yPos + 5);
+
+    yPos += 15;
+
+    // ========== WEATHER SUMMARY ==========
+    if (itinerary.weatherInfo?.averageTemp) {
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(71, 245, 154);
+      doc.text('Pronóstico del Clima', 15, yPos);
+      
+      yPos += 7;
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.text(`Temperatura Promedio: ${itinerary.weatherInfo.averageTemp}°C`, 20, yPos);
+      doc.text(`Condiciones: ${itinerary.weatherInfo.conditions || 'Variable'}`, 20, yPos + 5);
+      
+      yPos += 15;
     }
+
+    // ========== BUDGET BREAKDOWN ==========
+    if (itinerary.budgetBreakdown) {
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(71, 245, 154);
+      doc.text('Desglose de Presupuesto', 15, yPos);
+      
+      yPos += 5;
+
+      const budgetData = [
+        ['Categoría', 'Monto'],
+        ['Hospedaje', formatCurrency(itinerary.budgetBreakdown.accommodation || 0)],
+        ['Alimentación', formatCurrency(itinerary.budgetBreakdown.food || 0)],
+        ['Actividades', formatCurrency(itinerary.budgetBreakdown.activities || 0)],
+        ['Transporte', formatCurrency(itinerary.budgetBreakdown.transport || 0)],
+        ['Extras', formatCurrency(itinerary.budgetBreakdown.extras || 0)],
+        ['TOTAL', formatCurrency(itinerary.budgetBreakdown.total || 0)]
+      ];
+
+      doc.autoTable({
+        startY: yPos,
+        head: [budgetData[0]],
+        body: budgetData.slice(1),
+        theme: 'grid',
+        headStyles: { 
+          fillColor: [71, 245, 154], 
+          textColor: [26, 26, 26],
+          fontStyle: 'bold',
+          fontSize: 10
+        },
+        bodyStyles: { 
+          fontSize: 9,
+          textColor: [50, 50, 50]
+        },
+        footStyles: {
+          fillColor: [245, 245, 245],
+          textColor: [26, 26, 26],
+          fontStyle: 'bold'
+        },
+        alternateRowStyles: { fillColor: [250, 250, 250] },
+        margin: { left: 15, right: 15 },
+        columnStyles: {
+          0: { cellWidth: 100 },
+          1: { cellWidth: 'auto', halign: 'right' }
+        }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 15;
+    }
+
+    // ========== DAILY ITINERARY ==========
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 245, 154);
+    
+    // Check if we need a new page
+    if (yPos > pageHeight - 40) {
+      doc.addPage();
+      yPos = 20;
+    }
+    
+    doc.text('Itinerario Detallado', 15, yPos);
+    yPos += 10;
+
+    // Iterate through each day
+    itinerary.dailyActivities.forEach((day, dayIndex) => {
+      // Check if we need a new page
+      if (yPos > pageHeight - 60) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      // Day header with weather
+      doc.setFillColor(71, 245, 154);
+      doc.rect(15, yPos - 5, pageWidth - 30, 10, 'F');
+      
+      doc.setTextColor(26, 26, 26);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Día ${day.day} - ${formatDate(day.date)}`, 20, yPos + 2);
+
+      // Weather info for the day
+      const dayWeather = itinerary.weatherInfo?.dailyForecasts?.find((f, i) => i === day.day - 1);
+      if (dayWeather) {
+        doc.setFontSize(9);
+        doc.text(`${dayWeather.temp}°C - ${dayWeather.condition}`, pageWidth - 20, yPos + 2, { align: 'right' });
+      }
+
+      yPos += 10;
+
+      // Activities table
+      const activitiesData = day.activities.map(activity => [
+        activity.time,
+        activity.title,
+        activity.description || '',
+        formatCurrency(activity.cost || 0)
+      ]);
+
+      doc.autoTable({
+        startY: yPos,
+        head: [['Hora', 'Actividad', 'Descripción', 'Costo']],
+        body: activitiesData,
+        theme: 'striped',
+        headStyles: { 
+          fillColor: [245, 245, 245], 
+          textColor: [26, 26, 26],
+          fontStyle: 'bold',
+          fontSize: 9
+        },
+        bodyStyles: { 
+          fontSize: 8,
+          textColor: [50, 50, 50]
+        },
+        alternateRowStyles: { fillColor: [252, 252, 252] },
+        margin: { left: 20, right: 20 },
+        columnStyles: {
+          0: { cellWidth: 20, fontStyle: 'bold' },
+          1: { cellWidth: 50 },
+          2: { cellWidth: 70 },
+          3: { cellWidth: 25, halign: 'right' }
+        }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 8;
+    });
+
+    // ========== FOOTER ==========
+    const totalPages = doc.internal.pages.length - 1;
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        `Página ${i} de ${totalPages}`,
+        pageWidth / 2,
+        pageHeight - 10,
+        { align: 'center' }
+      );
+      doc.text(
+        'TravelBrain - Tu compañero de viaje',
+        pageWidth - 15,
+        pageHeight - 10,
+        { align: 'right' }
+      );
+    }
+
+    // Save PDF
+    const filename = `Itinerario_${selectedTrip.destination.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(filename);
   };
 
   const handleLogout = () => {
@@ -146,9 +370,9 @@ const Itineraries = () => {
   };
 
   return (
-    <div className="itineraries-container">
+    <div className="itineraries-page">
       {/* Navbar */}
-      <nav className="navbar">
+      <nav className="navbar itineraries-navbar">
         <div className="container navbar-content">
           <div className="navbar-left">
             <img src="/assets/images/logo.png" alt="Logo" className="navbar-logo" />
@@ -158,9 +382,9 @@ const Itineraries = () => {
           <div className="navbar-center">
             <Link to="/dashboard" className="nav-link">Dashboard</Link>
             <Link to="/trips" className="nav-link">My Trips</Link>
+            <Link to="/itineraries" className="nav-link active">Itineraries</Link>
             <Link to="/destinations" className="nav-link">Destinations</Link>
             <Link to="/weather" className="nav-link">Weather</Link>
-            <Link to="/itineraries" className="nav-link active">Itineraries</Link>
           </div>
 
           <div className="navbar-right">
@@ -222,10 +446,11 @@ const Itineraries = () => {
         </div>
       </nav>
 
-      <div className="itineraries-header">
-        <h1>Generador de Itinerarios</h1>
-        <p>Crea itinerarios personalizados para tus viajes</p>
-      </div>
+      <div className="itineraries-container">
+        <div className="itineraries-header">
+          <h1>Generador de Itinerarios</h1>
+          <p>Crea itinerarios personalizados para tus viajes</p>
+        </div>
 
       <div className="itinerary-form">
         <div className="form-group">
@@ -273,10 +498,25 @@ const Itineraries = () => {
               </div>
             </div>
 
+            <div className="form-group">
+              <label>Tipo de Presupuesto</label>
+              <div className="interest-types">
+                {budgetTypes.map((type) => (
+                  <button
+                    key={type}
+                    className={`interest-btn ${budgetType === type ? 'active' : ''}`}
+                    onClick={() => setBudgetType(type)}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <button
               className="generate-btn"
               onClick={handleGenerateItinerary}
-              disabled={loading || !interestType}
+              disabled={loading || !interestType || !budgetType}
             >
               {loading ? 'Generando...' : 'Generar Itinerario'}
             </button>
@@ -289,54 +529,87 @@ const Itineraries = () => {
       {itinerary && (
         <div className="itinerary-result" id="itinerary-content">
           <div className="itinerary-header-section">
-            <h2>Itinerario generado</h2>
-            <h3>Plan de Viaje: {selectedTrip?.destination}</h3>
+            <div className="itinerary-title-row">
+              <div>
+                <h2>Itinerario generado</h2>
+                <h3>Plan de Viaje: {selectedTrip?.destination}</h3>
+              </div>
+              <button 
+                className="download-pdf-btn"
+                onClick={handleDownloadPDF}
+                title="Descargar PDF"
+              >
+                <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M.5 9.9a.5.5 0 01.5.5v2.5a1 1 0 001 1h12a1 1 0 001-1v-2.5a.5.5 0 011 0v2.5a2 2 0 01-2 2H2a2 2 0 01-2-2v-2.5a.5.5 0 01.5-.5z"/>
+                  <path d="M7.646 11.854a.5.5 0 00.708 0l3-3a.5.5 0 00-.708-.708L8.5 10.293V1.5a.5.5 0 00-1 0v8.793L5.354 8.146a.5.5 0 10-.708.708l3 3z"/>
+                </svg>
+                Descargar PDF
+              </button>
+            </div>
             <div className="itinerary-meta">
               <span className="badge badge-interest">{itinerary.interestType}</span>
               <span className="badge badge-budget">{itinerary.budgetType}</span>
+              {itinerary.weatherInfo?.averageTemp && (
+                <span className="badge badge-weather">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 11.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7zm0 1a4.5 4.5 0 110-9 4.5 4.5 0 010 9z"/>
+                    <path d="M8 0a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 0zm0 13a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 13zm8-5a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zM3 8a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2A.5.5 0 013 8z"/>
+                  </svg>
+                  {itinerary.weatherInfo.averageTemp}°C promedio
+                </span>
+              )}
             </div>
           </div>
 
           <div className="itinerary-details">
             <h4>Itinerario Detallado</h4>
-            {itinerary.dailyActivities.map((day) => (
-              <div key={day.day} className="day-section">
-                <h5>Día {day.day} - {formatDate(day.date)}</h5>
-                <div className="activities-list">
-                  {day.activities.map((activity, index) => (
-                    <div key={index} className="activity-item">
-                      <div className="activity-time">{activity.time}</div>
-                      <div className="activity-details">
-                        <div className="activity-title">{activity.title}</div>
-                        <div className="activity-cost">${activity.cost}</div>
+            {itinerary.dailyActivities.map((day) => {
+              // Find weather forecast for this day
+              const dayWeather = itinerary.weatherInfo?.dailyForecasts?.find((forecast, index) => index === day.day - 1);
+              
+              return (
+                <div key={day.day} className="day-section">
+                  <div className="day-header">
+                    <div className="day-title">
+                      <h5>Día {day.day} - {formatDate(day.date)}</h5>
+                    </div>
+                    {dayWeather && (
+                      <div className="day-weather">
+                        <img 
+                          src={dayWeather.icon.startsWith('//') ? `https:${dayWeather.icon}` : dayWeather.icon} 
+                          alt={dayWeather.condition}
+                          className="weather-icon"
+                        />
+                        <div className="weather-info">
+                          <span className="weather-temp">{dayWeather.temp}°C</span>
+                          <span className="weather-condition">{dayWeather.condition}</span>
+                          {dayWeather.chanceOfRain > 0 && (
+                            <span className="weather-rain">
+                              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 0a.5.5 0 01.5.5v.5a.5.5 0 01-1 0V.5A.5.5 0 018 0zM0 8a.5.5 0 01.5-.5h.5a.5.5 0 010 1h-.5A.5.5 0 010 8zm13 0a.5.5 0 01.5-.5h.5a.5.5 0 010 1h-.5a.5.5 0 01-.5-.5zM8 13a.5.5 0 01.5.5v.5a.5.5 0 01-1 0v-.5a.5.5 0 01.5-.5zm6.5-8a.5.5 0 00-.5.5 6 6 0 11-12 0 .5.5 0 00-1 0 7 7 0 1014 0 .5.5 0 00-.5-.5z"/>
+                              </svg>
+                              {dayWeather.chanceOfRain}%
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )}
+                  </div>
+                  <div className="activities-list">
+                    {day.activities.map((activity, index) => (
+                      <div key={index} className="activity-item">
+                        <div className="activity-time">{activity.time}</div>
+                        <div className="activity-details">
+                          <div className="activity-title">{activity.title}</div>
+                          <div className="activity-cost">${activity.cost}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-
-          {itinerary.weatherInfo && (
-            <div className="weather-section">
-              <h4>Información del Clima</h4>
-              <div className="weather-summary">
-                <p><strong>Temperatura promedio:</strong> {itinerary.weatherInfo.averageTemp}°C</p>
-                <p><strong>Condiciones:</strong> {itinerary.weatherInfo.conditions}</p>
-              </div>
-              {itinerary.weatherInfo.dailyForecasts && itinerary.weatherInfo.dailyForecasts.length > 0 && (
-                <div className="daily-forecasts">
-                  {itinerary.weatherInfo.dailyForecasts.map((forecast, index) => (
-                    <div key={index} className="forecast-item">
-                      <p className="forecast-date">{formatDate(forecast.date)}</p>
-                      <p className="forecast-temp">{forecast.temp}°C</p>
-                      <p className="forecast-condition">{forecast.condition}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
 
           {itinerary.budgetBreakdown && (
             <div className="budget-section">
@@ -377,6 +650,7 @@ const Itineraries = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };
