@@ -129,8 +129,8 @@ const Itineraries = () => {
     const pageHeight = doc.internal.pageSize.height;
     let yPos = 20;
 
-    // Colors - Usando verde turquesa #11AF2F
-    const primaryColor = [17, 175, 47]; // #11AF2F - Color principal verde turquesa
+    // Colors - Usando verde oscuro #021509
+    const primaryColor = [2, 21, 9]; // #021509 - Color principal verde oscuro
     const darkBg = [26, 26, 26];
     const lightText = [160, 160, 160];
     const whiteText = [255, 255, 255];
@@ -185,7 +185,7 @@ const Itineraries = () => {
     // ========== USER INFORMATION ==========
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(17, 175, 47);
+    doc.setTextColor(2, 21, 9);
     doc.text('Información del Usuario', 15, yPos);
     
     yPos += 7;
@@ -201,7 +201,7 @@ const Itineraries = () => {
     if (itinerary.weatherInfo?.averageTemp) {
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(17, 175, 47);
+      doc.setTextColor(2, 21, 9);
       doc.text('Pronóstico del Clima', 15, yPos);
       
       yPos += 7;
@@ -218,7 +218,7 @@ const Itineraries = () => {
     if (itinerary.budgetBreakdown) {
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(17, 175, 47);
+      doc.setTextColor(2, 21, 9);
       doc.text('Desglose de Presupuesto', 15, yPos);
       
       yPos += 5;
@@ -239,7 +239,7 @@ const Itineraries = () => {
         body: budgetData.slice(1),
         theme: 'grid',
         headStyles: { 
-          fillColor: [17, 175, 47], 
+          fillColor: [2, 21, 9], 
           textColor: [255, 255, 255],
           fontStyle: 'bold',
           fontSize: 10
@@ -267,7 +267,7 @@ const Itineraries = () => {
     // ========== DAILY ITINERARY ==========
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(17, 175, 47);
+    doc.setTextColor(2, 21, 9);
     
     // Check if we need a new page
     if (yPos > pageHeight - 40) {
@@ -287,7 +287,7 @@ const Itineraries = () => {
       }
 
       // Day header with weather
-      doc.setFillColor(17, 175, 47);
+      doc.setFillColor(2, 21, 9);
       doc.rect(15, yPos - 5, pageWidth - 30, 10, 'F');
       
       doc.setTextColor(255, 255, 255);
