@@ -582,11 +582,22 @@ const Itineraries = () => {
                     </div>
                     {dayWeather && (
                       <div className="day-weather">
-                        <img 
-                          src={dayWeather.icon.startsWith('//') ? `https:${dayWeather.icon}` : dayWeather.icon} 
-                          alt={dayWeather.condition}
-                          className="weather-icon"
-                        />
+                        {dayWeather.icon && (
+                          <img 
+                            src={
+                              dayWeather.icon.startsWith('//') 
+                                ? `https:${dayWeather.icon}` 
+                                : dayWeather.icon.startsWith('http') 
+                                  ? dayWeather.icon 
+                                  : `https:${dayWeather.icon}`
+                            } 
+                            alt={dayWeather.condition || 'Weather icon'}
+                            className="weather-icon"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        )}
                         <div className="weather-info">
                           <span className="weather-temp">{dayWeather.temp}°C</span>
                           <span className="weather-condition">{dayWeather.condition}</span>
