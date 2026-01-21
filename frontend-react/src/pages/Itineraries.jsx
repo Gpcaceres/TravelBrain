@@ -121,7 +121,7 @@ const Itineraries = () => {
     }
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (!itinerary || !selectedTrip) return;
 
     const doc = new jsPDF();
@@ -139,15 +139,39 @@ const Itineraries = () => {
     doc.setFillColor(...primaryColor);
     doc.rect(0, 0, pageWidth, 35, 'F');
     
-    // Logo/Title (sin intentar cargar imagen para evitar errores CORS)
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.text('TravelBrain', 15, 18);
-    
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Plan de Itinerario', 15, 26);
+    // Load and add logo
+    try {
+      const logoImg = new Image();
+      logoImg.src = '/assets/images/logo.png';
+      await new Promise((resolve, reject) => {
+        logoImg.onload = resolve;
+        logoImg.onerror = reject;
+      });
+      
+      // Add logo image (ajustado a 30x30 para mejor visualización)
+      doc.addImage(logoImg, 'PNG', 15, 5, 25, 25);
+      
+      // Title next to logo
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text('TravelBrain', 45, 18);
+      
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Plan de Itinerario', 45, 26);
+    } catch (error) {
+      console.log('Error loading logo, using text only:', error);
+      // Fallback sin logo
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text('TravelBrain', 15, 18);
+      
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Plan de Itinerario', 15, 26);
+    }
 
     // Date generated
     doc.setFontSize(9);
