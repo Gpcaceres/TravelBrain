@@ -270,18 +270,86 @@ export default function Weather() {
   }
 
   const getWeatherIcon = (condition) => {
-    const icons = {
-      Clear: '☀️',
-      Clouds: '☁️',
-      Rain: '🌧️',
-      Drizzle: '🌦️',
-      Thunderstorm: '⛈️',
-      Snow: '❄️',
-      Mist: '🌫️',
-      Fog: '🌫️',
-      Haze: '🌫️'
+    const lowerCondition = condition?.toLowerCase() || ''
+    
+    // Clear/Sunny
+    if (lowerCondition.includes('clear') || lowerCondition.includes('sunny')) {
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 7a5 5 0 110 10 5 5 0 010-10zm0-2a7 7 0 100 14 7 7 0 000-14z"/>
+          <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      )
     }
-    return icons[condition] || '🌤️'
+    
+    // Clouds
+    if (lowerCondition.includes('cloud') || lowerCondition.includes('overcast')) {
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+        </svg>
+      )
+    }
+    
+    // Rain
+    if (lowerCondition.includes('rain') || lowerCondition.includes('shower')) {
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+          <path d="M8 16l-2 4m4-4l-2 4m4-4l-2 4m4-4l-2 4m4-4l-2 4"/>
+        </svg>
+      )
+    }
+    
+    // Drizzle/Light Rain
+    if (lowerCondition.includes('drizzle') || lowerCondition.includes('light rain')) {
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+          <circle cx="8" cy="19" r="1"/>
+          <circle cx="11" cy="19" r="1"/>
+          <circle cx="14" cy="19" r="1"/>
+          <circle cx="17" cy="19" r="1"/>
+        </svg>
+      )
+    }
+    
+    // Thunderstorm
+    if (lowerCondition.includes('thunder') || lowerCondition.includes('storm')) {
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+          <path d="M13 14h-2l3 8v-6h2l-3-8v6z"/>
+        </svg>
+      )
+    }
+    
+    // Snow
+    if (lowerCondition.includes('snow') || lowerCondition.includes('sleet')) {
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+          <path d="M8 16l-1 1 1 1 1-1-1-1zm4 0l-1 1 1 1 1-1-1-1zm4 0l-1 1 1 1 1-1-1-1zm-6 3l-1 1 1 1 1-1-1-1zm4 0l-1 1 1 1 1-1-1-1z"/>
+        </svg>
+      )
+    }
+    
+    // Mist/Fog/Haze
+    if (lowerCondition.includes('mist') || lowerCondition.includes('fog') || lowerCondition.includes('haze')) {
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 15h18M3 9h18M3 12h18M3 18h14M3 6h14"/>
+        </svg>
+      )
+    }
+    
+    // Default - Partly Cloudy
+    return (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95z"/>
+        <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" opacity="0.3"/>
+      </svg>
+    )
   }
 
   return (

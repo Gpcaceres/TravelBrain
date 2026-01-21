@@ -470,7 +470,16 @@
   line-height: 1;
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  color: #47F59A;
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.temp-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .temp-value {
@@ -706,6 +715,13 @@
 
 .info-icon.weather-emoji {
   font-size: 2.2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.info-icon.weather-emoji svg {
+  width: 100%;
+  height: 100%;
 }
 
 .info-icon svg {
