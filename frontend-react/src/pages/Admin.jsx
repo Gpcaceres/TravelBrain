@@ -500,7 +500,7 @@ function Admin() {
             <button
               className="pagination-btn"
               onClick={() => handlePageChange(currentPage - 1)}
-              disabled={!pagination.hasPrevPage}
+              disabled={currentPage === 1}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z"/>
@@ -510,7 +510,7 @@ function Admin() {
             
             <div className="pagination-info">
               {/* First page */}
-              {currentPage > 3 && (
+              {currentPage > 2 && (
                 <>
                   <button
                     className="pagination-number"
@@ -518,18 +518,18 @@ function Admin() {
                   >
                     1
                   </button>
-                  {currentPage > 4 && <span className="pagination-ellipsis">...</span>}
+                  {currentPage > 3 && <span className="pagination-ellipsis">...</span>}
                 </>
               )}
               
               {/* Pages around current */}
               {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
                 .filter(page => {
-                  return page === currentPage ||
-                         page === currentPage - 1 ||
-                         page === currentPage + 1 ||
-                         page === currentPage - 2 ||
-                         page === currentPage + 2;
+                  // Show current page and one page before and after
+                  if (pagination.totalPages <= 5) {
+                    return true; // Show all pages if 5 or less
+                  }
+                  return Math.abs(page - currentPage) <= 1;
                 })
                 .map(page => (
                   <button
@@ -542,9 +542,9 @@ function Admin() {
                 ))}
               
               {/* Last page */}
-              {currentPage < pagination.totalPages - 2 && (
+              {currentPage < pagination.totalPages - 1 && (
                 <>
-                  {currentPage < pagination.totalPages - 3 && <span className="pagination-ellipsis">...</span>}
+                  {currentPage < pagination.totalPages - 2 && <span className="pagination-ellipsis">...</span>}
                   <button
                     className="pagination-number"
                     onClick={() => handlePageChange(pagination.totalPages)}
@@ -562,7 +562,7 @@ function Admin() {
             <button
               className="pagination-btn"
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={!pagination.hasNextPage}
+              disabled={currentPage === pagination.totalPages}
             >
               Siguiente
               <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
