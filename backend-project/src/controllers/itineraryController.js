@@ -187,16 +187,17 @@ const calculateBudgetBreakdown = (totalBudget, budgetType, days) => {
 const getWeatherForecast = async (destination, startDate, endDate) => {
   try {
     // In a real scenario, you would use the weather API
-    // For now, we'll return mock data with proper icon URLs
+    // For now, we'll return mock data with proper icon URLs from OpenWeatherMap
     const days = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
     const dailyForecasts = [];
     
-    // Weather conditions with their corresponding icon codes
+    // Weather conditions with their corresponding OpenWeatherMap icon codes
     const weatherConditions = [
       { condition: 'Soleado', icon: '01d' },
       { condition: 'Parcialmente nublado', icon: '02d' },
       { condition: 'Nublado', icon: '03d' },
-      { condition: 'Lluvia ligera', icon: '10d' }
+      { condition: 'Lluvia ligera', icon: '10d' },
+      { condition: 'Despejado', icon: '01d' }
     ];
 
     for (let i = 0; i <= days; i++) {
@@ -210,7 +211,7 @@ const getWeatherForecast = async (destination, startDate, endDate) => {
         date: date,
         temp: Math.round(Math.random() * 10 + 20), // 20-30°C
         condition: weatherData.condition,
-        icon: `https://cdn.weatherapi.com/weather/64x64/day/113.png`, // Default sunny icon
+        icon: `https://openweathermap.org/img/wn/${weatherData.icon}@2x.png`,
         chanceOfRain: chanceOfRain
       });
     }
