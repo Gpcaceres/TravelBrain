@@ -37,6 +37,18 @@ export default function Weather() {
     }
   }, [user?._id])
 
+  // Auto-update relative times every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Force re-render to update relative times
+      if (savedSearches.length > 0) {
+        setSavedSearches([...savedSearches])
+      }
+    }, 60000) // Update every minute
+
+    return () => clearInterval(interval)
+  }, [savedSearches])
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (showMenu && !e.target.closest('.user-menu')) {
@@ -55,6 +67,51 @@ export default function Weather() {
     setShowMenu(false)
     logout()
     navigate('/')
+  }
+
+  // Format date to show if it's today or relative time
+  const formatSearchDate = (dateString) => {
+    const searchDate = new Date(dateString)
+    const now = new Date()
+    const diffInMs = now - searchDate
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60))
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+    
+    const isToday = searchDate.toDateString() === now.toDateString()
+    const isYesterday = new Date(now - 24 * 60 * 60 * 1000).toDateString() === searchDate.toDateString()
+    
+    const timeStr = searchDate.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true
+    })
+    
+    if (isToday) {
+      if (diffInMinutes < 1) {
+        return { label: 'Today', time: 'Just now', isRecent: true }
+      } else if (diffInMinutes < 60) {
+        return { label: 'Today', time: `${diffInMinutes} min ago`, isRecent: true }
+      } else if (diffInHours < 24) {
+        return { label: 'Today', time: timeStr, isRecent: true }
+      }
+    } else if (isYesterday) {
+      return { label: 'Yesterday', time: timeStr, isRecent: false }
+    } else if (diffInDays < 7) {
+      const dayName = searchDate.toLocaleDateString('en-US', { weekday: 'long' })
+      return { label: dayName, time: timeStr, isRecent: false }
+    }
+    
+    // For older dates
+    return { 
+      label: searchDate.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: now.getFullYear() !== searchDate.getFullYear() ? 'numeric' : undefined
+      }), 
+      time: timeStr,
+      isRecent: false
+    }
   }
 
   const loadSavedSearches = async () => {
@@ -258,15 +315,7 @@ export default function Weather() {
                   {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
                 </div>
                 <span className="user-name">{user?.name || user?.username || 'User'}</span>
-                <svg 
-                  className={`dropdown-arrow ${showMenu ? 'rotated' : ''}`} 
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 16 16" 
-                  fill="currentColor"
-                >
-                  <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
-                </svg>
+                <span className={`dropdown-arrow ${showMenu ? 'rotated' : ''}`}>▼</span>
               </button>
 
               {showMenu && (
@@ -277,7 +326,7 @@ export default function Weather() {
                         {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
                       </div>
                       <div>
-                        <p className="dropdown-name">{user?.name || user?.username}</p>
+                        <p className="dropdown-name">{user?.name || user?.username || 'User'}</p>
                         <p className="dropdown-email">{user?.email}</p>
                       </div>
                     </div>
@@ -289,7 +338,7 @@ export default function Weather() {
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                       <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm2.5 1h-5A2.5 2.5 0 003 11.5V13a1 1 0 001 1h8a1 1 0 001-1v-1.5A2.5 2.5 0 0010.5 9z"/>
                     </svg>
-                    My Profile
+                    Profile Settings
                   </Link>
                   
                   {user?.role === 'ADMIN' && (
@@ -466,14 +515,26 @@ export default function Weather() {
             </div>
           ) : (
             <div className="searches-grid">
-              {savedSearches.map((search) => (
-                <div key={search._id} className="search-card">
-                  <div className="search-card-content">
-                    <div className="search-grid-item city">
-                      <h3 className="search-city">{search.label}</h3>
-                    </div>
-                    
-                    <div className="search-grid-item delete">
+              {savedSearches.map((search) => {
+                const dateInfo = formatSearchDate(search.createdAt)
+                return (
+                  <div key={search._id} className="search-card">
+                    <div className="search-card-header">
+                      <div className="search-header-left">
+                        <h3 className="search-city">{search.label}</h3>
+                        <div className="search-date-time">
+                          <span className={`date-badge ${dateInfo.isRecent ? 'today-badge' : ''}`}>
+                            {dateInfo.label}
+                          </span>
+                          <span className="time-text">
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                              <path d="M8 3.5a.5.5 0 01.5.5v4a.5.5 0 01-.5.5H6a.5.5 0 010-1h1.5V4a.5.5 0 01.5-.5z"/>
+                              <path d="M8 16A8 8 0 108 0a8 8 0 000 16zm0-1A7 7 0 108 1a7 7 0 000 14z"/>
+                            </svg>
+                            {dateInfo.time}
+                          </span>
+                        </div>
+                      </div>
                       <button
                         className="delete-btn"
                         onClick={(e) => {
@@ -489,47 +550,50 @@ export default function Weather() {
                       </button>
                     </div>
                     
-                    <div className="search-grid-item info-box">
-                      <span className="info-icon">{getWeatherIcon(search.condition)}</span>
-                      <div className="info-content">
-                        <p className="info-label">Temperature</p>
-                        <p className="info-value">{search.temp}°C</p>
+                    <div className="search-card-content">
+                      <div className="search-grid-item info-box">
+                        <span className="info-icon weather-emoji">{getWeatherIcon(search.condition)}</span>
+                        <div className="info-content">
+                          <p className="info-label">Temperature</p>
+                          <p className="info-value">{search.temp}°C</p>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="search-grid-item info-box">
-                      <svg className="info-icon" width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8.5 8.5a.5.5 0 00-1 0v5.793L6.354 13.146a.5.5 0 10-.708.708l2 2a.5.5 0 00.708 0l2-2a.5.5 0 00-.708-.708L8.5 14.293V8.5z"/>
-                        <path d="M6.646 3.646a.5.5 0 01.708 0L8.5 4.793l1.146-1.147a.5.5 0 01.708.708l-1.5 1.5a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 010-.708z"/>
-                      </svg>
-                      <div className="info-content">
-                        <p className="info-label">Humidity</p>
-                        <p className="info-value">{search.humidity}%</p>
+                      
+                      <div className="search-grid-item info-box">
+                        <svg className="info-icon" width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M8.5 8.5a.5.5 0 00-1 0v5.793L6.354 13.146a.5.5 0 10-.708.708l2 2a.5.5 0 00.708 0l2-2a.5.5 0 00-.708-.708L8.5 14.293V8.5z"/>
+                          <path d="M6.646 3.646a.5.5 0 01.708 0L8.5 4.793l1.146-1.147a.5.5 0 01.708.708l-1.5 1.5a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 010-.708z"/>
+                        </svg>
+                        <div className="info-content">
+                          <p className="info-label">Humidity</p>
+                          <p className="info-value">{search.humidity}%</p>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="search-grid-item info-box">
-                      <svg className="info-icon" width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M12.5 2A2.5 2.5 0 0010 4.5a.5.5 0 001 0 1.5 1.5 0 113 0c0 .474-.196.953-.667 1.424a4.488 4.488 0 01-.976.69 2.5 2.5 0 00-1.357 2.22V10.5a.5.5 0 001 0V9.165c.095-.04.19-.084.284-.132a5.5 5.5 0 001.216-.865c.653-.67 1-1.518 1-2.418A2.5 2.5 0 0012.5 2z"/>
-                      </svg>
-                      <div className="info-content">
-                        <p className="info-label">Wind Speed</p>
-                        <p className="info-value">{Number(search.windSpeed).toFixed(2)} m/s</p>
+                      
+                      <div className="search-grid-item info-box">
+                        <svg className="info-icon" width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M12.5 2A2.5 2.5 0 0010 4.5a.5.5 0 001 0 1.5 1.5 0 113 0c0 .474-.196.953-.667 1.424a4.488 4.488 0 01-.976.69 2.5 2.5 0 00-1.357 2.22V10.5a.5.5 0 001 0V9.165c.095-.04.19-.084.284-.132a5.5 5.5 0 001.216-.865c.653-.67 1-1.518 1-2.418A2.5 2.5 0 0012.5 2z"/>
+                        </svg>
+                        <div className="info-content">
+                          <p className="info-label">Wind Speed</p>
+                          <p className="info-value">{Number(search.windSpeed).toFixed(2)} m/s</p>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="search-grid-item date">
-                      <p className="search-date">
-                        {new Date(search.createdAt).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
-                      </p>
+                      
+                      <div className="search-grid-item info-box condition-box">
+                        <svg className="info-icon" width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M8 15A7 7 0 118 1a7 7 0 010 14zm0 1A8 8 0 108 0a8 8 0 000 16z"/>
+                          <path d="M4.285 9.567a.5.5 0 01.683.183A3.498 3.498 0 008 11.5a3.498 3.498 0 003.032-1.75.5.5 0 11.866.5A4.498 4.498 0 018 12.5a4.498 4.498 0 01-3.898-2.25.5.5 0 01.183-.683zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>
+                        </svg>
+                        <div className="info-content">
+                          <p className="info-label">Condition</p>
+                          <p className="info-value condition-value">{search.condition}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </section>
