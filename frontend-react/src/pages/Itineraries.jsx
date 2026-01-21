@@ -129,8 +129,8 @@ const Itineraries = () => {
     const pageHeight = doc.internal.pageSize.height;
     let yPos = 20;
 
-    // Colors
-    const primaryColor = [71, 245, 154]; // #47F59A
+    // Colors - Usando la paleta magenta del proyecto
+    const primaryColor = [229, 74, 122]; // #E54A7A - Color principal magenta
     const darkBg = [26, 26, 26];
     const lightText = [160, 160, 160];
     const whiteText = [255, 255, 255];
@@ -139,15 +139,24 @@ const Itineraries = () => {
     doc.setFillColor(...primaryColor);
     doc.rect(0, 0, pageWidth, 35, 'F');
     
+    // Logo - Intentar cargar el logo del proyecto
+    try {
+      const logoImg = new Image();
+      logoImg.src = '/assets/images/logo.png';
+      doc.addImage(logoImg, 'PNG', 10, 8, 20, 20);
+    } catch (e) {
+      console.log('Logo no disponible para PDF');
+    }
+    
     // Logo/Title
-    doc.setTextColor(26, 26, 26);
+    doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text('TravelBrain', 15, 15);
+    doc.text('TravelBrain', 35, 18);
     
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text('Plan de Itinerario', 15, 25);
+    doc.text('Plan de Itinerario', 35, 26);
 
     // Date generated
     doc.setFontSize(9);
@@ -176,7 +185,7 @@ const Itineraries = () => {
     // ========== USER INFORMATION ==========
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(71, 245, 154);
+    doc.setTextColor(229, 74, 122);
     doc.text('Información del Usuario', 15, yPos);
     
     yPos += 7;
@@ -192,7 +201,7 @@ const Itineraries = () => {
     if (itinerary.weatherInfo?.averageTemp) {
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(71, 245, 154);
+      doc.setTextColor(229, 74, 122);
       doc.text('Pronóstico del Clima', 15, yPos);
       
       yPos += 7;
@@ -209,7 +218,7 @@ const Itineraries = () => {
     if (itinerary.budgetBreakdown) {
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(71, 245, 154);
+      doc.setTextColor(229, 74, 122);
       doc.text('Desglose de Presupuesto', 15, yPos);
       
       yPos += 5;
@@ -230,8 +239,8 @@ const Itineraries = () => {
         body: budgetData.slice(1),
         theme: 'grid',
         headStyles: { 
-          fillColor: [71, 245, 154], 
-          textColor: [26, 26, 26],
+          fillColor: [229, 74, 122], 
+          textColor: [255, 255, 255],
           fontStyle: 'bold',
           fontSize: 10
         },
@@ -258,7 +267,7 @@ const Itineraries = () => {
     // ========== DAILY ITINERARY ==========
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(71, 245, 154);
+    doc.setTextColor(229, 74, 122);
     
     // Check if we need a new page
     if (yPos > pageHeight - 40) {
@@ -278,10 +287,10 @@ const Itineraries = () => {
       }
 
       // Day header with weather
-      doc.setFillColor(71, 245, 154);
+      doc.setFillColor(229, 74, 122);
       doc.rect(15, yPos - 5, pageWidth - 30, 10, 'F');
       
-      doc.setTextColor(26, 26, 26);
+      doc.setTextColor(255, 255, 255);
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.text(`Día ${day.day} - ${formatDate(day.date)}`, 20, yPos + 2);
