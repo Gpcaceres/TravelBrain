@@ -41,6 +41,7 @@ const Itineraries = () => {
     try {
       const response = await tripService.getAllTrips();
       console.log('Response from tripService:', response);
+      console.log('Current user:', user);
       
       // Handle different response formats
       let allTrips = [];
@@ -50,8 +51,14 @@ const Itineraries = () => {
         allTrips = response;
       }
       
-      console.log(`Found ${allTrips.length} trips`);
-      setTrips(Array.isArray(allTrips) ? allTrips : []);
+      // Filter trips by current user
+      const userTrips = allTrips.filter(trip => {
+        console.log(`Comparing trip.userId (${trip.userId}) with user._id (${user._id})`);
+        return String(trip.userId) === String(user._id);
+      });
+      
+      console.log(`Found ${userTrips.length} trips for user ${user._id} out of ${allTrips.length} total trips`);
+      setTrips(Array.isArray(userTrips) ? userTrips : []);
     } catch (err) {
       console.error('Error fetching trips:', err);
       setError('Error al cargar los viajes');

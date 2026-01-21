@@ -338,55 +338,62 @@
 }
 
 .interest-btn {
-  padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(15, 23, 42, 0.7);
-  border-radius: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(71, 245, 154, 0.2);
+  border-radius: 0.75rem;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #a0a0a0;
+  text-align: center;
 }
 
 .interest-btn:hover {
-  border-color: rgba(71, 245, 154, 0.5);
   background: rgba(71, 245, 154, 0.1);
-  color: #47F59A;
+  border-color: rgba(71, 245, 154, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(71, 245, 154, 0.2);
 }
 
 .interest-btn.active {
+  background: linear-gradient(135deg, #47F59A 0%, #2ecc71 100%);
   border-color: #47F59A;
-  background: rgba(71, 245, 154, 0.15);
-  color: #47F59A;
-  box-shadow: 0 0 20px rgba(71, 245, 154, 0.2);
+  color: #1a1a1a;
+  box-shadow: 0 4px 20px rgba(71, 245, 154, 0.4);
 }
 
 /* Generate Button */
 .generate-btn {
   width: 100%;
-  padding: 1rem;
-  background: #47F59A;
+  padding: 1.25rem 2rem;
+  background: linear-gradient(135deg, #47F59A 0%, #2ecc71 100%);
   color: #1a1a1a;
   border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
+  border-radius: 0.75rem;
+  font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 1rem;
+  margin-top: 2rem;
+  box-shadow: 0 4px 20px rgba(71, 245, 154, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .generate-btn:hover:not(:disabled) {
-  background: #2ecc71;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(71, 245, 154, 0.3);
+  background: linear-gradient(135deg, #2ecc71 0%, #47F59A 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(71, 245, 154, 0.5);
 }
 
 .generate-btn:disabled {
   background: rgba(255, 255, 255, 0.1);
   color: #666;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Error Message */
@@ -663,6 +670,72 @@
 .budget-total span:last-child {
   color: #47F59A;
   font-size: 1.2rem;
+}
+
+/* Weather Section */
+.day-weather {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(71, 245, 154, 0.05);
+  border: 1px solid rgba(71, 245, 154, 0.2);
+  border-radius: 0.5rem;
+}
+
+.weather-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.weather-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.weather-temp {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #47F59A;
+}
+
+.weather-condition {
+  font-size: 0.9rem;
+  color: #a0a0a0;
+  text-transform: capitalize;
+}
+
+.weather-rain {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: #6eb3ff;
+  margin-top: 0.25rem;
+}
+
+.weather-rain svg {
+  opacity: 0.8;
+}
+
+.badge-weather {
+  background: rgba(71, 245, 154, 0.15);
+  color: #47F59A;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(71, 245, 154, 0.3);
+}
+
+.badge-weather svg {
+  color: #47F59A;
 }
 
 /* Actions */
