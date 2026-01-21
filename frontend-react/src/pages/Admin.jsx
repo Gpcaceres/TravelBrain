@@ -114,9 +114,17 @@ function Admin() {
     setUpdatingUserId(userId);
     try {
       const response = await api.patch(`/users/${userId}/activate`);
+      // Update local state immediately
+      setUsers(prevUsers => 
+        prevUsers.map(u => 
+          u._id === userId ? { ...u, status: 'ACTIVE' } : u
+        )
+      );
       setSuccessMessage(response.data.message);
       setTimeout(() => setSuccessMessage(''), 3000);
-      fetchData();
+      // Refresh stats
+      const statsResponse = await api.get('/users/stats');
+      setStats(statsResponse.data.stats);
     } catch (err) {
       console.error('Error al activar usuario:', err);
       setError(err.response?.data?.message || 'Error al activar usuario');
@@ -130,9 +138,17 @@ function Admin() {
     setUpdatingUserId(userId);
     try {
       const response = await api.patch(`/users/${userId}/deactivate`);
+      // Update local state immediately
+      setUsers(prevUsers => 
+        prevUsers.map(u => 
+          u._id === userId ? { ...u, status: 'INACTIVE' } : u
+        )
+      );
       setSuccessMessage(response.data.message);
       setTimeout(() => setSuccessMessage(''), 3000);
-      fetchData();
+      // Refresh stats
+      const statsResponse = await api.get('/users/stats');
+      setStats(statsResponse.data.stats);
     } catch (err) {
       console.error('Error al desactivar usuario:', err);
       setError(err.response?.data?.message || 'Error al desactivar usuario');
@@ -148,13 +164,19 @@ function Admin() {
     setDeletingUserId(userId);
     try {
       const response = await api.delete(`/users/${userId}`);
+      // Remove user from local state immediately
+      setUsers(prevUsers => prevUsers.filter(u => u._id !== userId));
       setSuccessMessage(response.data.message || 'Usuario eliminado');
       setTimeout(() => setSuccessMessage(''), 3000);
-      fetchData();
+      // Refresh stats
+      const statsResponse = await api.get('/users/stats');
+      setStats(statsResponse.data.stats);
     } catch (err) {
       console.error('Error al eliminar usuario:', err);
       setError(err.response?.data?.message || 'Error al eliminar usuario');
       setTimeout(() => setError(''), 3000);
+      // Revert if failed - refetch data
+      fetchData();
     } finally {
       setDeletingUserId(null);
     }
@@ -171,13 +193,23 @@ function Admin() {
   const handleChangeRole = async (userId, newRole) => {
     try {
       const response = await api.patch(`/users/${userId}/role`, { role: newRole });
+      // Update local state immediately
+      setUsers(prevUsers => 
+        prevUsers.map(u => 
+          u._id === userId ? { ...u, role: newRole } : u
+        )
+      );
       setSuccessMessage(response.data.message);
       setTimeout(() => setSuccessMessage(''), 3000);
-      fetchData();
+      // Refresh stats
+      const statsResponse = await api.get('/users/stats');
+      setStats(statsResponse.data.stats);
     } catch (err) {
       console.error('Error al cambiar rol:', err);
       setError(err.response?.data?.message || 'Error al cambiar rol de usuario');
       setTimeout(() => setError(''), 3000);
+      // Revert if failed - refetch data
+      fetchData();
     }
   };
 
