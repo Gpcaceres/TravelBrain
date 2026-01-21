@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_CONFIG } from '../config';
+import { API_CONFIG, STORAGE_KEYS } from '../config';
 
 const API_BASE_URL = API_CONFIG.BASE_URL;
 
@@ -7,7 +7,7 @@ const API_BASE_URL = API_CONFIG.BASE_URL;
  * Get authentication token from localStorage
  */
 const getAuthToken = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
   return token;
 };
 
@@ -26,15 +26,17 @@ const createAuthHeaders = () => {
 
 /**
  * Generate a new itinerary for a trip
- * @param {string} tripId - Trip ID
- * @param {string} interestType - Type of interest (Cultura e Historia, Naturaleza y Aventura, Gastronomía, Deportes y Aventura)
+ * @param {Object} data - Itinerary generation data
+ * @param {string} data.tripId - Trip ID
+ * @param {string} data.interestType - Type of interest (Cultura e Historia, Naturaleza y Aventura, Gastronomía, Deportes y Aventura)
+ * @param {string} data.budgetType - Budget type (Económico, Medio, Alto)
  * @returns {Promise} Generated itinerary
  */
-export const generateItinerary = async (tripId, interestType) => {
+export const generateItinerary = async (data) => {
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/itineraries/generate`,
-      { tripId, interestType },
+      `${API_BASE_URL}/api/itineraries/generate`,
+      data,
       createAuthHeaders()
     );
     return response.data;
@@ -52,7 +54,7 @@ export const generateItinerary = async (tripId, interestType) => {
 export const getItineraryById = async (id) => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/itineraries/${id}`,
+      `${API_BASE_URL}/api/itineraries/${id}`,
       createAuthHeaders()
     );
     return response.data;
@@ -70,7 +72,7 @@ export const getItineraryById = async (id) => {
 export const getItineraryByTripId = async (tripId) => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/itineraries/trip/${tripId}`,
+      `${API_BASE_URL}/api/itineraries/trip/${tripId}`,
       createAuthHeaders()
     );
     return response.data;
@@ -87,7 +89,7 @@ export const getItineraryByTripId = async (tripId) => {
 export const getUserItineraries = async () => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/itineraries`,
+      `${API_BASE_URL}/api/itineraries`,
       createAuthHeaders()
     );
     return response.data;
@@ -105,7 +107,7 @@ export const getUserItineraries = async () => {
 export const deleteItinerary = async (id) => {
   try {
     const response = await axios.delete(
-      `${API_BASE_URL}/itineraries/${id}`,
+      `${API_BASE_URL}/api/itineraries/${id}`,
       createAuthHeaders()
     );
     return response.data;
