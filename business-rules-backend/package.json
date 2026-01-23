@@ -1,7 +1,7 @@
 {
-  "name": "travelbrain-backend",
+  "name": "travelbrain-business-rules",
   "version": "1.0.0",
-  "description": "TravelBrain Backend API - Personalized travel itinerary generator with weather, budget, and distance integration",
+  "description": "TravelBrain Business Rules API - Centralized business logic and validation service",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -9,23 +9,18 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "travel",
+    "business-rules",
+    "validation",
     "api",
-    "backend",
     "express",
-    "mongodb",
-    "nodejs"
+    "microservices"
   ],
   "author": "TravelBrain Team",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.6.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^8.0.3",
-    "node-cache": "^5.1.2"
+    "express": "^4.18.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

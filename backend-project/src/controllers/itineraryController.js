@@ -1,6 +1,7 @@
 const Itinerary = require('../models/Itinerary');
 const Trip = require('../models/Trip');
 const config = require('../config/env');
+const businessRulesClient = require('../utils/businessRulesClient');
 
 /**
  * Activity templates based on interest type and budget
@@ -266,36 +267,77 @@ exports.generateItinerary = async (req, res) => {
       });
     }
 
-    // Calculate days
-    const days = Math.ceil((trip.endDate - trip.startDate) / (1000 * 60 * 60 * 24));
-    
-    // Use requested budget type or detect from trip budget
-    const budgetType = requestedBudgetType || detectBudgetType(trip.budget || 500, days);
+    // Use business rules service to generate itinerary
+    const tripData = {
+      startDate: trip.startDate,
+      endDate: trip.endDate,
+      budget: trip.budget,
+      destination: trip.destination
+    };
 
-    // Get activity templates
-    const activities = activityTemplates[interestType][budgetType];
+    const itineraryResult = await businessRulesClient.generateItinerary(
+      tripData,
+      interestType,
+      requestedBudgetType
+    );
 
-    // Generate daily activities
-    const dailyActivities = [];
-    for (let day = 1; day <= days; day++) {
-      const date = new Date(trip.startDate);
-      date.setDate(date.getDate() + (day - 1));
-
-      dailyActivities.push({
-        day,
-        date,
-        activities: generateDailySchedule(budgetType, activities, day)
+    if (!itineraryResult.valid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Error al generar itinerario',
+        errors: itineraryResult.errors
       });
     }
+
+    const { budgetType, dailyActivities, budgetBreakdown } = itineraryResult.data;
 
     // Get weather forecast
     const weatherInfo = await getWeatherForecast(trip.destination, trip.startDate, trip.endDate);
 
-    // Calculate budget breakdown
-    const budgetBreakdown = calculateBudgetBreakdown(trip.budget || 500, budgetType, days);
-
     // Check if itinerary already exists for this trip
     let itinerary = await Itinerary.findOne({ tripId });
+
+    if (itinerary) {
+      // Update existing itinerary
+      itinerary.interestType = interestType;
+      itinerary.budgetType = budgetType;
+      itinerary.dailyActivities = dailyActivities;
+      itinerary.weatherInfo = weatherInfo;
+      itinerary.budgetBreakdown = budgetBreakdown;
+      itinerary.generatedAt = new Date();
+      await itinerary.save();
+    } else {
+      // Create new itinerary
+      itinerary = new Itinerary({
+        tripId,
+        userId,
+        interestType,
+        budgetType,
+        dailyActivities,
+        weatherInfo,
+        budgetBreakdown
+      });
+      await itinerary.save();
+    }
+
+    // Populate trip data
+    await itinerary.populate('tripId');
+
+    res.status(201).json({
+      success: true,
+      message: 'Itinerario generado exitosamente',
+      data: itinerary
+    });
+
+  } catch (error) {
+    console.error('Error generating itinerary:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al generar itinerario',
+      error: error.message
+    });
+  }
+};
 
     if (itinerary) {
       // Update existing itinerary

@@ -34,6 +34,9 @@ const config = {
   corsOrigins: process.env.CORS_ORIGINS 
     ? process.env.CORS_ORIGINS.split(',')
     : ['http://localhost:8000', 'http://localhost:3004', 'https://travelbrain-3tfv.onrender.com'],
+  
+  // Business Rules API
+  businessRulesApiUrl: process.env.BUSINESS_RULES_API_URL || 'http://localhost:3005',
 };
 
 /**

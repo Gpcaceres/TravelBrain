@@ -1,4 +1,5 @@
 const Trip = require('../models/Trip');
+const businessRulesClient = require('../utils/businessRulesClient');
 
 /**
  * Get all trips
@@ -39,6 +40,16 @@ exports.getTripById = async (req, res) => {
  */
 exports.createTrip = async (req, res) => {
   try {
+    // Validate trip data using business rules
+    const validation = await businessRulesClient.validateTripCreation(req.body);
+    
+    if (!validation.valid) {
+      return res.status(400).json({ 
+        message: 'Error de validación',
+        errors: validation.errors 
+      });
+    }
+
     const trip = new Trip({
       userId: req.body.userId,
       title: req.body.title,
@@ -64,6 +75,17 @@ exports.createTrip = async (req, res) => {
 exports.updateTrip = async (req, res) => {
   try {
     console.log(`Updating trip with id: ${req.params.id}`);
+    
+    // Validate update data using business rules
+    const validation = await businessRulesClient.validateTripUpdate(req.body);
+    
+    if (!validation.valid) {
+      return res.status(400).json({ 
+        message: 'Error de validación',
+        errors: validation.errors 
+      });
+    }
+
     const trip = await Trip.findById(req.params.id);
     
     if (!trip) {

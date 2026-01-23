@@ -1,6 +1,25 @@
 version: '3.8'
 
 services:
+  business-rules:
+    build:
+      context: ./business-rules-backend
+      dockerfile: Dockerfile
+    container_name: travelbrain-business-rules
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=development
+      - PORT=3005
+      - APP_TIMEZONE=America/Guayaquil
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:8000,http://localhost:3004,http://35.239.79.6:5173,http://35.222.67.75:5173
+    volumes:
+      - ./business-rules-backend:/app
+      - /app/node_modules
+    networks:
+      - travelbrain-network
+    restart: unless-stopped
+
   backend:
     build:
       context: ./backend-project
@@ -20,11 +39,14 @@ services:
       - JWT_EXPIRES_IN=7d
       - APP_TIMEZONE=America/Guayaquil
       - CORS_ORIGINS=http://35.239.79.6:5173,http://35.222.67.75:5173,http://localhost:5173,http://localhost:8000
+      - BUSINESS_RULES_API_URL=http://business-rules:3005
     volumes:
       - ./backend-project:/app
       - /app/node_modules
     networks:
       - travelbrain-network
+    depends_on:
+      - business-rules
     restart: unless-stopped
 
   frontend:
