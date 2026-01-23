@@ -70,6 +70,26 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* 360 Video Section */}
+      <section className="video-360-section">
+        <div className="container">
+          <h2 className="section-title">Explore Destinations in 360°</h2>
+          <div className="video-360-wrapper">
+            <iframe
+              className="video-360-iframe"
+              src="https://www.youtube.com/embed/C9zTx6xW7LY?start=30"
+              title="360° Virtual Tour"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            ></iframe>
+          </div>
+          <p className="video-360-description">
+            Immerse yourself in stunning 360° views of amazing destinations around the world
+          </p>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="features-section">
         <div className="container">
