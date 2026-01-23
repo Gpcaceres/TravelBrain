@@ -182,7 +182,12 @@ export default function Destinations() {
       })
       if (routeLineRef.current) {
         try {
-          map.removeLayer(routeLineRef.current)
+          // Handle both single route and array of routes
+          if (Array.isArray(routeLineRef.current)) {
+            routeLineRef.current.forEach(route => map.removeLayer(route))
+          } else {
+            map.removeLayer(routeLineRef.current)
+          }
         } catch (e) {
           console.warn('Error removing route:', e)
         }
@@ -222,87 +227,131 @@ export default function Destinations() {
       
       markersRef.current.push(originMarker, destMarker)
       
-      // Determine route style based on transport type
-      const transportType = distanceInfo?.transportType || 'ground'
-      let routeStyle = {}
-      let routeIcon = ''
+      // Draw route segments with different styles
+      const segments = distanceInfo?.segments || []
       
-      switch(transportType) {
-        case 'air':
-          routeStyle = {
-            color: '#4285F4', // Google blue for flights
-            weight: 4,
-            opacity: 0.7,
-            dashArray: '1, 10', // Dotted line for air
-            className: 'air-route'
-          }
-          routeIcon = '✈️'
-          break
-        case 'sea':
-          routeStyle = {
-            color: '#0D9488', // Teal for sea
+      if (segments.length === 0) {
+        // Fallback to simple line
+        const routeLine = L.polyline(
+          [[originLat, originLng], [destLat, destLng]],
+          {
+            color: '#34D399',
             weight: 5,
-            opacity: 0.7,
-            dashArray: '5, 5, 1, 5', // Dash-dot pattern for sea
-            className: 'sea-route'
+            opacity: 0.8
           }
-          routeIcon = '🚢'
-          break
-        case 'mixed':
-          routeStyle = {
-            color: '#9333EA', // Purple for mixed
-            weight: 4,
-            opacity: 0.7,
-            dashArray: '10, 5, 2, 5', // Complex pattern for mixed
-            className: 'mixed-route'
+        ).addTo(map)
+        routeLineRef.current = [routeLine]
+      } else {
+        // Draw each segment with appropriate style
+        const routeLines = []
+        
+        segments.forEach((segment, index) => {
+          let routeStyle = {}
+          let segmentIcon = ''
+          
+          switch(segment.type) {
+            case 'air':
+              routeStyle = {
+                color: '#4285F4',
+                weight: 4,
+                opacity: 0.7,
+                dashArray: '1, 10',
+                className: 'air-route'
+              }
+              segmentIcon = '✈️'
+              break
+            case 'sea':
+              routeStyle = {
+                color: '#0D9488',
+                weight: 5,
+                opacity: 0.7,
+                dashArray: '5, 5, 1, 5',
+                className: 'sea-route'
+              }
+              segmentIcon = '🚢'
+              break
+            default: // ground
+              routeStyle = {
+                color: '#34D399',
+                weight: 5,
+                opacity: 0.8,
+                dashArray: '',
+                className: 'ground-route'
+              }
+              segmentIcon = '🚗'
           }
-          routeIcon = '✈️+🚗'
-          break
-        default: // ground
-          routeStyle = {
-            color: '#34D399', // Green for ground
-            weight: 5,
-            opacity: 0.8,
-            dashArray: '', // Solid line for ground
-            className: 'ground-route'
+          
+          // Draw segment line
+          const segmentLine = L.polyline(
+            segment.coordinates,
+            routeStyle
+          ).addTo(map)
+          
+          // Add popup to segment
+          if (segment.label) {
+            const midIndex = Math.floor(segment.coordinates.length / 2)
+            const midPoint = segment.coordinates[midIndex]
+            
+            const segmentMarker = L.marker(midPoint, {
+              icon: L.divIcon({
+                className: 'segment-icon',
+                html: `<div style="background: white; padding: 4px 8px; border-radius: 12px; border: 2px solid ${routeStyle.color}; box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-size: 16px; white-space: nowrap;">${segmentIcon} ${segment.label}</div>`,
+                iconSize: [80, 30],
+                iconAnchor: [40, 15]
+              })
+            }).addTo(map)
+            
+            markersRef.current.push(segmentMarker)
           }
-          routeIcon = '🚗'
+          
+          routeLines.push(segmentLine)
+        })
+        
+        routeLineRef.current = routeLines
+        
+        // Add overall transport icon at midpoint
+        const allCoords = segments.flatMap(s => s.coordinates)
+        const midIndex = Math.floor(allCoords.length / 2)
+        const midPoint = allCoords[midIndex]
+        
+        let mainIcon = '🚗'
+        if (distanceInfo.transportType === 'air') mainIcon = '✈️'
+        else if (distanceInfo.transportType === 'sea') mainIcon = '🚢'
+        else if (distanceInfo.transportType === 'mixed') mainIcon = '🌐'
+        
+        const transportMarker = L.marker(midPoint, {
+          icon: L.divIcon({
+            className: 'transport-icon',
+            html: `<div style="background: white; padding: 8px 12px; border-radius: 20px; border: 3px solid #47F59A; box-shadow: 0 4px 12px rgba(0,0,0,0.4); font-size: 24px;">${mainIcon}</div>`,
+            iconSize: [50, 50],
+            iconAnchor: [25, 25]
+          })
+        }).addTo(map).bindPopup(`
+          <div style="text-align: center;">
+            <b>${mainIcon} ${distanceInfo.transportType.charAt(0).toUpperCase() + distanceInfo.transportType.slice(1)} Route</b><br/>
+            <span style="color: #666;">Total Distance: ${distanceInfo.distance}</span><br/>
+            <span style="color: #666;">Total Duration: ${distanceInfo.duration}</span><br/>
+            <span style="color: #999; font-size: 12px;">${segments.length} segment(s)</span>
+          </div>
+        `)
+        
+        markersRef.current.push(transportMarker)
       }
       
-      // Draw route line with appropriate style
-      const routeLine = L.polyline(
-        [[originLat, originLng], [destLat, destLng]],
-        routeStyle
-      ).addTo(map)
-      
-      // Add popup with transport info
-      const midLat = (originLat + destLat) / 2
-      const midLng = (originLng + destLng) / 2
-      
-      const transportMarker = L.marker([midLat, midLng], {
-        icon: L.divIcon({
-          className: 'transport-icon',
-          html: `<div style="background: white; padding: 5px 10px; border-radius: 15px; border: 2px solid ${routeStyle.color}; box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-size: 20px;">${routeIcon}</div>`,
-          iconSize: [40, 40],
-          iconAnchor: [20, 20]
-        })
-      }).addTo(map).bindPopup(`
-        <div style="text-align: center;">
-          <b>${routeIcon} ${transportType.charAt(0).toUpperCase() + transportType.slice(1)} Transport</b><br/>
-          <span style="color: #666;">Distance: ${distanceInfo?.distance}</span><br/>
-          <span style="color: #666;">Duration: ${distanceInfo?.duration}</span>
-        </div>
-      `)
-      
-      markersRef.current.push(transportMarker)
-      routeLineRef.current = routeLine
-      
-      // Fit map to show both markers
-      const bounds = L.latLngBounds(
-        [originLat, originLng],
-        [destLat, destLng]
-      )
-      map.fitBounds(bounds, { padding: [50, 50] })
+      // Fit map to show entire route
+      if (segments.length > 0) {
+        // Create bounds from all segment coordinates
+        const allCoords = segments.flatMap(s => s.coordinates)
+        const bounds = L.latLngBounds(allCoords)
+        map.fitBounds(bounds, { padding: [50, 50] })
+      } else {
+        // Fallback to origin and destination
+        const bounds = L.latLngBounds(
+          [originLat, originLng],
+          [destLat, destLng]
+        )
+        map.fitBounds(bounds, { padding: [50, 50] })
+      }
       
       console.log('Map route updated successfully')
     } catch (error) {
@@ -514,7 +563,7 @@ export default function Destinations() {
 
     setCalculatingDistance(true)
     try {
-      // Calculate using Haversine formula (accurate for straight-line distance)
+      // Calculate straight-line distance first
       const R = 6371 // Earth radius in km
       const dLat = (selectedDestination.lat - selectedOrigin.lat) * Math.PI / 180
       const dLon = (selectedDestination.lng - selectedOrigin.lng) * Math.PI / 180
@@ -523,77 +572,288 @@ export default function Destinations() {
         Math.cos(selectedOrigin.lat * Math.PI / 180) * Math.cos(selectedDestination.lat * Math.PI / 180) *
         Math.sin(dLon/2) * Math.sin(dLon/2)
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-      const distance = R * c
+      const straightDistance = R * c
 
-      // Determine transport type based on distance and geography
-      const transportType = determineTransportType(distance, selectedOrigin, selectedDestination)
+      // Detect if route crosses ocean
+      const needsSeaRoute = detectOceanCrossing(selectedOrigin, selectedDestination, straightDistance)
       
-      // Estimate travel time based on transport type
-      let hours, minutes, speedKmH
-      switch(transportType) {
-        case 'air':
-          speedKmH = 800 // Average airplane speed
-          break
-        case 'sea':
-          speedKmH = 40 // Average ship speed
-          break
-        case 'mixed':
-          speedKmH = 300 // Mixed transport average
-          break
-        default: // ground
-          speedKmH = 80 // Average car speed
+      let routeData
+      if (needsSeaRoute) {
+        // Calculate multimodal route (land + sea + land)
+        routeData = await calculateMultimodalRoute(selectedOrigin, selectedDestination, straightDistance)
+      } else if (straightDistance > 800) {
+        // Long distance ground - try to get driving route, fallback to air
+        const drivingRoute = await calculateDrivingRoute(selectedOrigin, selectedDestination)
+        if (drivingRoute && drivingRoute.distance < straightDistance * 2) {
+          routeData = drivingRoute
+        } else {
+          // Too far for driving, use air
+          routeData = {
+            distance: straightDistance,
+            duration: straightDistance / 800, // hours
+            transportType: 'air',
+            segments: [{
+              type: 'air',
+              coordinates: [[selectedOrigin.lat, selectedOrigin.lng], [selectedDestination.lat, selectedDestination.lng]],
+              distance: straightDistance
+            }]
+          }
+        }
+      } else {
+        // Short/medium distance - calculate driving route
+        const drivingRoute = await calculateDrivingRoute(selectedOrigin, selectedDestination)
+        routeData = drivingRoute || {
+          distance: straightDistance,
+          duration: straightDistance / 80,
+          transportType: 'ground',
+          segments: [{
+            type: 'ground',
+            coordinates: [[selectedOrigin.lat, selectedOrigin.lng], [selectedDestination.lat, selectedDestination.lng]],
+            distance: straightDistance
+          }]
+        }
       }
-      
-      hours = Math.floor(distance / speedKmH)
-      minutes = Math.round((distance / speedKmH - hours) * 60)
+
+      const hours = Math.floor(routeData.duration)
+      const minutes = Math.round((routeData.duration - hours) * 60)
 
       setDistanceInfo({
-        distance: `${distance.toFixed(2)} km`,
-        duration: `${hours}h ${minutes}m (estimated)`,
+        distance: `${routeData.distance.toFixed(2)} km`,
+        duration: `${hours}h ${minutes}m`,
         origin: selectedOrigin.name,
         destination: selectedDestination.name,
-        transportType: transportType,
-        distanceKm: distance
+        transportType: routeData.transportType,
+        distanceKm: routeData.distance,
+        segments: routeData.segments
       })
       
-      // Initialize map if not already done
       if (mapRef.current && !mapInstanceRef.current && typeof window.L !== 'undefined') {
         initializeMap()
       }
     } catch (error) {
       console.error('Error calculating distance:', error)
-      setMessage({ type: 'error', text: 'Failed to calculate distance' })
+      setMessage({ type: 'error', text: 'Failed to calculate route. Please try again.' })
     } finally {
       setCalculatingDistance(false)
     }
   }
   
-  // Determine transport type based on distance and location
+  // Detect if route crosses a major ocean
+  const detectOceanCrossing = (origin, dest, distance) => {
+    const latDiff = Math.abs(dest.lat - origin.lat)
+    const lonDiff = Math.abs(dest.lng - origin.lng)
+    
+    // Check for transoceanic routes
+    // Atlantic: Europe <-> Americas
+    if ((origin.lng < -30 && dest.lng > 0) || (dest.lng < -30 && origin.lng > 0)) {
+      if (Math.abs(origin.lng - dest.lng) > 50 && distance > 4000) {
+        return true // Atlantic crossing
+      }
+    }
+    
+    // Pacific: Americas <-> Asia/Oceania
+    if ((origin.lng < -100 && dest.lng > 100) || (dest.lng < -100 && origin.lng > 100)) {
+      return true // Pacific crossing
+    }
+    
+    // Check if both points are on different continents with large distance
+    if (distance > 3000 && lonDiff > 40) {
+      return true
+    }
+    
+    return false
+  }
+  
+  // Calculate driving route using OpenRouteService
+  const calculateDrivingRoute = async (origin, dest) => {
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.OPENROUTE}/v2/directions/driving-car?` +
+        `start=${origin.lng},${origin.lat}&end=${dest.lng},${dest.lat}`,
+        {
+          headers: {
+            'Authorization': API_KEYS.OPENROUTE,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      
+      if (!response.ok) {
+        console.warn('OpenRouteService failed, using straight line')
+        return null
+      }
+      
+      const data = await response.json()
+      const route = data.features[0]
+      const distanceKm = route.properties.segments[0].distance / 1000
+      const durationHours = route.properties.segments[0].duration / 3600
+      const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]) // Swap to [lat, lng]
+      
+      return {
+        distance: distanceKm,
+        duration: durationHours,
+        transportType: 'ground',
+        segments: [{
+          type: 'ground',
+          coordinates: coordinates,
+          distance: distanceKm
+        }]
+      }
+    } catch (error) {
+      console.error('Error fetching driving route:', error)
+      return null
+    }
+  }
+  
+  // Calculate multimodal route (ground + sea + ground)
+  const calculateMultimodalRoute = async (origin, dest, straightDistance) => {
+    // Major port coordinates (simplified database)
+    const ports = {
+      // European ports
+      'rotterdam': { lat: 51.9225, lng: 4.47917, name: 'Rotterdam' },
+      'barcelona': { lat: 41.3851, lng: 2.1734, name: 'Barcelona' },
+      'hamburg': { lat: 53.5511, lng: 9.9937, name: 'Hamburg' },
+      
+      // American ports (East)
+      'new_york': { lat: 40.7128, lng: -74.0060, name: 'New York' },
+      'miami': { lat: 25.7617, lng: -80.1918, name: 'Miami' },
+      'halifax': { lat: 44.6488, lng: -63.5752, name: 'Halifax' },
+      
+      // American ports (West)
+      'los_angeles': { lat: 33.7405, lng: -118.2669, name: 'Los Angeles' },
+      'san_francisco': { lat: 37.7749, lng: -122.4194, name: 'San Francisco' },
+      'vancouver': { lat: 49.2827, lng: -123.1207, name: 'Vancouver' },
+      
+      // South American ports
+      'guayaquil': { lat: -2.1961, lng: -79.8862, name: 'Guayaquil' },
+      'cartagena': { lat: 10.3997, lng: -75.5144, name: 'Cartagena' },
+      'buenos_aires': { lat: -34.6037, lng: -58.3816, name: 'Buenos Aires' },
+      
+      // Asian ports
+      'singapore': { lat: 1.2897, lng: 103.8501, name: 'Singapore' },
+      'shanghai': { lat: 31.2304, lng: 121.4737, name: 'Shanghai' },
+      'tokyo': { lat: 35.6762, lng: 139.6503, name: 'Tokyo' }
+    }
+    
+    // Find nearest ports to origin and destination
+    const originPort = findNearestPort(origin, Object.values(ports))
+    const destPort = findNearestPort(dest, Object.values(ports))
+    
+    const segments = []
+    let totalDistance = 0
+    let totalDuration = 0
+    
+    // Segment 1: Ground route to origin port
+    const toPortRoute = await calculateDrivingRoute(origin, originPort)
+    if (toPortRoute) {
+      segments.push({
+        type: 'ground',
+        coordinates: toPortRoute.segments[0].coordinates,
+        distance: toPortRoute.distance,
+        label: `Drive to ${originPort.name} Port`
+      })
+      totalDistance += toPortRoute.distance
+      totalDuration += toPortRoute.duration
+    } else {
+      // Fallback to straight line
+      const dist = calculateHaversine(origin, originPort)
+      segments.push({
+        type: 'ground',
+        coordinates: [[origin.lat, origin.lng], [originPort.lat, originPort.lng]],
+        distance: dist,
+        label: `Drive to ${originPort.name} Port`
+      })
+      totalDistance += dist
+      totalDuration += dist / 80
+    }
+    
+    // Segment 2: Sea route between ports
+    const seaDistance = calculateHaversine(originPort, destPort)
+    segments.push({
+      type: 'sea',
+      coordinates: [[originPort.lat, originPort.lng], [destPort.lat, destPort.lng]],
+      distance: seaDistance,
+      label: `${originPort.name} to ${destPort.name} (Sea)`
+    })
+    totalDistance += seaDistance
+    totalDuration += seaDistance / 40 // Ship speed ~40 km/h
+    
+    // Segment 3: Ground route from destination port
+    const fromPortRoute = await calculateDrivingRoute(destPort, dest)
+    if (fromPortRoute) {
+      segments.push({
+        type: 'ground',
+        coordinates: fromPortRoute.segments[0].coordinates,
+        distance: fromPortRoute.distance,
+        label: `Drive from ${destPort.name} Port`
+      })
+      totalDistance += fromPortRoute.distance
+      totalDuration += fromPortRoute.duration
+    } else {
+      const dist = calculateHaversine(destPort, dest)
+      segments.push({
+        type: 'ground',
+        coordinates: [[destPort.lat, destPort.lng], [dest.lat, dest.lng]],
+        distance: dist,
+        label: `Drive from ${destPort.name} Port`
+      })
+      totalDistance += dist
+      totalDuration += dist / 80
+    }
+    
+    return {
+      distance: totalDistance,
+      duration: totalDuration,
+      transportType: 'mixed',
+      segments: segments
+    }
+  }
+  
+  // Helper: Find nearest port
+  const findNearestPort = (location, ports) => {
+    let nearest = ports[0]
+    let minDist = calculateHaversine(location, ports[0])
+    
+    for (let port of ports) {
+      const dist = calculateHaversine(location, port)
+      if (dist < minDist) {
+        minDist = dist
+        nearest = port
+      }
+    }
+    
+    return nearest
+  }
+  
+  // Helper: Haversine distance calculation
+  const calculateHaversine = (point1, point2) => {
+    const R = 6371
+    const dLat = (point2.lat - point1.lat) * Math.PI / 180
+    const dLon = (point2.lng - point1.lng) * Math.PI / 180
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) *
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+    return R * c
+  }
+  
+  // OLD FUNCTION REMOVED
   const determineTransportType = (distance, origin, dest) => {
-    // If distance > 500 km, likely needs air travel
     if (distance > 500) {
-      // Check if it crosses major water bodies (simplified check)
       const latDiff = Math.abs(dest.lat - origin.lat)
       const lonDiff = Math.abs(dest.lng - origin.lng)
       
-      // If crosses ocean (large lat/lon difference with long distance)
       if (distance > 2000 && (latDiff > 20 || lonDiff > 30)) {
-        // Check if it might involve sea travel
-        const avgLat = (origin.lat + dest.lat) / 2
-        const avgLon = (origin.lng + dest.lng) / 2
-        
-        // Simplified ocean detection (between continents)
         if (Math.abs(lonDiff) > 40) {
-          return 'mixed' // Likely involves multiple transport types
+          return 'mixed'
         }
         return 'air'
       }
       return 'air'
     } else if (distance > 200 && distance <= 500) {
-      // Medium distance - could be ground or air
       return 'ground'
     } else {
-      // Short distance - definitely ground
       return 'ground'
     }
   }
