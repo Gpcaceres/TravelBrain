@@ -384,20 +384,17 @@ export default function Destinations() {
 
     setSearchingPlaces(true)
     try {
-      // Use OpenStreetMap Nominatim (free, no API key required)
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeSearchQuery)}&limit=5`,
-        {
-          headers: {
-            'User-Agent': 'TravelBrain App'
-          }
-        }
+        `${API_URL}/api/routing/geocode?q=${encodeURIComponent(placeSearchQuery)}&limit=5`
       )
       
       if (!response.ok) throw new Error('Failed to search places')
       
-      const data = await response.json()
-      const results = data.map(item => ({
+      const result = await response.json()
+      if (!result.success) throw new Error(result.message)
+      
+      const results = result.data.map(item => ({
         name: item.display_name,
         formatted_address: item.display_name,
         geometry: {
@@ -431,19 +428,17 @@ export default function Destinations() {
 
     setSearchingOrigin(true)
     try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`,
-        {
-          headers: {
-            'User-Agent': 'TravelBrain App'
-          }
-        }
+        `${API_URL}/api/routing/geocode?q=${encodeURIComponent(query)}&limit=5`
       )
       
       if (!response.ok) throw new Error('Failed to search places')
       
-      const data = await response.json()
-      const results = data.map(item => ({
+      const result = await response.json()
+      if (!result.success) throw new Error(result.message)
+      
+      const results = result.data.map(item => ({
         name: item.display_name,
         lat: parseFloat(item.lat),
         lng: parseFloat(item.lon),
@@ -465,19 +460,17 @@ export default function Destinations() {
 
     setSearchingDestination(true)
     try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`,
-        {
-          headers: {
-            'User-Agent': 'TravelBrain App'
-          }
-        }
+        `${API_URL}/api/routing/geocode?q=${encodeURIComponent(query)}&limit=5`
       )
       
       if (!response.ok) throw new Error('Failed to search places')
       
-      const data = await response.json()
-      const results = data.map(item => ({
+      const result = await response.json()
+      if (!result.success) throw new Error(result.message)
+      
+      const results = result.data.map(item => ({
         name: item.display_name,
         lat: parseFloat(item.lat),
         lng: parseFloat(item.lon),
@@ -667,25 +660,33 @@ export default function Destinations() {
   // Calculate driving route using backend proxy (avoids CORS)
   const calculateDrivingRoute = async (origin, dest) => {
     try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3004'}/api/routing/directions?` +
-        `start=${origin.lng},${origin.lat}&end=${dest.lng},${dest.lat}&profile=driving-car`
+        `${API_URL}/api/routing/directions`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            start: `${origin.lng},${origin.lat}`,
+            end: `${dest.lng},${dest.lat}`,
+            profile: 'driving-car'
+          })
+        }
       )
       
-      if (!response.ok) {
-        console.warn('Routing API failed, using straight line')
-        return null
-      }
-      
       const result = await response.json()
-      if (!result.success || !result.data) {
+      
+      if (!result.success || result.fallback) {
+        console.warn('Routing API failed or unavailable, using fallback')
         return null
       }
       
       const data = result.data
       const route = data.features[0]
-      const distanceKm = route.properties.segments[0].distance / 1000
-      const durationHours = route.properties.segments[0].duration / 3600
+      const distanceKm = route.properties.summary.distance / 1000
+      const durationHours = route.properties.summary.duration / 3600
       const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]) // Swap to [lat, lng]
       
       return {
@@ -1001,19 +1002,17 @@ export default function Destinations() {
 
     setSearchingModalPlaces(true)
     try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`,
-        {
-          headers: {
-            'User-Agent': 'TravelBrain App'
-          }
-        }
+        `${API_URL}/api/routing/geocode?q=${encodeURIComponent(query)}&limit=5`
       )
       
       if (!response.ok) throw new Error('Failed to search places')
       
-      const data = await response.json()
-      const results = data.map(item => ({
+      const result = await response.json()
+      if (!result.success) throw new Error(result.message)
+      
+      const results = result.data.map(item => ({
         name: item.display_name,
         lat: parseFloat(item.lat),
         lng: parseFloat(item.lon),

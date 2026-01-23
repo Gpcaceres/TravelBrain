@@ -3,7 +3,106 @@ const router = express.Router();
 const axios = require('axios');
 
 /**
+ * Proxy endpoint for Nominatim geocoding to avoid CORS issues
+ * GET /api/routing/geocode?q=query&limit=5
+ */
+router.get('/geocode', async (req, res) => {
+  try {
+    const { q, limit = 5 } = req.query;
+    
+    if (!q) {
+      return res.status(400).json({
+        success: false,
+        message: 'Query parameter is required'
+      });
+    }
+
+    const response = await axios.get(
+      'https://nominatim.openstreetmap.org/search',
+      {
+        params: {
+          format: 'json',
+          q,
+          limit
+        },
+        headers: {
+          'User-Agent': 'TravelBrain/1.0'
+        },
+        timeout: 10000
+      }
+    );
+
+    res.json({
+      success: true,
+      data: response.data
+    });
+  } catch (error) {
+    console.error('Geocoding error:', error.message);
+    res.status(error.response?.status || 500).json({
+      success: false,
+      message: 'Failed to geocode location',
+      error: error.message
+    });
+  }
+});
+
+/**
  * Proxy endpoint for OpenRouteService to avoid CORS issues
+ * Uses POST method with body instead of query params (better for API)
+ * POST /api/routing/directions
+ */
+router.post('/directions', async (req, res) => {
+  try {
+    const { start, end, profile = 'driving-car' } = req.body;
+    
+    if (!start || !end) {
+      return res.status(400).json({
+        success: false,
+        message: 'Start and end coordinates are required'
+      });
+    }
+
+    // Parse coordinates
+    const [startLng, startLat] = start.split(',').map(Number);
+    const [endLng, endLat] = end.split(',').map(Number);
+
+    const OPENROUTE_API_KEY = process.env.OPENROUTE_API_KEY || '5b3ce3597851110001cf62486bbfc1e6f98743e5b34bf5bf9e2e8b5c';
+    
+    // Use POST endpoint with coordinates in body (more reliable)
+    const response = await axios.post(
+      `https://api.openrouteservice.org/v2/directions/${profile}/geojson`,
+      {
+        coordinates: [[startLng, startLat], [endLng, endLat]]
+      },
+      {
+        headers: {
+          'Authorization': OPENROUTE_API_KEY,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, application/geo+json'
+        },
+        timeout: 15000
+      }
+    );
+
+    res.json({
+      success: true,
+      data: response.data
+    });
+  } catch (error) {
+    console.error('Routing error:', error.response?.data || error.message);
+    
+    // If OpenRouteService fails, return error with more detail
+    res.status(error.response?.status || 500).json({
+      success: false,
+      message: 'Failed to calculate route',
+      error: error.response?.data?.error?.message || error.message,
+      fallback: true // Signal to use fallback on frontend
+    });
+  }
+});
+
+/**
+ * Old GET endpoint for backward compatibility
  * GET /api/routing/directions?start=lng,lat&end=lng,lat&profile=driving-car
  */
 router.get('/directions', async (req, res) => {
@@ -17,20 +116,24 @@ router.get('/directions', async (req, res) => {
       });
     }
 
+    // Parse coordinates
+    const [startLng, startLat] = start.split(',').map(Number);
+    const [endLng, endLat] = end.split(',').map(Number);
+
     const OPENROUTE_API_KEY = process.env.OPENROUTE_API_KEY || '5b3ce3597851110001cf62486bbfc1e6f98743e5b34bf5bf9e2e8b5c';
     
-    const response = await axios.get(
-      `https://api.openrouteservice.org/v2/directions/${profile}`,
+    // Use POST endpoint (more reliable than GET)
+    const response = await axios.post(
+      `https://api.openrouteservice.org/v2/directions/${profile}/geojson`,
       {
-        params: {
-          start,
-          end
-        },
+        coordinates: [[startLng, startLat], [endLng, endLat]]
+      },
+      {
         headers: {
           'Authorization': OPENROUTE_API_KEY,
-          'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'
+          'Content-Type': 'application/json'
         },
-        timeout: 10000
+        timeout: 15000
       }
     );
 
@@ -39,11 +142,12 @@ router.get('/directions', async (req, res) => {
       data: response.data
     });
   } catch (error) {
-    console.error('Routing error:', error.message);
+    console.error('Routing error:', error.response?.data || error.message);
     res.status(error.response?.status || 500).json({
       success: false,
       message: 'Failed to calculate route',
-      error: error.message
+      error: error.response?.data?.error?.message || error.message,
+      fallback: true
     });
   }
 });
