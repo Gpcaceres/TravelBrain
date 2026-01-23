@@ -1466,7 +1466,96 @@ export default function Destinations() {
                   )}
                 </div>
               </div>
+              
+              {/* Route Map */}
+              <div className="route-map-container">
+                <div className="route-map-header">
+                  <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                    <path fillRule="evenodd" d="M15.817.113A.5.5 0 0116 .5v14a.5.5 0 01-.402.49l-5 1a.502.502 0 01-.196 0L5.5 15.01l-4.902.98A.5.5 0 010 15.5v-14a.5.5 0 01.402-.49l5-1a.5.5 0 01.196 0L10.5.99l4.902-.98a.5.5 0 01.415.103zM10 1.91l-4-.8v12.98l4 .8V1.91zm1 12.98l4-.8V1.11l-4 .8v12.98zm-6-.8V1.11l-4 .8v12.98l4-.8z"/>
+                  </svg>
+                  <h3>Route Visualization</h3>
+                </div>
+                <div ref={mapRef} className="route-map"></div>
+                <div className="map-legend">
+                  <div className="legend-item">
+                    <span className="legend-marker" style={{background: '#47F59A'}}>A</span>
+                    <span>Origin</span>
+                  </div>
+                  <div className="legend-item">
+                    <span className="legend-marker" style={{background: '#F547A7'}}>B</span>
+                    <span>Destination</span>
+                  </div>
+                </div>
+                
+                {/* Transport Type Legend */}
+                <div className="route-legend">
+                  <h4>🗺️ Transport Types</h4>
+                  <div className="route-legend-item">
+                    <div className="route-legend-line ground"></div>
+                    <span>🚗 Ground {distanceInfo.transportType === 'ground' && '✓'}</span>
+                  </div>
+                  <div className="route-legend-item">
+                    <div className="route-legend-line air"></div>
+                    <span>✈️ Air Travel {distanceInfo.transportType === 'air' && '✓'}</span>
+                  </div>
+                  <div className="route-legend-item">
+                    <div className="route-legend-line sea"></div>
+                    <span>🚢 Sea Travel {distanceInfo.transportType === 'sea' && '✓'}</span>
+                  </div>
+                  <div className="route-legend-item">
+                    <div className="route-legend-line mixed"></div>
+                    <span>🌐 Mixed {distanceInfo.transportType === 'mixed' && '✓'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
 
+        {/* Search Bar */}
+        <div className="search-bar">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.1zM12 6.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z"/>
+          </svg>
+          <input
+            type="text"
+            placeholder="Search destinations by name or country..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {/* Message */}
+        {message.text && (
+          <div className={`message message-${message.type}`}>
+            {message.text}
+          </div>
+        )}
+
+        {/* Destinations Grid */}
+        {loading ? (
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Loading destinations...</p>
+          </div>
+        ) : filteredDestinations.length === 0 ? (
+          <div className="empty-state">
+            <svg width="64" height="64" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 16s6-5.686 6-10A6 6 0 002 6c0 4.314 6 10 6 10zm0-7a3 3 0 110-6 3 3 0 010 6z"/>
+            </svg>
+            <h3>{searchTerm ? 'No destinations found' : 'No destinations yet'}</h3>
+            <p>{searchTerm ? 'Try adjusting your search' : 'Start exploring the world!'}</p>
+            {!searchTerm && (
+              <button className="btn-primary" onClick={() => openModal()}>
+                Add Your First Destination
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="destinations-grid">
+            {filteredDestinations.map((destination) => (
+              <div key={destination._id} className="destination-card">
+                <div className="destination-image">
                   {destination.img ? (
                     <img src={destination.img} alt={destination.name} />
                   ) : (
