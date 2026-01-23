@@ -65,6 +65,30 @@ const favoriteRouteSchema = new mongoose.Schema(
       enum: ['driving', 'walking', 'cycling', 'transit'],
       default: 'driving'
     },
+    transportType: {
+      type: String,
+      enum: ['ground', 'air', 'sea', 'mixed'],
+      default: 'ground'
+    },
+    segments: [{
+      type: {
+        type: String,
+        enum: ['ground', 'air', 'sea'],
+        required: true
+      },
+      start: {
+        lat: Number,
+        lon: Number,
+        label: String
+      },
+      end: {
+        lat: Number,
+        lon: Number,
+        label: String
+      },
+      distance: Number,
+      duration: Number
+    }],
     createdAt: {
       type: Date,
       default: Date.now

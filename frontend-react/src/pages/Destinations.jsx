@@ -222,17 +222,79 @@ export default function Destinations() {
       
       markersRef.current.push(originMarker, destMarker)
       
-      // Draw route line
+      // Determine route style based on transport type
+      const transportType = distanceInfo?.transportType || 'ground'
+      let routeStyle = {}
+      let routeIcon = ''
+      
+      switch(transportType) {
+        case 'air':
+          routeStyle = {
+            color: '#4285F4', // Google blue for flights
+            weight: 4,
+            opacity: 0.7,
+            dashArray: '1, 10', // Dotted line for air
+            className: 'air-route'
+          }
+          routeIcon = '✈️'
+          break
+        case 'sea':
+          routeStyle = {
+            color: '#0D9488', // Teal for sea
+            weight: 5,
+            opacity: 0.7,
+            dashArray: '5, 5, 1, 5', // Dash-dot pattern for sea
+            className: 'sea-route'
+          }
+          routeIcon = '🚢'
+          break
+        case 'mixed':
+          routeStyle = {
+            color: '#9333EA', // Purple for mixed
+            weight: 4,
+            opacity: 0.7,
+            dashArray: '10, 5, 2, 5', // Complex pattern for mixed
+            className: 'mixed-route'
+          }
+          routeIcon = '✈️+🚗'
+          break
+        default: // ground
+          routeStyle = {
+            color: '#34D399', // Green for ground
+            weight: 5,
+            opacity: 0.8,
+            dashArray: '', // Solid line for ground
+            className: 'ground-route'
+          }
+          routeIcon = '🚗'
+      }
+      
+      // Draw route line with appropriate style
       const routeLine = L.polyline(
         [[originLat, originLng], [destLat, destLng]],
-        {
-          color: '#FF00FF',
-          weight: 4,
-          opacity: 0.8,
-          dashArray: '10, 10'
-        }
+        routeStyle
       ).addTo(map)
       
+      // Add popup with transport info
+      const midLat = (originLat + destLat) / 2
+      const midLng = (originLng + destLng) / 2
+      
+      const transportMarker = L.marker([midLat, midLng], {
+        icon: L.divIcon({
+          className: 'transport-icon',
+          html: `<div style="background: white; padding: 5px 10px; border-radius: 15px; border: 2px solid ${routeStyle.color}; box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-size: 20px;">${routeIcon}</div>`,
+          iconSize: [40, 40],
+          iconAnchor: [20, 20]
+        })
+      }).addTo(map).bindPopup(`
+        <div style="text-align: center;">
+          <b>${routeIcon} ${transportType.charAt(0).toUpperCase() + transportType.slice(1)} Transport</b><br/>
+          <span style="color: #666;">Distance: ${distanceInfo?.distance}</span><br/>
+          <span style="color: #666;">Duration: ${distanceInfo?.duration}</span>
+        </div>
+      `)
+      
+      markersRef.current.push(transportMarker)
       routeLineRef.current = routeLine
       
       // Fit map to show both markers
@@ -463,15 +525,35 @@ export default function Destinations() {
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
       const distance = R * c
 
-      // Estimate travel time (assuming average speed of 60 km/h)
-      const hours = Math.floor(distance / 60)
-      const minutes = Math.round((distance / 60 - hours) * 60)
+      // Determine transport type based on distance and geography
+      const transportType = determineTransportType(distance, selectedOrigin, selectedDestination)
+      
+      // Estimate travel time based on transport type
+      let hours, minutes, speedKmH
+      switch(transportType) {
+        case 'air':
+          speedKmH = 800 // Average airplane speed
+          break
+        case 'sea':
+          speedKmH = 40 // Average ship speed
+          break
+        case 'mixed':
+          speedKmH = 300 // Mixed transport average
+          break
+        default: // ground
+          speedKmH = 80 // Average car speed
+      }
+      
+      hours = Math.floor(distance / speedKmH)
+      minutes = Math.round((distance / speedKmH - hours) * 60)
 
       setDistanceInfo({
         distance: `${distance.toFixed(2)} km`,
         duration: `${hours}h ${minutes}m (estimated)`,
         origin: selectedOrigin.name,
-        destination: selectedDestination.name
+        destination: selectedDestination.name,
+        transportType: transportType,
+        distanceKm: distance
       })
       
       // Initialize map if not already done
@@ -483,6 +565,36 @@ export default function Destinations() {
       setMessage({ type: 'error', text: 'Failed to calculate distance' })
     } finally {
       setCalculatingDistance(false)
+    }
+  }
+  
+  // Determine transport type based on distance and location
+  const determineTransportType = (distance, origin, dest) => {
+    // If distance > 500 km, likely needs air travel
+    if (distance > 500) {
+      // Check if it crosses major water bodies (simplified check)
+      const latDiff = Math.abs(dest.lat - origin.lat)
+      const lonDiff = Math.abs(dest.lng - origin.lng)
+      
+      // If crosses ocean (large lat/lon difference with long distance)
+      if (distance > 2000 && (latDiff > 20 || lonDiff > 30)) {
+        // Check if it might involve sea travel
+        const avgLat = (origin.lat + dest.lat) / 2
+        const avgLon = (origin.lng + dest.lng) / 2
+        
+        // Simplified ocean detection (between continents)
+        if (Math.abs(lonDiff) > 40) {
+          return 'mixed' // Likely involves multiple transport types
+        }
+        return 'air'
+      }
+      return 'air'
+    } else if (distance > 200 && distance <= 500) {
+      // Medium distance - could be ground or air
+      return 'ground'
+    } else {
+      // Short distance - definitely ground
+      return 'ground'
     }
   }
 
@@ -877,6 +989,26 @@ export default function Destinations() {
                       <p className="stat-value">{distanceInfo.duration}</p>
                     </div>
                   </div>
+                  <div className="result-stat">
+                    {distanceInfo.transportType === 'air' && (
+                      <span style={{fontSize: '24px'}}>✈️</span>
+                    )}
+                    {distanceInfo.transportType === 'sea' && (
+                      <span style={{fontSize: '24px'}}>🚢</span>
+                    )}
+                    {distanceInfo.transportType === 'ground' && (
+                      <span style={{fontSize: '24px'}}>🚗</span>
+                    )}
+                    {distanceInfo.transportType === 'mixed' && (
+                      <span style={{fontSize: '24px'}}>🌐</span>
+                    )}
+                    <div>
+                      <p className="stat-label">Transport</p>
+                      <p className="stat-value" style={{textTransform: 'capitalize'}}>
+                        {distanceInfo.transportType}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               
@@ -897,6 +1029,27 @@ export default function Destinations() {
                   <div className="legend-item">
                     <span className="legend-marker" style={{background: '#F547A7'}}>B</span>
                     <span>Destination</span>
+                  </div>
+                </div>
+                
+                {/* Transport Type Legend */}
+                <div className="route-legend">
+                  <h4>🗺️ Transport Types</h4>
+                  <div className="route-legend-item">
+                    <div className="route-legend-line ground"></div>
+                    <span>🚗 Ground ({distanceInfo.transportType === 'ground' ? '✓' : ''})</span>
+                  </div>
+                  <div className="route-legend-item">
+                    <div className="route-legend-line air"></div>
+                    <span>✈️ Air Travel ({distanceInfo.transportType === 'air' ? '✓' : ''})</span>
+                  </div>
+                  <div className="route-legend-item">
+                    <div className="route-legend-line sea"></div>
+                    <span>🚢 Sea Travel ({distanceInfo.transportType === 'sea' ? '✓' : ''})</span>
+                  </div>
+                  <div className="route-legend-item">
+                    <div className="route-legend-line mixed"></div>
+                    <span>🌐 Mixed ({distanceInfo.transportType === 'mixed' ? '✓' : ''})</span>
                   </div>
                 </div>
               </div>
