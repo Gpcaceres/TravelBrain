@@ -10,7 +10,12 @@ export const API_KEYS = {
   // OpenRouteService API - Free key for routing
   // Get your key at: https://openrouteservice.org/dev/#/signup
   // Free plan: 2,000 requests/day
-  OPENROUTE: import.meta.env.VITE_OPENROUTE_API_KEY || '5b3ce3597851110001cf62486bbfc1e6f98743e5b34bf5bf9e2e8b5c'
+  OPENROUTE: import.meta.env.VITE_OPENROUTE_API_KEY || '5b3ce3597851110001cf62486bbfc1e6f98743e5b34bf5bf9e2e8b5c',
+  
+  // GraphHopper API - More reliable routing alternative
+  // Get your key at: https://graphhopper.com/dashboard/#/api-keys
+  // Free plan: 500 requests/day
+  GRAPHHOPPER: import.meta.env.VITE_GRAPHHOPPER_API_KEY || 'demo'
 }
 
 export const API_ENDPOINTS = {
@@ -18,5 +23,6 @@ export const API_ENDPOINTS = {
   GOOGLE_PLACES: 'https://maps.googleapis.com/maps/api/place',
   GOOGLE_GEOCODE: 'https://maps.googleapis.com/maps/api/geocode',
   GOOGLE_DISTANCE: 'https://maps.googleapis.com/maps/api/distancematrix',
-  OPENROUTE: 'https://api.openrouteservice.org'
+  OPENROUTE: 'https://api.openrouteservice.org',
+  GRAPHHOPPER: 'https://graphhopper.com/api/1'
 }

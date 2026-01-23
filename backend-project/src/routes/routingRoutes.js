@@ -47,7 +47,8 @@ router.get('/geocode', async (req, res) => {
 });
 
 /**
- * Proxy endpoint for OpenRouteService to avoid CORS issues
+ * Proxy endpoint for routing services to avoid CORS issues
+ * Tries GraphHopper first (more reliable), then falls back to OpenRouteService
  * Uses POST method with body instead of query params (better for API)
  * POST /api/routing/directions
  */
@@ -66,9 +67,65 @@ router.post('/directions', async (req, res) => {
     const [startLng, startLat] = start.split(',').map(Number);
     const [endLng, endLat] = end.split(',').map(Number);
 
+    // Try GraphHopper first (more reliable)
+    const GRAPHHOPPER_API_KEY = process.env.GRAPHHOPPER_API_KEY;
+    
+    if (GRAPHHOPPER_API_KEY && GRAPHHOPPER_API_KEY !== 'demo') {
+      try {
+        const vehicle = profile.includes('car') ? 'car' : 'foot';
+        const ghResponse = await axios.get(
+          'https://graphhopper.com/api/1/route',
+          {
+            params: {
+              point: [`${startLat},${startLng}`, `${endLat},${endLng}`],
+              vehicle: vehicle,
+              locale: 'en',
+              points_encoded: false,
+              key: GRAPHHOPPER_API_KEY
+            },
+            timeout: 15000
+          }
+        );
+
+        if (ghResponse.data.paths && ghResponse.data.paths.length > 0) {
+          const path = ghResponse.data.paths[0];
+          
+          // Convert GraphHopper response to GeoJSON format
+          const geojson = {
+            type: 'FeatureCollection',
+            features: [{
+              type: 'Feature',
+              properties: {
+                summary: {
+                  distance: path.distance,
+                  duration: path.time / 1000
+                },
+                segments: [{
+                  distance: path.distance,
+                  duration: path.time / 1000
+                }]
+              },
+              geometry: {
+                type: 'LineString',
+                coordinates: path.points.coordinates
+              }
+            }]
+          };
+
+          return res.json({
+            success: true,
+            data: geojson,
+            provider: 'graphhopper'
+          });
+        }
+      } catch (ghError) {
+        console.error('GraphHopper error, falling back to OpenRouteService:', ghError.message);
+      }
+    }
+
+    // Fallback to OpenRouteService
     const OPENROUTE_API_KEY = process.env.OPENROUTE_API_KEY || '5b3ce3597851110001cf62486bbfc1e6f98743e5b34bf5bf9e2e8b5c';
     
-    // Use POST endpoint with coordinates in body (more reliable)
     const response = await axios.post(
       `https://api.openrouteservice.org/v2/directions/${profile}/geojson`,
       {
@@ -86,7 +143,8 @@ router.post('/directions', async (req, res) => {
 
     res.json({
       success: true,
-      data: response.data
+      data: response.data,
+      provider: 'openrouteservice'
     });
   } catch (error) {
     console.error('Routing error:', error.response?.data || error.message);
