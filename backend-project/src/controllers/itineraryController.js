@@ -339,48 +339,6 @@ exports.generateItinerary = async (req, res) => {
   }
 };
 
-    if (itinerary) {
-      // Update existing itinerary
-      itinerary.interestType = interestType;
-      itinerary.budgetType = budgetType;
-      itinerary.dailyActivities = dailyActivities;
-      itinerary.weatherInfo = weatherInfo;
-      itinerary.budgetBreakdown = budgetBreakdown;
-      itinerary.generatedAt = new Date();
-      await itinerary.save();
-    } else {
-      // Create new itinerary
-      itinerary = new Itinerary({
-        tripId,
-        userId,
-        interestType,
-        budgetType,
-        dailyActivities,
-        weatherInfo,
-        budgetBreakdown
-      });
-      await itinerary.save();
-    }
-
-    // Populate trip data
-    await itinerary.populate('tripId');
-
-    res.status(201).json({
-      success: true,
-      message: 'Itinerario generado exitosamente',
-      data: itinerary
-    });
-
-  } catch (error) {
-    console.error('Error generating itinerary:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al generar itinerario',
-      error: error.message
-    });
-  }
-};
-
 /**
  * Get itinerary by ID
  */
