@@ -15,7 +15,8 @@ const {
   tripRoutes,
   favoriteRouteRoutes,
   weatherRoutes,
-  itineraryRoutes
+  itineraryRoutes,
+  routingRoutes
 } = require('./routes');
 
 /**
@@ -57,6 +58,7 @@ const createApp = () => {
   app.use('/', favoriteRouteRoutes);
   app.use('/', weatherRoutes);
   app.use('/api/itineraries', itineraryRoutes);
+  app.use('/api/routing', routingRoutes);
 
   // Root endpoint
   app.get('/', (req, res) => {

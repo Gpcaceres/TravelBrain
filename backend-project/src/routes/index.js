@@ -10,6 +10,7 @@ const tripRoutes = require('./tripRoutes');
 const favoriteRouteRoutes = require('./favoriteRouteRoutes');
 const weatherRoutes = require('./weatherRoutes');
 const itineraryRoutes = require('./itineraryRoutes');
+const routingRoutes = require('./routingRoutes');
 
 module.exports = {
   authRoutes,
@@ -18,5 +19,6 @@ module.exports = {
   tripRoutes,
   favoriteRouteRoutes,
   weatherRoutes,
-  itineraryRoutes
+  itineraryRoutes,
+  routingRoutes
 };

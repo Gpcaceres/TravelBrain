@@ -664,26 +664,25 @@ export default function Destinations() {
     return false
   }
   
-  // Calculate driving route using OpenRouteService
+  // Calculate driving route using backend proxy (avoids CORS)
   const calculateDrivingRoute = async (origin, dest) => {
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.OPENROUTE}/v2/directions/driving-car?` +
-        `start=${origin.lng},${origin.lat}&end=${dest.lng},${dest.lat}`,
-        {
-          headers: {
-            'Authorization': API_KEYS.OPENROUTE,
-            'Content-Type': 'application/json'
-          }
-        }
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3004'}/api/routing/directions?` +
+        `start=${origin.lng},${origin.lat}&end=${dest.lng},${dest.lat}&profile=driving-car`
       )
       
       if (!response.ok) {
-        console.warn('OpenRouteService failed, using straight line')
+        console.warn('Routing API failed, using straight line')
         return null
       }
       
-      const data = await response.json()
+      const result = await response.json()
+      if (!result.success || !result.data) {
+        return null
+      }
+      
+      const data = result.data
       const route = data.features[0]
       const distanceKm = route.properties.segments[0].distance / 1000
       const durationHours = route.properties.segments[0].duration / 3600
@@ -745,7 +744,7 @@ export default function Destinations() {
     
     // Segment 1: Ground route to origin port
     const toPortRoute = await calculateDrivingRoute(origin, originPort)
-    if (toPortRoute) {
+    if (toPortRoute && toPortRoute.segments && toPortRoute.segments[0]) {
       segments.push({
         type: 'ground',
         coordinates: toPortRoute.segments[0].coordinates,
@@ -755,11 +754,12 @@ export default function Destinations() {
       totalDistance += toPortRoute.distance
       totalDuration += toPortRoute.duration
     } else {
-      // Fallback to straight line
+      // Fallback to curved approximation
       const dist = calculateHaversine(origin, originPort)
+      const curvedPath = generateCurvedPath([origin.lat, origin.lng], [originPort.lat, originPort.lng], 20)
       segments.push({
         type: 'ground',
-        coordinates: [[origin.lat, origin.lng], [originPort.lat, originPort.lng]],
+        coordinates: curvedPath,
         distance: dist,
         label: `Drive to ${originPort.name} Port`
       })
@@ -769,9 +769,10 @@ export default function Destinations() {
     
     // Segment 2: Sea route between ports
     const seaDistance = calculateHaversine(originPort, destPort)
+    const seaPath = generateCurvedPath([originPort.lat, originPort.lng], [destPort.lat, destPort.lng], 50)
     segments.push({
       type: 'sea',
-      coordinates: [[originPort.lat, originPort.lng], [destPort.lat, destPort.lng]],
+      coordinates: seaPath,
       distance: seaDistance,
       label: `${originPort.name} to ${destPort.name} (Sea)`
     })
@@ -780,7 +781,7 @@ export default function Destinations() {
     
     // Segment 3: Ground route from destination port
     const fromPortRoute = await calculateDrivingRoute(destPort, dest)
-    if (fromPortRoute) {
+    if (fromPortRoute && fromPortRoute.segments && fromPortRoute.segments[0]) {
       segments.push({
         type: 'ground',
         coordinates: fromPortRoute.segments[0].coordinates,
@@ -791,9 +792,10 @@ export default function Destinations() {
       totalDuration += fromPortRoute.duration
     } else {
       const dist = calculateHaversine(destPort, dest)
+      const curvedPath = generateCurvedPath([destPort.lat, destPort.lng], [dest.lat, dest.lng], 20)
       segments.push({
         type: 'ground',
-        coordinates: [[destPort.lat, destPort.lng], [dest.lat, dest.lng]],
+        coordinates: curvedPath,
         distance: dist,
         label: `Drive from ${destPort.name} Port`
       })
@@ -836,6 +838,42 @@ export default function Destinations() {
       Math.sin(dLon/2) * Math.sin(dLon/2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
     return R * c
+  }
+  
+  // Helper: Generate curved path between two points (more realistic than straight line)
+  const generateCurvedPath = (start, end, numPoints = 30) => {
+    const path = []
+    const [startLat, startLng] = start
+    const [endLat, endLng] = end
+    
+    // Calculate control point for bezier curve (offset perpendicular to line)
+    const midLat = (startLat + endLat) / 2
+    const midLng = (startLng + endLng) / 2
+    const dx = endLng - startLng
+    const dy = endLat - startLat
+    const distance = Math.sqrt(dx * dx + dy * dy)
+    const curvature = distance * 0.15 // 15% curvature
+    
+    // Perpendicular offset
+    const offsetLat = -dx / distance * curvature
+    const offsetLng = dy / distance * curvature
+    const controlLat = midLat + offsetLat
+    const controlLng = midLng + offsetLng
+    
+    // Generate points along quadratic bezier curve
+    for (let i = 0; i <= numPoints; i++) {
+      const t = i / numPoints
+      const t2 = t * t
+      const mt = 1 - t
+      const mt2 = mt * mt
+      
+      const lat = mt2 * startLat + 2 * mt * t * controlLat + t2 * endLat
+      const lng = mt2 * startLng + 2 * mt * t * controlLng + t2 * endLng
+      
+      path.push([lat, lng])
+    }
+    
+    return path
   }
   
   // OLD FUNCTION REMOVED
