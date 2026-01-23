@@ -1465,7 +1465,6 @@ export default function Destinations() {
                     </div>
                   )}
                 </div>
-              </div>
               
               {/* Route Map */}
               <div className="route-map-container">
