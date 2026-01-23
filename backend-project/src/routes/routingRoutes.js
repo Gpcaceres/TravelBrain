@@ -26,9 +26,10 @@ router.get('/geocode', async (req, res) => {
           limit
         },
         headers: {
-          'User-Agent': 'TravelBrain/1.0'
+          'User-Agent': 'TravelBrain/1.0 (https://github.com/Gpcaceres/TravelBrain)',
+          'Accept': 'application/json'
         },
-        timeout: 10000
+        timeout: 30000 // Increased to 30 seconds
       }
     );
 
@@ -38,10 +39,13 @@ router.get('/geocode', async (req, res) => {
     });
   } catch (error) {
     console.error('Geocoding error:', error.message);
-    res.status(error.response?.status || 500).json({
-      success: false,
-      message: 'Failed to geocode location',
-      error: error.message
+    
+    // Return empty results instead of error to avoid breaking the UI
+    res.json({
+      success: true,
+      data: [],
+      fallback: true,
+      message: 'Geocoding service unavailable, please try again'
     });
   }
 });
