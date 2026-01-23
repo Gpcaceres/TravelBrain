@@ -575,35 +575,52 @@ export default function Destinations() {
         // Calculate multimodal route (land + sea + land)
         routeData = await calculateMultimodalRoute(selectedOrigin, selectedDestination, straightDistance)
       } else if (straightDistance > 800) {
-        // Long distance ground - try to get driving route, fallback to air
+        // Long distance ground - try to get driving route, fallback to curved air route
         const drivingRoute = await calculateDrivingRoute(selectedOrigin, selectedDestination)
-        if (drivingRoute && drivingRoute.distance < straightDistance * 2) {
+        if (drivingRoute) {
           routeData = drivingRoute
         } else {
-          // Too far for driving, use air
+          // Too far for driving or API unavailable, use air with curved path
+          const curvedPath = generateCurvedPath(
+            [selectedOrigin.lat, selectedOrigin.lng],
+            [selectedDestination.lat, selectedDestination.lng],
+            50
+          )
           routeData = {
             distance: straightDistance,
-            duration: straightDistance / 800, // hours
+            duration: straightDistance / 800,
             transportType: 'air',
             segments: [{
               type: 'air',
-              coordinates: [[selectedOrigin.lat, selectedOrigin.lng], [selectedDestination.lat, selectedDestination.lng]],
-              distance: straightDistance
+              coordinates: curvedPath,
+              distance: straightDistance,
+              label: 'Air Route'
             }]
           }
         }
       } else {
-        // Short/medium distance - calculate driving route
+        // Short/medium distance - calculate driving route with fallback
         const drivingRoute = await calculateDrivingRoute(selectedOrigin, selectedDestination)
-        routeData = drivingRoute || {
-          distance: straightDistance,
-          duration: straightDistance / 80,
-          transportType: 'ground',
-          segments: [{
-            type: 'ground',
-            coordinates: [[selectedOrigin.lat, selectedOrigin.lng], [selectedDestination.lat, selectedDestination.lng]],
-            distance: straightDistance
-          }]
+        if (drivingRoute) {
+          routeData = drivingRoute
+        } else {
+          // API unavailable, use curved ground path
+          const curvedPath = generateCurvedPath(
+            [selectedOrigin.lat, selectedOrigin.lng],
+            [selectedDestination.lat, selectedDestination.lng],
+            Math.min(straightDistance * 2, 50)
+          )
+          routeData = {
+            distance: straightDistance * 1.3, // Add 30% for road routing
+            duration: (straightDistance * 1.3) / 80,
+            transportType: 'ground',
+            segments: [{
+              type: 'ground',
+              coordinates: curvedPath,
+              distance: straightDistance * 1.3,
+              label: 'Estimated Ground Route'
+            }]
+          }
         }
       }
 

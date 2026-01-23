@@ -91,12 +91,13 @@ router.post('/directions', async (req, res) => {
   } catch (error) {
     console.error('Routing error:', error.response?.data || error.message);
     
-    // If OpenRouteService fails, return error with more detail
-    res.status(error.response?.status || 500).json({
+    // Don't send error status, send 200 with fallback flag
+    // This allows frontend to gracefully fallback to local calculation
+    res.json({
       success: false,
-      message: 'Failed to calculate route',
-      error: error.response?.data?.error?.message || error.message,
-      fallback: true // Signal to use fallback on frontend
+      message: 'Routing API unavailable, use fallback',
+      fallback: true,
+      error: error.response?.data?.error?.message || error.message
     });
   }
 });
@@ -143,11 +144,13 @@ router.get('/directions', async (req, res) => {
     });
   } catch (error) {
     console.error('Routing error:', error.response?.data || error.message);
-    res.status(error.response?.status || 500).json({
+    
+    // Return fallback flag instead of error
+    res.json({
       success: false,
-      message: 'Failed to calculate route',
-      error: error.response?.data?.error?.message || error.message,
-      fallback: true
+      message: 'Routing API unavailable, use fallback',
+      fallback: true,
+      error: error.response?.data?.error?.message || error.message
     });
   }
 });
