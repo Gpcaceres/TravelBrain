@@ -22,6 +22,8 @@ export default function Destinations() {
   const [selectedDestination, setSelectedDestination] = useState(null)
   const [distanceInfo, setDistanceInfo] = useState(null)
   const [calculatingDistance, setCalculatingDistance] = useState(false)
+  const [routeOptions, setRouteOptions] = useState([]) // Multiple route options
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0) // Currently selected route
   const [originInput, setOriginInput] = useState('')
   const [destinationInput, setDestinationInput] = useState('')
   const [originSuggestions, setOriginSuggestions] = useState([])
@@ -555,6 +557,9 @@ export default function Destinations() {
     }
 
     setCalculatingDistance(true)
+    setRouteOptions([])
+    setSelectedRouteIndex(0)
+    
     try {
       // Calculate straight-line distance first
       const R = 6371 // Earth radius in km
@@ -567,75 +572,112 @@ export default function Destinations() {
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
       const straightDistance = R * c
 
+      const options = []
+
       // Detect if route crosses ocean
       const needsSeaRoute = detectOceanCrossing(selectedOrigin, selectedDestination, straightDistance)
       
-      let routeData
       if (needsSeaRoute) {
-        // Calculate multimodal route (land + sea + land)
-        routeData = await calculateMultimodalRoute(selectedOrigin, selectedDestination, straightDistance)
-      } else if (straightDistance > 800) {
-        // Long distance ground - try to get driving route, fallback to curved air route
+        // Option 1: Multimodal (land + sea + land)
+        const multimodalRoute = await calculateMultimodalRoute(selectedOrigin, selectedDestination, straightDistance)
+        options.push({
+          ...multimodalRoute,
+          name: '🌐 Multimodal (Land + Sea)',
+          description: 'Combination of ground and sea travel'
+        })
+        
+        // Option 2: Air (always available)
+        const curvedAirPath = generateCurvedPath(
+          [selectedOrigin.lat, selectedOrigin.lng],
+          [selectedDestination.lat, selectedDestination.lng],
+          50
+        )
+        options.push({
+          distance: straightDistance,
+          duration: straightDistance / 800,
+          transportType: 'air',
+          segments: [{
+            type: 'air',
+            coordinates: curvedAirPath,
+            distance: straightDistance,
+            label: 'Direct Flight'
+          }],
+          name: '✈️ Air Travel',
+          description: 'Fastest option'
+        })
+      } else {
+        // Option 1: Ground route (ALWAYS calculate, regardless of distance)
         const drivingRoute = await calculateDrivingRoute(selectedOrigin, selectedDestination)
         if (drivingRoute) {
-          routeData = drivingRoute
+          options.push({
+            ...drivingRoute,
+            name: '🚗 Ground Travel',
+            description: `By road (${Math.ceil(drivingRoute.duration * 24)} hours)`
+          })
         } else {
-          // Too far for driving or API unavailable, use air with curved path
+          // Fallback to curved ground path
           const curvedPath = generateCurvedPath(
+            [selectedOrigin.lat, selectedOrigin.lng],
+            [selectedDestination.lat, selectedDestination.lng],
+            Math.min(straightDistance * 2, 80)
+          )
+          const roadDistance = straightDistance * 1.4 // Add 40% for winding roads
+          options.push({
+            distance: roadDistance,
+            duration: roadDistance / 80,
+            transportType: 'ground',
+            segments: [{
+              type: 'ground',
+              coordinates: curvedPath,
+              distance: roadDistance,
+              label: 'Estimated Road Route'
+            }],
+            name: '🚗 Ground Travel',
+            description: `By road (approx. ${Math.ceil((roadDistance / 80) * 24)} hours)`
+          })
+        }
+        
+        // Option 2: Air route (for distances > 300 km)
+        if (straightDistance > 300) {
+          const curvedAirPath = generateCurvedPath(
             [selectedOrigin.lat, selectedOrigin.lng],
             [selectedDestination.lat, selectedDestination.lng],
             50
           )
-          routeData = {
+          options.push({
             distance: straightDistance,
             duration: straightDistance / 800,
             transportType: 'air',
             segments: [{
               type: 'air',
-              coordinates: curvedPath,
+              coordinates: curvedAirPath,
               distance: straightDistance,
-              label: 'Air Route'
-            }]
-          }
-        }
-      } else {
-        // Short/medium distance - calculate driving route with fallback
-        const drivingRoute = await calculateDrivingRoute(selectedOrigin, selectedDestination)
-        if (drivingRoute) {
-          routeData = drivingRoute
-        } else {
-          // API unavailable, use curved ground path
-          const curvedPath = generateCurvedPath(
-            [selectedOrigin.lat, selectedOrigin.lng],
-            [selectedDestination.lat, selectedDestination.lng],
-            Math.min(straightDistance * 2, 50)
-          )
-          routeData = {
-            distance: straightDistance * 1.3, // Add 30% for road routing
-            duration: (straightDistance * 1.3) / 80,
-            transportType: 'ground',
-            segments: [{
-              type: 'ground',
-              coordinates: curvedPath,
-              distance: straightDistance * 1.3,
-              label: 'Estimated Ground Route'
-            }]
-          }
+              label: 'Flight Route'
+            }],
+            name: '✈️ Air Travel',
+            description: `Direct flight (${Math.ceil((straightDistance / 800) * 60)} min)`
+          })
         }
       }
 
-      const hours = Math.floor(routeData.duration)
-      const minutes = Math.round((routeData.duration - hours) * 60)
+      setRouteOptions(options)
+      
+      // Set first option as default
+      if (options.length > 0) {
+        const firstRoute = options[0]
+        const hours = Math.floor(firstRoute.duration)
+        const minutes = Math.round((firstRoute.duration - hours) * 60)
 
-      setDistanceInfo({
-        distance: `${routeData.distance.toFixed(2)} km`,
-        duration: `${hours}h ${minutes}m`,
-        origin: selectedOrigin.name,
-        destination: selectedDestination.name,
-        transportType: routeData.transportType,
-        distanceKm: routeData.distance,
-        segments: routeData.segments
-      })
+        setDistanceInfo({
+          distance: `${firstRoute.distance.toFixed(2)} km`,
+          duration: `${hours}h ${minutes}m`,
+          origin: selectedOrigin.name,
+          destination: selectedDestination.name,
+          transportType: firstRoute.transportType,
+          distanceKm: firstRoute.distance,
+          segments: firstRoute.segments
+        })
+      }
       
       if (mapRef.current && !mapInstanceRef.current && typeof window.L !== 'undefined') {
         initializeMap()
@@ -646,6 +688,27 @@ export default function Destinations() {
     } finally {
       setCalculatingDistance(false)
     }
+  }
+  
+  // Switch between route options
+  const selectRouteOption = (index) => {
+    if (index < 0 || index >= routeOptions.length) return
+    
+    setSelectedRouteIndex(index)
+    const route = routeOptions[index]
+    
+    const hours = Math.floor(route.duration)
+    const minutes = Math.round((route.duration - hours) * 60)
+
+    setDistanceInfo({
+      distance: `${route.distance.toFixed(2)} km`,
+      duration: `${hours}h ${minutes}m`,
+      origin: selectedOrigin.name,
+      destination: selectedDestination.name,
+      transportType: route.transportType,
+      distanceKm: route.distance,
+      segments: route.segments
+    })
   }
   
   // Detect if route crosses a major ocean
@@ -1275,6 +1338,41 @@ export default function Destinations() {
 
           {distanceInfo && (
             <div className="distance-result">
+              {/* Route Options Selector */}
+              {routeOptions.length > 1 && (
+                <div className="route-options">
+                  <h3 className="options-title">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                      <path fillRule="evenodd" d="M15.817.113A.5.5 0 0116 .5v14a.5.5 0 01-.402.49l-5 1a.502.502 0 01-.196 0L5.5 15.01l-4.902.98A.5.5 0 010 15.5v-14a.5.5 0 01.402-.49l5-1a.5.5 0 01.196 0L10.5.99l4.902-.98a.5.5 0 01.415.103zM10 1.91l-4-.8v12.98l4 .8V1.91zm1 12.98l4-.8V1.11l-4 .8v12.98zm-6-.8V1.11l-4 .8v12.98l4-.8z"/>
+                    </svg>
+                    Choose Your Route
+                  </h3>
+                  <div className="route-options-grid">
+                    {routeOptions.map((option, index) => (
+                      <button
+                        key={index}
+                        className={`route-option-card ${selectedRouteIndex === index ? 'active' : ''}`}
+                        onClick={() => selectRouteOption(index)}
+                      >
+                        <div className="option-header">
+                          <span className="option-name">{option.name}</span>
+                          {selectedRouteIndex === index && (
+                            <span className="option-badge">Selected</span>
+                          )}
+                        </div>
+                        <p className="option-description">{option.description}</p>
+                        <div className="option-stats">
+                          <span className="option-distance">{option.distance.toFixed(0)} km</span>
+                          <span className="option-duration">
+                            {Math.floor(option.duration)}h {Math.round((option.duration - Math.floor(option.duration)) * 60)}m
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               <div className="result-content">
                 <div className="result-route">
                   <span className="route-point">{distanceInfo.origin}</span>
