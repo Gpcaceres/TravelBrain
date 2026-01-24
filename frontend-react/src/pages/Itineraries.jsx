@@ -192,11 +192,38 @@ const Itineraries = () => {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Fechas: ${formatDate(selectedTrip.startDate)} - ${formatDate(selectedTrip.endDate)}`, 20, yPos + 16);
-    doc.text(`Presupuesto Total: ${formatCurrency(selectedTrip.budget)}`, 20, yPos + 23);
-    doc.text(`Tipo de Interés: ${itinerary.interestType}`, 20, yPos + 30);
-    doc.text(`Categoría: ${itinerary.budgetType}`, pageWidth - 20, yPos + 30, { align: 'right' });
+    
+    // Currency conversion info
+    const hasCurrencyConversion = selectedTrip.destinationCurrency && 
+                                  selectedTrip.currency &&
+                                  selectedTrip.destinationCurrency !== selectedTrip.currency;
+    
+    if (hasCurrencyConversion) {
+      const convertedBudget = selectedTrip.budget * (selectedTrip.exchangeRate || 1);
+      const totalSpent = itinerary.budgetBreakdown?.total || 0;
+      const remaining = convertedBudget - totalSpent;
+      
+      doc.text(`Presupuesto Original: ${formatCurrencyService(selectedTrip.budget, selectedTrip.currency)}`, 20, yPos + 23);
+      doc.text(`Tasa de Cambio: 1 ${selectedTrip.currency} = ${(selectedTrip.exchangeRate || 1).toFixed(2)} ${selectedTrip.destinationCurrency}`, 20, yPos + 30);
+      doc.text(`Presupuesto en Destino: ${formatCurrencyService(convertedBudget, selectedTrip.destinationCurrency)}`, 20, yPos + 37);
+      doc.text(`Gasto Estimado: ${formatCurrencyService(totalSpent, selectedTrip.destinationCurrency)}`, 20, yPos + 44);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(remaining >= 0 ? 0 : 255, remaining >= 0 ? 150 : 0, 0);
+      doc.text(`Sobrante: ${formatCurrencyService(remaining, selectedTrip.destinationCurrency)}`, 20, yPos + 51);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'normal');
+      
+      yPos += 58;
+    } else {
+      doc.text(`Presupuesto Total: ${formatCurrency(selectedTrip.budget)}`, 20, yPos + 23);
+      yPos += 30;
+    }
+    
+    doc.text(`Tipo de Interés: ${itinerary.interestType}`, 20, yPos);
+    doc.text(`Categoría: ${itinerary.budgetType}`, pageWidth - 20, yPos, { align: 'right' });
 
-    yPos += 42;
+    yPos += 12;
 
     // ========== USER INFORMATION ==========
     doc.setFontSize(11);
@@ -303,7 +330,11 @@ const Itineraries = () => {
         alternateRowStyles: { fillColor: [250, 250, 250] },
         margin: { left: 15, right: 15 },
         tableWidth: 'auto',
-        columnStyles: {
+        columnStyles: hasCurrencyConversion ? {
+          0: { cellWidth: 55 },
+          1: { cellWidth: 50, halign: 'right' },
+          2: { cellWidth: 50, halign: 'right' }
+        } : {
           0: { cellWidth: 90 },
           1: { cellWidth: 'auto', halign: 'right', minCellWidth: 40 }
         }
@@ -543,7 +574,19 @@ const Itineraries = () => {
                 <p><strong>Destino:</strong> {selectedTrip.destination}</p>
                 <p><strong>Fecha de inicio:</strong> {formatDate(selectedTrip.startDate)}</p>
                 <p><strong>Fecha de fin:</strong> {formatDate(selectedTrip.endDate)}</p>
-                <p><strong>Presupuesto:</strong> {formatCurrency(selectedTrip.budget || 0)}</p>
+                
+                {/* Currency conversion info */}
+                {selectedTrip.destinationCurrency && selectedTrip.currency && 
+                 selectedTrip.destinationCurrency !== selectedTrip.currency ? (
+                  <>
+                    <p><strong>Presupuesto Original:</strong> {formatCurrencyService(selectedTrip.budget || 0, selectedTrip.currency)}</p>
+                    <p><strong>Tasa de Cambio:</strong> 1 {selectedTrip.currency} = {(selectedTrip.exchangeRate || 1).toFixed(2)} {selectedTrip.destinationCurrency}</p>
+                    <p><strong>Presupuesto en Destino:</strong> {formatCurrencyService((selectedTrip.budget || 0) * (selectedTrip.exchangeRate || 1), selectedTrip.destinationCurrency)}</p>
+                  </>
+                ) : (
+                  <p><strong>Presupuesto:</strong> {formatCurrency(selectedTrip.budget || 0)}</p>
+                )}
+                
                 <p><strong>Descripción:</strong> {selectedTrip.description || 'Sin descripción'}</p>
               </div>
             </div>
@@ -701,7 +744,7 @@ const Itineraries = () => {
                     <span className="currency-rate">
                       {itinerary.budgetBreakdown.originalCurrency} → {itinerary.budgetBreakdown.currency}
                       {itinerary.budgetBreakdown.exchangeRate && (
-                        <span className="rate-value"> (1:{itinerary.budgetBreakdown.exchangeRate.toFixed(4)})</span>
+                        <span className="rate-value"> (1:{itinerary.budgetBreakdown.exchangeRate.toFixed(2)})</span>
                       )}
                     </span>
                   </div>
@@ -834,6 +877,55 @@ const Itineraries = () => {
                     )}
                   </div>
                 </div>
+                
+                {/* Budget available vs spent */}
+                {selectedTrip && itinerary.budgetBreakdown.currency && (
+                  <>
+                    <div className="budget-item">
+                      <span>Presupuesto Disponible</span>
+                      <div className="budget-values">
+                        <span className="primary-currency">
+                          {formatCurrencyService(
+                            selectedTrip.budget * (selectedTrip.exchangeRate || 1), 
+                            itinerary.budgetBreakdown.currency
+                          )}
+                        </span>
+                        {itinerary.budgetBreakdown.originalCurrency && 
+                         itinerary.budgetBreakdown.currency !== itinerary.budgetBreakdown.originalCurrency && (
+                          <span className="original-currency">
+                            ≈ {formatCurrencyService(selectedTrip.budget, itinerary.budgetBreakdown.originalCurrency)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="budget-item budget-remaining">
+                      <span><strong>Sobrante</strong></span>
+                      <div className="budget-values">
+                        <span className="primary-currency" style={{ 
+                          color: (selectedTrip.budget * (selectedTrip.exchangeRate || 1) - itinerary.budgetBreakdown.total) >= 0 ? '#47F59A' : '#E54A7A' 
+                        }}>
+                          <strong>{formatCurrencyService(
+                            (selectedTrip.budget * (selectedTrip.exchangeRate || 1)) - itinerary.budgetBreakdown.total, 
+                            itinerary.budgetBreakdown.currency
+                          )}</strong>
+                        </span>
+                        {itinerary.budgetBreakdown.originalCurrency && 
+                         itinerary.budgetBreakdown.currency !== itinerary.budgetBreakdown.originalCurrency && (
+                          <span className="original-currency" style={{ 
+                            color: (selectedTrip.budget - (itinerary.budgetBreakdown.total / (itinerary.budgetBreakdown.exchangeRate || 1))) >= 0 ? '#47F59A' : '#E54A7A',
+                            opacity: 0.8
+                          }}>
+                            <strong>≈ {formatCurrencyService(
+                              selectedTrip.budget - (itinerary.budgetBreakdown.total / (itinerary.budgetBreakdown.exchangeRate || 1)), 
+                              itinerary.budgetBreakdown.originalCurrency
+                            )}</strong>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           )}
