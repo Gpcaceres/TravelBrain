@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { 
   getPopularCurrencies, 
   getCurrencyForDestination,
@@ -187,14 +186,6 @@ const CurrencySelector = ({
       )}
     </div>
   );
-};
-
-CurrencySelector.propTypes = {
-  sourceCurrency: PropTypes.string,
-  targetCurrency: PropTypes.string,
-  budget: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  destination: PropTypes.string,
-  onCurrencyChange: PropTypes.func
 };
 
 export default CurrencySelector;
