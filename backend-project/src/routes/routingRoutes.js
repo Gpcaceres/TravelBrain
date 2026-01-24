@@ -74,27 +74,19 @@ router.post('/directions', async (req, res) => {
     // Try GraphHopper first (more reliable)
     const GRAPHHOPPER_API_KEY = process.env.GRAPHHOPPER_API_KEY;
     
-    // DEBUG: Log the key being used (first/last 4 chars only for security)
-    console.log(`🔑 GraphHopper API Key: ${GRAPHHOPPER_API_KEY ? GRAPHHOPPER_API_KEY.substring(0, 4) + '...' + GRAPHHOPPER_API_KEY.substring(GRAPHHOPPER_API_KEY.length - 4) : 'NOT SET'}`);
-    
     if (GRAPHHOPPER_API_KEY && GRAPHHOPPER_API_KEY !== 'demo') {
       try {
         const vehicle = profile.includes('car') ? 'car' : 'foot';
-        console.log(`🚗 Calling GraphHopper API: vehicle=${vehicle}, start=${startLat},${startLng}, end=${endLat},${endLng}`);
         
-        const ghResponse = await axios.get(
-          'https://graphhopper.com/api/1/route',
-          {
-            params: {
-              point: [`${startLat},${startLng}`, `${endLat},${endLng}`],
-              vehicle: vehicle,
-              locale: 'en',
-              points_encoded: false,
-              key: GRAPHHOPPER_API_KEY
-            },
-            timeout: 15000
-          }
-        );
+        // GraphHopper needs multiple 'point' parameters, not an array
+        // Build URL manually because axios doesn't handle multiple params with same name correctly
+        const ghUrl = `https://graphhopper.com/api/1/route?point=${startLat},${startLng}&point=${endLat},${endLng}&vehicle=${vehicle}&locale=en&points_encoded=false&key=${GRAPHHOPPER_API_KEY}`;
+        
+        console.log(`🚗 Calling GraphHopper API: ${vehicle} route from [${startLat},${startLng}] to [${endLat},${endLng}]`);
+        
+        const ghResponse = await axios.get(ghUrl, {
+          timeout: 15000
+        });
 
         if (ghResponse.data.paths && ghResponse.data.paths.length > 0) {
           const path = ghResponse.data.paths[0];
@@ -128,11 +120,10 @@ router.post('/directions', async (req, res) => {
           });
         }
       } catch (ghError) {
-        console.error('❌ GraphHopper error, falling back to OpenRouteService:', ghError.message);
-        if (ghError.response) {
-          console.error('GraphHopper API response:', ghError.response.data);
-        }
+        console.error('❌ GraphHopper error:', ghError.response?.data || ghError.message);
       }
+    } else {
+      console.log('⚠️  GraphHopper API key not configured, using OpenRouteService');
     }
 
     // Fallback to OpenRouteService
