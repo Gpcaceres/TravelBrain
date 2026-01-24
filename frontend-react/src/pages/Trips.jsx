@@ -150,6 +150,7 @@ export default function Trips() {
   }
 
   const handleCurrencyChange = (data) => {
+    console.log('💰 Trips: Received currency data from selector:', data);
     setCurrencyData(data)
     setFormData({
       ...formData,
@@ -171,6 +172,12 @@ export default function Trips() {
         destinationCurrency: currencyData.targetCurrency,
         exchangeRate: currencyData.exchangeRate
       }
+
+      console.log('💾 Trips: Submitting trip with data:', {
+        currency: tripData.currency,
+        destinationCurrency: tripData.destinationCurrency,
+        exchangeRate: tripData.exchangeRate
+      });
 
       if (editingTrip) {
         await tripService.updateTrip(editingTrip._id, tripData)

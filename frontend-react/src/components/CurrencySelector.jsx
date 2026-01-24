@@ -49,7 +49,10 @@ const CurrencySelector = ({
       
       // Always get the exchange rate, even if budget is 0
       const amount = budget && budget > 0 ? budget : 1; // Use 1 as base for rate calculation
+      console.log('🔄 CurrencySelector: Converting', amount, selectedSource, '→', selectedTarget);
+      
       const result = await convertCurrency(amount, selectedSource, selectedTarget);
+      console.log('✅ CurrencySelector: Got rate', result.rate, 'isFallback:', result.isFallback);
       
       setExchangeRate(result.rate);
       
@@ -59,6 +62,7 @@ const CurrencySelector = ({
       
       // Notify parent component with real exchange rate
       if (onCurrencyChange) {
+        console.log('📢 CurrencySelector: Notifying parent with rate', result.rate);
         onCurrencyChange({
           sourceCurrency: selectedSource,
           targetCurrency: selectedTarget,
