@@ -106,10 +106,22 @@ const Itineraries = () => {
     setError('');
 
     try {
+      console.log('🎯 Generating itinerary with:', {
+        tripId: selectedTrip._id,
+        interestType: interestType,
+        budgetType: budgetType,
+        budget: selectedTrip.budget
+      });
+      
       const response = await generateItinerary({
         tripId: selectedTrip._id,
         interestType: interestType,
         budgetType: budgetType
+      });
+      
+      console.log('✅ Itinerary response:', {
+        budgetType: response.data?.budgetType,
+        breakdown: response.data?.budgetBreakdown
       });
       if (response.success) {
         setItinerary(response.data);
@@ -191,7 +203,22 @@ const Itineraries = () => {
     
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Fechas: ${formatDate(selectedTrip.startDate)} - ${formatDate(selectedTrip.endDate)}`, 20, yPos + 16);
+    
+    // Origin country based on currency
+    const originCountry = selectedTrip.currency === 'USD' ? 'Estados Unidos / Ecuador' :
+                         selectedTrip.currency === 'EUR' ? 'Zona Euro' :
+                         selectedTrip.currency === 'COP' ? 'Colombia' :
+                         selectedTrip.currency === 'PEN' ? 'Perú' :
+                         selectedTrip.currency === 'MXN' ? 'México' :
+                         selectedTrip.currency === 'BRL' ? 'Brasil' :
+                         selectedTrip.currency === 'ARS' ? 'Argentina' :
+                         selectedTrip.currency === 'CLP' ? 'Chile' :
+                         selectedTrip.currency === 'CAD' ? 'Canadá' :
+                         selectedTrip.currency === 'GBP' ? 'Reino Unido' :
+                         selectedTrip.currency || 'N/A';
+    
+    doc.text(`País de Origen: ${originCountry}`, 20, yPos + 16);
+    doc.text(`Fechas: ${formatDate(selectedTrip.startDate)} - ${formatDate(selectedTrip.endDate)}`, 20, yPos + 23);
     
     // Currency conversion info
     const hasCurrencyConversion = selectedTrip.destinationCurrency && 
@@ -203,21 +230,21 @@ const Itineraries = () => {
       const totalSpent = itinerary.budgetBreakdown?.total || 0;
       const remaining = convertedBudget - totalSpent;
       
-      doc.text(`Presupuesto Original: ${formatCurrencyService(selectedTrip.budget, selectedTrip.currency)}`, 20, yPos + 23);
-      doc.text(`Tasa de Cambio: 1 ${selectedTrip.currency} = ${(selectedTrip.exchangeRate || 1).toFixed(2)} ${selectedTrip.destinationCurrency}`, 20, yPos + 30);
-      doc.text(`Presupuesto en Destino: ${formatCurrencyService(convertedBudget, selectedTrip.destinationCurrency)}`, 20, yPos + 37);
-      doc.text(`Gasto Estimado: ${formatCurrencyService(totalSpent, selectedTrip.destinationCurrency)}`, 20, yPos + 44);
+      doc.text(`Presupuesto Original: ${formatCurrencyService(selectedTrip.budget, selectedTrip.currency)}`, 20, yPos + 30);
+      doc.text(`Tasa de Cambio: 1 ${selectedTrip.currency} = ${(selectedTrip.exchangeRate || 1).toFixed(2)} ${selectedTrip.destinationCurrency}`, 20, yPos + 37);
+      doc.text(`Presupuesto en Destino: ${formatCurrencyService(convertedBudget, selectedTrip.destinationCurrency)}`, 20, yPos + 44);
+      doc.text(`Gasto Estimado: ${formatCurrencyService(totalSpent, selectedTrip.destinationCurrency)}`, 20, yPos + 51);
       
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(remaining >= 0 ? 0 : 255, remaining >= 0 ? 150 : 0, 0);
-      doc.text(`Sobrante: ${formatCurrencyService(remaining, selectedTrip.destinationCurrency)}`, 20, yPos + 51);
+      doc.text(`Sobrante: ${formatCurrencyService(remaining, selectedTrip.destinationCurrency)}`, 20, yPos + 58);
       doc.setTextColor(0, 0, 0);
       doc.setFont('helvetica', 'normal');
       
-      yPos += 58;
+      yPos += 65;
     } else {
-      doc.text(`Presupuesto Total: ${formatCurrency(selectedTrip.budget)}`, 20, yPos + 23);
-      yPos += 30;
+      doc.text(`Presupuesto Total: ${formatCurrency(selectedTrip.budget)}`, 20, yPos + 30);
+      yPos += 37;
     }
     
     doc.text(`Tipo de Interés: ${itinerary.interestType}`, 20, yPos);
@@ -572,6 +599,24 @@ const Itineraries = () => {
               <h3>Detalles del Viaje</h3>
               <div className="trip-info">
                 <p><strong>Destino:</strong> {selectedTrip.destination}</p>
+                
+                {/* Origin country based on currency */}
+                {selectedTrip.currency && (
+                  <p><strong>País de Origen:</strong> 
+                    {selectedTrip.currency === 'USD' ? 'Estados Unidos / Ecuador' :
+                     selectedTrip.currency === 'EUR' ? 'Zona Euro' :
+                     selectedTrip.currency === 'COP' ? 'Colombia' :
+                     selectedTrip.currency === 'PEN' ? 'Perú' :
+                     selectedTrip.currency === 'MXN' ? 'México' :
+                     selectedTrip.currency === 'BRL' ? 'Brasil' :
+                     selectedTrip.currency === 'ARS' ? 'Argentina' :
+                     selectedTrip.currency === 'CLP' ? 'Chile' :
+                     selectedTrip.currency === 'CAD' ? 'Canadá' :
+                     selectedTrip.currency === 'GBP' ? 'Reino Unido' :
+                     selectedTrip.currency}
+                  </p>
+                )}
+                
                 <p><strong>Fecha de inicio:</strong> {formatDate(selectedTrip.startDate)}</p>
                 <p><strong>Fecha de fin:</strong> {formatDate(selectedTrip.endDate)}</p>
                 
