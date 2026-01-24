@@ -22,6 +22,12 @@ const CurrencySelector = ({
   const [loading, setLoading] = useState(false);
   const [showConverter, setShowConverter] = useState(false);
 
+  // Sync with parent props when they change (for editing)
+  useEffect(() => {
+    if (sourceCurrency) setSelectedSource(sourceCurrency);
+    if (targetCurrency) setSelectedTarget(targetCurrency);
+  }, [sourceCurrency, targetCurrency]);
+
   // Auto-detect target currency from destination
   useEffect(() => {
     if (destination) {
@@ -34,6 +40,16 @@ const CurrencySelector = ({
   useEffect(() => {
     if (budget && selectedSource && selectedTarget) {
       performConversion();
+    } else if (selectedSource && selectedTarget) {
+      // Even without budget, notify parent of currency selection
+      if (onCurrencyChange) {
+        onCurrencyChange({
+          sourceCurrency: selectedSource,
+          targetCurrency: selectedTarget,
+          exchangeRate: 1,
+          convertedAmount: 0
+        });
+      }
     }
   }, [budget, selectedSource, selectedTarget]);
 
