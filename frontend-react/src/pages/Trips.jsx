@@ -21,6 +21,10 @@ export default function Trips() {
   const [searchingDestination, setSearchingDestination] = useState(false)
   const destinationTimeoutRef = useRef(null)
   
+  const [originCountryInput, setOriginCountryInput] = useState('')
+  const [originCountrySuggestions, setOriginCountrySuggestions] = useState([])
+  const originCountryTimeoutRef = useRef(null)
+  
   const [formData, setFormData] = useState({
     title: '',
     destination: '',
@@ -95,6 +99,7 @@ export default function Trips() {
         exchangeRate: trip.exchangeRate || 1
       })
       setDestinationInput(trip.destination || '')
+      setOriginCountryInput(trip.originCountry || '')
       setCurrencyData({
         sourceCurrency: trip.currency || 'USD',
         targetCurrency: trip.destinationCurrency || 'USD',
@@ -116,6 +121,7 @@ export default function Trips() {
         exchangeRate: 1
       })
       setDestinationInput('')
+      setOriginCountryInput('')
       setCurrencyData({
         sourceCurrency: 'USD',
         targetCurrency: 'USD',
@@ -124,6 +130,7 @@ export default function Trips() {
       })
     }
     setDestinationSuggestions([])
+    setOriginCountrySuggestions([])
     setShowModal(true)
     setMessage({ type: '', text: '' })
   }
@@ -132,7 +139,9 @@ export default function Trips() {
     setShowModal(false)
     setEditingTrip(null)
     setDestinationInput('')
+    setOriginCountryInput('')
     setDestinationSuggestions([])
+    setOriginCountrySuggestions([])
     setFormData({
       title: '',
       destination: '',
@@ -272,6 +281,53 @@ export default function Trips() {
     setDestinationInput(place.name)
     setFormData({ ...formData, destination: place.name })
     setDestinationSuggestions([])
+  }
+
+  // Lista de países comunes
+  const countries = [
+    'Argentina', 'Bolivia', 'Brasil', 'Chile', 'Colombia', 
+    'Costa Rica', 'Ecuador', 'El Salvador', 'España', 
+    'Estados Unidos', 'Guatemala', 'Honduras', 'México', 
+    'Nicaragua', 'Panamá', 'Paraguay', 'Perú', 
+    'República Dominicana', 'Uruguay', 'Venezuela'
+  ]
+
+  const searchOriginCountrySuggestions = (query) => {
+    if (!query || query.length < 1) {
+      setOriginCountrySuggestions([])
+      return
+    }
+
+    const filtered = countries.filter(country =>
+      country.toLowerCase().includes(query.toLowerCase())
+    )
+    setOriginCountrySuggestions(filtered)
+  }
+
+  const handleOriginCountryInputChange = (e) => {
+    const value = e.target.value
+    setOriginCountryInput(value)
+    setFormData({ ...formData, originCountry: value })
+    
+    // Clear previous timeout
+    if (originCountryTimeoutRef.current) {
+      clearTimeout(originCountryTimeoutRef.current)
+    }
+    
+    // Set new timeout for search
+    if (value.trim()) {
+      originCountryTimeoutRef.current = setTimeout(() => {
+        searchOriginCountrySuggestions(value)
+      }, 300)
+    } else {
+      setOriginCountrySuggestions([])
+    }
+  }
+
+  const selectOriginCountry = (country) => {
+    setOriginCountryInput(country)
+    setFormData({ ...formData, originCountry: country })
+    setOriginCountrySuggestions([])
   }
 
   const formatDate = (dateString) => {
@@ -546,34 +602,33 @@ export default function Trips() {
 
               <div className="form-group">
                 <label htmlFor="originCountry">País de Origen</label>
-                <select
-                  id="originCountry"
-                  name="originCountry"
-                  value={formData.originCountry}
-                  onChange={handleInputChange}
-                  className="form-select"
-                >
-                  <option value="">Seleccionar país...</option>
-                  <option value="Estados Unidos">Estados Unidos</option>
-                  <option value="Ecuador">Ecuador</option>
-                  <option value="Colombia">Colombia</option>
-                  <option value="Perú">Perú</option>
-                  <option value="México">México</option>
-                  <option value="Brasil">Brasil</option>
-                  <option value="Argentina">Argentina</option>
-                  <option value="Chile">Chile</option>
-                  <option value="Uruguay">Uruguay</option>
-                  <option value="Bolivia">Bolivia</option>
-                  <option value="Paraguay">Paraguay</option>
-                  <option value="Venezuela">Venezuela</option>
-                  <option value="España">España</option>
-                  <option value="Francia">Francia</option>
-                  <option value="Alemania">Alemania</option>
-                  <option value="Italia">Italia</option>
-                  <option value="Reino Unido">Reino Unido</option>
-                  <option value="Canadá">Canadá</option>
-                  <option value="Otro">Otro</option>
-                </select>
+                <div className="autocomplete-wrapper">
+                  <input
+                    type="text"
+                    id="originCountry"
+                    name="originCountry"
+                    value={originCountryInput}
+                    onChange={handleOriginCountryInputChange}
+                    placeholder="Empieza a escribir un país (e.g., Perú, Colombia)..."
+                    className="autocomplete-input"
+                  />
+                  {originCountrySuggestions.length > 0 && (
+                    <ul className="autocomplete-suggestions">
+                      {originCountrySuggestions.map((country) => (
+                        <li
+                          key={country}
+                          onClick={() => selectOriginCountry(country)}
+                          className="autocomplete-item"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M0 8a8 8 0 1116 0A8 8 0 010 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855-.143.268-.276.56-.395.872.705.157 1.472.257 2.282.287V1.077zM4.249 3.539c.142-.384.304-.744.481-1.078a6.7 6.7 0 011.597.654 3.5 3.5 0 01-.597.932 8.9 8.9 0 00-1.481-.508zM3.509 7.5c.036-1.07.188-2.087.436-3.008a9.124 9.124 0 011.565.667c-.12.253-.23.51-.329.772-.165.442-.293.905-.376 1.388-.943.07-1.865.267-2.704.582.08-.452.171-.9.272-1.347a.5.5 0 01.136-.054zm-.61 2.5c.263.072.533.135.809.187a9.001 9.001 0 01.375-1.512c-.669.105-1.32.272-1.947.507.26.294.533.57.818.818-.018.002-.036.004-.055.006zM8.5 1.077v2.114c.81-.03 1.577-.13 2.282-.287-.12-.312-.252-.604-.395-.872C9.835 1.897 9.17 1.282 8.5 1.077zM10.249 3.539c.142.384.304.744.481 1.078a6.7 6.7 0 001.597-.654 3.5 3.5 0 00-.597-.932 8.9 8.9 0 01-1.481.508zm1.242 1.961c.233.377.45.772.644 1.184.165.348.313.713.441 1.093a9.001 9.001 0 011.565-.667c-.12-.253-.23-.51-.329-.772a8.964 8.964 0 00-.376-1.388 9.124 9.124 0 00-1.945-.45zm.943 4.5c-.263-.072-.533-.135-.809-.187a9.001 9.001 0 00-.375 1.512c.669-.105 1.32-.272 1.947-.507a8.538 8.538 0 01-.818-.818l.055-.006zM8.5 8.5v6.923c.67-.204 1.335-.82 1.887-1.855.143-.268.276-.56.395-.872A12.63 12.63 0 018.5 11.91V8.5zm3.753-.93c-.142.384-.304.744-.481 1.078a6.7 6.7 0 00-1.597-.654c.196-.332.371-.676.525-1.032.165-.375.293-.77.376-1.176.943-.07 1.865-.267 2.704-.582-.08.452-.171.9-.272 1.347a.5.5 0 00-.136.054c.018.006.036.01.055.015-.245.297-.497.576-.763.832-.027.024-.053.047-.08.071a8.9 8.9 0 01-1.331.047z"/>
+                          </svg>
+                          {country}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
 
               <div className="form-row">
