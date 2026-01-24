@@ -57,6 +57,9 @@ exports.createTrip = async (req, res) => {
       startDate: req.body.startDate,
       endDate: req.body.endDate,
       budget: req.body.budget,
+      currency: req.body.currency,
+      destinationCurrency: req.body.destinationCurrency,
+      exchangeRate: req.body.exchangeRate,
       description: req.body.description
     });
 
@@ -100,6 +103,9 @@ exports.updateTrip = async (req, res) => {
     if (req.body.startDate != null) trip.startDate = req.body.startDate;
     if (req.body.endDate != null) trip.endDate = req.body.endDate;
     if (req.body.budget != null) trip.budget = req.body.budget;
+    if (req.body.currency != null) trip.currency = req.body.currency;
+    if (req.body.destinationCurrency != null) trip.destinationCurrency = req.body.destinationCurrency;
+    if (req.body.exchangeRate != null) trip.exchangeRate = req.body.exchangeRate;
     if (req.body.description != null) trip.description = req.body.description;
 
     const updatedTrip = await trip.save();
