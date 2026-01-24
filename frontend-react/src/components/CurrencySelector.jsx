@@ -38,41 +38,32 @@ const CurrencySelector = ({
 
   // Calculate conversion whenever values change
   useEffect(() => {
-    if (budget && selectedSource && selectedTarget) {
+    if (selectedSource && selectedTarget) {
       performConversion();
-    } else if (selectedSource && selectedTarget) {
-      // Even without budget, notify parent of currency selection
-      if (onCurrencyChange) {
-        onCurrencyChange({
-          sourceCurrency: selectedSource,
-          targetCurrency: selectedTarget,
-          exchangeRate: 1,
-          convertedAmount: 0
-        });
-      }
     }
   }, [budget, selectedSource, selectedTarget]);
 
   const performConversion = async () => {
-    if (!budget || budget <= 0) {
-      setConvertedAmount(0);
-      setExchangeRate(1);
-      return;
-    }
-
     try {
       setLoading(true);
-      const result = await convertCurrency(budget, selectedSource, selectedTarget);
-      setExchangeRate(result.rate);
-      setConvertedAmount(result.convertedAmount);
       
-      // Notify parent component
+      // Always get the exchange rate, even if budget is 0
+      const amount = budget && budget > 0 ? budget : 1; // Use 1 as base for rate calculation
+      const result = await convertCurrency(amount, selectedSource, selectedTarget);
+      
+      setExchangeRate(result.rate);
+      
+      // Calculate actual converted amount based on real budget
+      const actualConverted = budget && budget > 0 ? budget * result.rate : 0;
+      setConvertedAmount(actualConverted);
+      
+      // Notify parent component with real exchange rate
       if (onCurrencyChange) {
         onCurrencyChange({
           sourceCurrency: selectedSource,
           targetCurrency: selectedTarget,
           exchangeRate: result.rate,
-          convertedAmount: result.convertedAmount
+          convertedAmount: actualConverted
         });
       }
     } catch (error) {
