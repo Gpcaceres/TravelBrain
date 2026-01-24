@@ -291,6 +291,13 @@ exports.generateItinerary = async (req, res) => {
 
     const { budgetType, dailyActivities, budgetBreakdown } = itineraryResult.data;
 
+    // Add currency information to budget breakdown
+    if (budgetBreakdown && trip.currency) {
+      budgetBreakdown.currency = trip.destinationCurrency || trip.currency || 'USD';
+      budgetBreakdown.originalCurrency = trip.currency || 'USD';
+      budgetBreakdown.exchangeRate = trip.exchangeRate || 1;
+    }
+
     // Get weather forecast
     const weatherInfo = await getWeatherForecast(trip.destination, trip.startDate, trip.endDate);
 

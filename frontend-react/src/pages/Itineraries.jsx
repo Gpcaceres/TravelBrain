@@ -239,7 +239,38 @@ const Itineraries = () => {
       
       yPos += 5;
 
-      const budgetData = [
+      // Show currency conversion info if available
+      const hasCurrencyConversion = itinerary.budgetBreakdown.originalCurrency && 
+                                    itinerary.budgetBreakdown.currency &&
+                                    itinerary.budgetBreakdown.originalCurrency !== itinerary.budgetBreakdown.currency;
+
+      const budgetData = hasCurrencyConversion ? [
+        ['Categoría', `${itinerary.budgetBreakdown.currency}`, `${itinerary.budgetBreakdown.originalCurrency}`],
+        ['Hospedaje', 
+          formatCurrencyService(itinerary.budgetBreakdown.accommodation || 0, itinerary.budgetBreakdown.currency),
+          formatCurrencyService((itinerary.budgetBreakdown.accommodation || 0) / (itinerary.budgetBreakdown.exchangeRate || 1), itinerary.budgetBreakdown.originalCurrency)
+        ],
+        ['Alimentación', 
+          formatCurrencyService(itinerary.budgetBreakdown.food || 0, itinerary.budgetBreakdown.currency),
+          formatCurrencyService((itinerary.budgetBreakdown.food || 0) / (itinerary.budgetBreakdown.exchangeRate || 1), itinerary.budgetBreakdown.originalCurrency)
+        ],
+        ['Actividades', 
+          formatCurrencyService(itinerary.budgetBreakdown.activities || 0, itinerary.budgetBreakdown.currency),
+          formatCurrencyService((itinerary.budgetBreakdown.activities || 0) / (itinerary.budgetBreakdown.exchangeRate || 1), itinerary.budgetBreakdown.originalCurrency)
+        ],
+        ['Transporte', 
+          formatCurrencyService(itinerary.budgetBreakdown.transport || 0, itinerary.budgetBreakdown.currency),
+          formatCurrencyService((itinerary.budgetBreakdown.transport || 0) / (itinerary.budgetBreakdown.exchangeRate || 1), itinerary.budgetBreakdown.originalCurrency)
+        ],
+        ['Extras', 
+          formatCurrencyService(itinerary.budgetBreakdown.extras || 0, itinerary.budgetBreakdown.currency),
+          formatCurrencyService((itinerary.budgetBreakdown.extras || 0) / (itinerary.budgetBreakdown.exchangeRate || 1), itinerary.budgetBreakdown.originalCurrency)
+        ],
+        ['TOTAL', 
+          formatCurrencyService(itinerary.budgetBreakdown.total || 0, itinerary.budgetBreakdown.currency),
+          formatCurrencyService((itinerary.budgetBreakdown.total || 0) / (itinerary.budgetBreakdown.exchangeRate || 1), itinerary.budgetBreakdown.originalCurrency)
+        ]
+      ] : [
         ['Categoría', 'Monto'],
         ['Hospedaje', formatCurrency(itinerary.budgetBreakdown.accommodation || 0)],
         ['Alimentación', formatCurrency(itinerary.budgetBreakdown.food || 0)],
