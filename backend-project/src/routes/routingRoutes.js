@@ -74,9 +74,14 @@ router.post('/directions', async (req, res) => {
     // Try GraphHopper first (more reliable)
     const GRAPHHOPPER_API_KEY = process.env.GRAPHHOPPER_API_KEY;
     
+    // DEBUG: Log the key being used (first/last 4 chars only for security)
+    console.log(`🔑 GraphHopper API Key: ${GRAPHHOPPER_API_KEY ? GRAPHHOPPER_API_KEY.substring(0, 4) + '...' + GRAPHHOPPER_API_KEY.substring(GRAPHHOPPER_API_KEY.length - 4) : 'NOT SET'}`);
+    
     if (GRAPHHOPPER_API_KEY && GRAPHHOPPER_API_KEY !== 'demo') {
       try {
         const vehicle = profile.includes('car') ? 'car' : 'foot';
+        console.log(`🚗 Calling GraphHopper API: vehicle=${vehicle}, start=${startLat},${startLng}, end=${endLat},${endLng}`);
+        
         const ghResponse = await axios.get(
           'https://graphhopper.com/api/1/route',
           {
@@ -123,7 +128,10 @@ router.post('/directions', async (req, res) => {
           });
         }
       } catch (ghError) {
-        console.error('GraphHopper error, falling back to OpenRouteService:', ghError.message);
+        console.error('❌ GraphHopper error, falling back to OpenRouteService:', ghError.message);
+        if (ghError.response) {
+          console.error('GraphHopper API response:', ghError.response.data);
+        }
       }
     }
 
