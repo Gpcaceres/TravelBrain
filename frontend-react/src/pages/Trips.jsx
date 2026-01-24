@@ -24,6 +24,7 @@ export default function Trips() {
   const [formData, setFormData] = useState({
     title: '',
     destination: '',
+    originCountry: '',
     startDate: '',
     endDate: '',
     budget: '',
@@ -84,6 +85,7 @@ export default function Trips() {
       setFormData({
         title: trip.title,
         destination: trip.destination,
+        originCountry: trip.originCountry || '',
         startDate: trip.startDate?.split('T')[0] || '',
         endDate: trip.endDate?.split('T')[0] || '',
         budget: trip.budget || '',
@@ -104,6 +106,7 @@ export default function Trips() {
       setFormData({
         title: '',
         destination: '',
+        originCountry: '',
         startDate: '',
         endDate: '',
         budget: '',
@@ -133,6 +136,7 @@ export default function Trips() {
     setFormData({
       title: '',
       destination: '',
+      originCountry: '',
       startDate: '',
       endDate: '',
       budget: '',
@@ -538,6 +542,38 @@ export default function Trips() {
                     </ul>
                   )}
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="originCountry">País de Origen</label>
+                <select
+                  id="originCountry"
+                  name="originCountry"
+                  value={formData.originCountry}
+                  onChange={handleInputChange}
+                  className="form-select"
+                >
+                  <option value="">Seleccionar país...</option>
+                  <option value="Estados Unidos">Estados Unidos</option>
+                  <option value="Ecuador">Ecuador</option>
+                  <option value="Colombia">Colombia</option>
+                  <option value="Perú">Perú</option>
+                  <option value="México">México</option>
+                  <option value="Brasil">Brasil</option>
+                  <option value="Argentina">Argentina</option>
+                  <option value="Chile">Chile</option>
+                  <option value="Uruguay">Uruguay</option>
+                  <option value="Bolivia">Bolivia</option>
+                  <option value="Paraguay">Paraguay</option>
+                  <option value="Venezuela">Venezuela</option>
+                  <option value="España">España</option>
+                  <option value="Francia">Francia</option>
+                  <option value="Alemania">Alemania</option>
+                  <option value="Italia">Italia</option>
+                  <option value="Reino Unido">Reino Unido</option>
+                  <option value="Canadá">Canadá</option>
+                  <option value="Otro">Otro</option>
+                </select>
               </div>
 
               <div className="form-row">

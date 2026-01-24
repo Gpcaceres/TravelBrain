@@ -204,21 +204,10 @@ const Itineraries = () => {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     
-    // Origin country based on currency
-    const originCountry = selectedTrip.currency === 'USD' ? 'Estados Unidos / Ecuador' :
-                         selectedTrip.currency === 'EUR' ? 'Zona Euro' :
-                         selectedTrip.currency === 'COP' ? 'Colombia' :
-                         selectedTrip.currency === 'PEN' ? 'Perú' :
-                         selectedTrip.currency === 'MXN' ? 'México' :
-                         selectedTrip.currency === 'BRL' ? 'Brasil' :
-                         selectedTrip.currency === 'ARS' ? 'Argentina' :
-                         selectedTrip.currency === 'CLP' ? 'Chile' :
-                         selectedTrip.currency === 'CAD' ? 'Canadá' :
-                         selectedTrip.currency === 'GBP' ? 'Reino Unido' :
-                         selectedTrip.currency || 'N/A';
-    
-    doc.text(`País de Origen: ${originCountry}`, 20, yPos + 16);
-    doc.text(`Fechas: ${formatDate(selectedTrip.startDate)} - ${formatDate(selectedTrip.endDate)}`, 20, yPos + 23);
+    // Origin country
+    if (selectedTrip.originCountry) {
+      doc.text(`País de Origen: ${selectedTrip.originCountry}`, 20, yPos + 16);
+      doc.text(`Fechas: ${formatDate(selectedTrip.startDate)} - ${formatDate(selectedTrip.endDate)}`, 20, yPos + 23);
     
     // Currency conversion info
     const hasCurrencyConversion = selectedTrip.destinationCurrency && 
@@ -600,21 +589,9 @@ const Itineraries = () => {
               <div className="trip-info">
                 <p><strong>Destino:</strong> {selectedTrip.destination}</p>
                 
-                {/* Origin country based on currency */}
-                {selectedTrip.currency && (
-                  <p><strong>País de Origen:</strong> 
-                    {selectedTrip.currency === 'USD' ? 'Estados Unidos / Ecuador' :
-                     selectedTrip.currency === 'EUR' ? 'Zona Euro' :
-                     selectedTrip.currency === 'COP' ? 'Colombia' :
-                     selectedTrip.currency === 'PEN' ? 'Perú' :
-                     selectedTrip.currency === 'MXN' ? 'México' :
-                     selectedTrip.currency === 'BRL' ? 'Brasil' :
-                     selectedTrip.currency === 'ARS' ? 'Argentina' :
-                     selectedTrip.currency === 'CLP' ? 'Chile' :
-                     selectedTrip.currency === 'CAD' ? 'Canadá' :
-                     selectedTrip.currency === 'GBP' ? 'Reino Unido' :
-                     selectedTrip.currency}
-                  </p>
+                {/* Origin country */}
+                {selectedTrip.originCountry && (
+                  <p><strong>País de Origen:</strong> {selectedTrip.originCountry}</p>
                 )}
                 
                 <p><strong>Fecha de inicio:</strong> {formatDate(selectedTrip.startDate)}</p>

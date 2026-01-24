@@ -54,6 +54,7 @@ exports.createTrip = async (req, res) => {
       userId: req.body.userId,
       title: req.body.title,
       destination: req.body.destination,
+      originCountry: req.body.originCountry,
       startDate: req.body.startDate,
       endDate: req.body.endDate,
       budget: req.body.budget,
@@ -100,6 +101,7 @@ exports.updateTrip = async (req, res) => {
     if (req.body.userId != null) trip.userId = req.body.userId;
     if (req.body.title != null) trip.title = req.body.title;
     if (req.body.destination != null) trip.destination = req.body.destination;
+    if (req.body.originCountry != null) trip.originCountry = req.body.originCountry;
     if (req.body.startDate != null) trip.startDate = req.body.startDate;
     if (req.body.endDate != null) trip.endDate = req.body.endDate;
     if (req.body.budget != null) trip.budget = req.body.budget;

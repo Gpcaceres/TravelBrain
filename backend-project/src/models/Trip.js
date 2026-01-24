@@ -21,6 +21,10 @@ const tripSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    originCountry: {
+      type: String,
+      trim: true
+    },
     startDate: {
       type: Date,
       required: true
