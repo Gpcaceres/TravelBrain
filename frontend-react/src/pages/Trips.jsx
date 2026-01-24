@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { tripService } from '../services/tripService'
+import CurrencySelector from '../components/CurrencySelector'
 import '../styles/Trips.css'
 
 export default function Trips() {
@@ -26,7 +27,17 @@ export default function Trips() {
     startDate: '',
     endDate: '',
     budget: '',
-    description: ''
+    description: '',
+    currency: 'USD',
+    destinationCurrency: 'USD',
+    exchangeRate: 1
+  })
+
+  const [currencyData, setCurrencyData] = useState({
+    sourceCurrency: 'USD',
+    targetCurrency: 'USD',
+    exchangeRate: 1,
+    convertedAmount: 0
   })
 
   useEffect(() => {
@@ -76,9 +87,18 @@ export default function Trips() {
         startDate: trip.startDate?.split('T')[0] || '',
         endDate: trip.endDate?.split('T')[0] || '',
         budget: trip.budget || '',
-        description: trip.description || ''
+        description: trip.description || '',
+        currency: trip.currency || 'USD',
+        destinationCurrency: trip.destinationCurrency || 'USD',
+        exchangeRate: trip.exchangeRate || 1
       })
       setDestinationInput(trip.destination || '')
+      setCurrencyData({
+        sourceCurrency: trip.currency || 'USD',
+        targetCurrency: trip.destinationCurrency || 'USD',
+        exchangeRate: trip.exchangeRate || 1,
+        convertedAmount: trip.budget ? trip.budget * (trip.exchangeRate || 1) : 0
+      })
     } else {
       setEditingTrip(null)
       setFormData({
@@ -87,9 +107,18 @@ export default function Trips() {
         startDate: '',
         endDate: '',
         budget: '',
-        description: ''
+        description: '',
+        currency: 'USD',
+        destinationCurrency: 'USD',
+        exchangeRate: 1
       })
       setDestinationInput('')
+      setCurrencyData({
+        sourceCurrency: 'USD',
+        targetCurrency: 'USD',
+        exchangeRate: 1,
+        convertedAmount: 0
+      })
     }
     setDestinationSuggestions([])
     setShowModal(true)
@@ -107,7 +136,26 @@ export default function Trips() {
       startDate: '',
       endDate: '',
       budget: '',
-      description: ''
+      description: '',
+      currency: 'USD',
+      destinationCurrency: 'USD',
+      exchangeRate: 1
+    })
+    setCurrencyData({
+      sourceCurrency: 'USD',
+      targetCurrency: 'USD',
+      exchangeRate: 1,
+      convertedAmount: 0
+    })
+  }
+
+  const handleCurrencyChange = (data) => {
+    setCurrencyData(data)
+    setFormData({
+      ...formData,
+      currency: data.sourceCurrency,
+      destinationCurrency: data.targetCurrency,
+      exchangeRate: data.exchangeRate
     })
   }
 
@@ -118,7 +166,10 @@ export default function Trips() {
       const tripData = {
         ...formData,
         userId: user._id,
-        budget: formData.budget ? parseFloat(formData.budget) : 0
+        budget: formData.budget ? parseFloat(formData.budget) : 0,
+        currency: currencyData.sourceCurrency,
+        destinationCurrency: currencyData.targetCurrency,
+        exchangeRate: currencyData.exchangeRate
       }
 
       if (editingTrip) {
@@ -521,6 +572,15 @@ export default function Trips() {
                   step="0.01"
                 />
               </div>
+
+              {/* Currency Converter */}
+              <CurrencySelector 
+                sourceCurrency={currencyData.sourceCurrency}
+                targetCurrency={currencyData.targetCurrency}
+                budget={formData.budget}
+                destination={formData.destination}
+                onCurrencyChange={handleCurrencyChange}
+              />
 
               <div className="form-group">
                 <label htmlFor="description">Description</label>

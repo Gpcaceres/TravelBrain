@@ -33,6 +33,21 @@ const tripSchema = new mongoose.Schema(
       type: Number,
       min: 0
     },
+    currency: {
+      type: String,
+      default: 'USD',
+      uppercase: true,
+      trim: true
+    },
+    destinationCurrency: {
+      type: String,
+      uppercase: true,
+      trim: true
+    },
+    exchangeRate: {
+      type: Number,
+      default: 1
+    },
     description: {
       type: String,
       trim: true

@@ -93,6 +93,17 @@ const itinerarySchema = new mongoose.Schema(
       total: {
         type: Number,
         default: 0
+      },
+      currency: {
+        type: String,
+        default: 'USD'
+      },
+      originalCurrency: {
+        type: String
+      },
+      exchangeRate: {
+        type: Number,
+        default: 1
       }
     },
     pdfUrl: {

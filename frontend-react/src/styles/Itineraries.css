@@ -689,6 +689,48 @@
   font-weight: 600;
 }
 
+/* Currency Info Box */
+.currency-info-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(71, 245, 154, 0.1) 0%, rgba(20, 20, 20, 0.5) 100%);
+  border: 1px solid rgba(71, 245, 154, 0.3);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.currency-icon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(71, 245, 154, 0.3));
+}
+
+.currency-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.currency-label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.currency-rate {
+  font-size: 0.95rem;
+  color: #47F59A;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.rate-value {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  margin-left: 4px;
+}
+
 .budget-breakdown {
   display: flex;
   flex-direction: column;
@@ -698,6 +740,7 @@
 .budget-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 0.75rem 1rem;
   background: #1e1e1e;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -711,13 +754,28 @@
   border-color: rgba(229, 74, 122, 0.2);
 }
 
-.budget-item span:first-child {
+.budget-item > span:first-child {
   color: #a0a0a0;
 }
 
-.budget-item span:last-child {
+.budget-values {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.primary-currency {
   color: #47F59A;
   font-weight: 600;
+  font-size: 1rem;
+}
+
+.original-currency {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-style: italic;
 }
 
 .budget-total {
@@ -732,9 +790,13 @@
   color: #ffffff;
 }
 
-.budget-total span:last-child {
+.budget-total .primary-currency {
   color: #47F59A;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+}
+
+.budget-total .original-currency {
+  font-size: 0.95rem;
 }
 
 /* Weather Section */

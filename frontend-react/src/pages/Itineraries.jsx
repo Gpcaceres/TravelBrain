@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { tripService } from '../services/tripService';
 import { generateItinerary, getItineraryByTripId } from '../services/itineraryService';
+import { formatCurrency as formatCurrencyService } from '../services/currencyService';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import '../styles/Itineraries.css';
@@ -658,30 +659,149 @@ const Itineraries = () => {
           {itinerary.budgetBreakdown && (
             <div className="budget-section">
               <h4>Presupuesto Estimado</h4>
+              
+              {/* Show currency information if available */}
+              {itinerary.budgetBreakdown.currency && itinerary.budgetBreakdown.originalCurrency && 
+               itinerary.budgetBreakdown.currency !== itinerary.budgetBreakdown.originalCurrency && (
+                <div className="currency-info-box">
+                  <span className="currency-icon">💱</span>
+                  <div className="currency-details">
+                    <span className="currency-label">Conversión de moneda:</span>
+                    <span className="currency-rate">
+                      {itinerary.budgetBreakdown.originalCurrency} → {itinerary.budgetBreakdown.currency}
+                      {itinerary.budgetBreakdown.exchangeRate && (
+                        <span className="rate-value"> (1:{itinerary.budgetBreakdown.exchangeRate.toFixed(4)})</span>
+                      )}
+                    </span>
+                  </div>
+                </div>
+              )}
+              
               <div className="budget-breakdown">
                 <div className="budget-item">
                   <span>Hospedaje</span>
-                  <span>{formatCurrency(itinerary.budgetBreakdown.accommodation)}</span>
+                  <div className="budget-values">
+                    <span className="primary-currency">
+                      {formatCurrencyService(
+                        itinerary.budgetBreakdown.accommodation, 
+                        itinerary.budgetBreakdown.currency || 'USD'
+                      )}
+                    </span>
+                    {itinerary.budgetBreakdown.originalCurrency && 
+                     itinerary.budgetBreakdown.currency !== itinerary.budgetBreakdown.originalCurrency && (
+                      <span className="original-currency">
+                        ≈ {formatCurrencyService(
+                          itinerary.budgetBreakdown.accommodation / (itinerary.budgetBreakdown.exchangeRate || 1), 
+                          itinerary.budgetBreakdown.originalCurrency
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </div>
+                
                 <div className="budget-item">
                   <span>Alimentación</span>
-                  <span>{formatCurrency(itinerary.budgetBreakdown.food)}</span>
+                  <div className="budget-values">
+                    <span className="primary-currency">
+                      {formatCurrencyService(
+                        itinerary.budgetBreakdown.food, 
+                        itinerary.budgetBreakdown.currency || 'USD'
+                      )}
+                    </span>
+                    {itinerary.budgetBreakdown.originalCurrency && 
+                     itinerary.budgetBreakdown.currency !== itinerary.budgetBreakdown.originalCurrency && (
+                      <span className="original-currency">
+                        ≈ {formatCurrencyService(
+                          itinerary.budgetBreakdown.food / (itinerary.budgetBreakdown.exchangeRate || 1), 
+                          itinerary.budgetBreakdown.originalCurrency
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </div>
+                
                 <div className="budget-item">
                   <span>Actividades y Tours</span>
-                  <span>{formatCurrency(itinerary.budgetBreakdown.activities)}</span>
+                  <div className="budget-values">
+                    <span className="primary-currency">
+                      {formatCurrencyService(
+                        itinerary.budgetBreakdown.activities, 
+                        itinerary.budgetBreakdown.currency || 'USD'
+                      )}
+                    </span>
+                    {itinerary.budgetBreakdown.originalCurrency && 
+                     itinerary.budgetBreakdown.currency !== itinerary.budgetBreakdown.originalCurrency && (
+                      <span className="original-currency">
+                        ≈ {formatCurrencyService(
+                          itinerary.budgetBreakdown.activities / (itinerary.budgetBreakdown.exchangeRate || 1), 
+                          itinerary.budgetBreakdown.originalCurrency
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </div>
+                
                 <div className="budget-item">
                   <span>Transporte Local</span>
-                  <span>{formatCurrency(itinerary.budgetBreakdown.transport)}</span>
+                  <div className="budget-values">
+                    <span className="primary-currency">
+                      {formatCurrencyService(
+                        itinerary.budgetBreakdown.transport, 
+                        itinerary.budgetBreakdown.currency || 'USD'
+                      )}
+                    </span>
+                    {itinerary.budgetBreakdown.originalCurrency && 
+                     itinerary.budgetBreakdown.currency !== itinerary.budgetBreakdown.originalCurrency && (
+                      <span className="original-currency">
+                        ≈ {formatCurrencyService(
+                          itinerary.budgetBreakdown.transport / (itinerary.budgetBreakdown.exchangeRate || 1), 
+                          itinerary.budgetBreakdown.originalCurrency
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </div>
+                
                 <div className="budget-item">
                   <span>Extras - Compras</span>
-                  <span>{formatCurrency(itinerary.budgetBreakdown.extras)}</span>
+                  <div className="budget-values">
+                    <span className="primary-currency">
+                      {formatCurrencyService(
+                        itinerary.budgetBreakdown.extras, 
+                        itinerary.budgetBreakdown.currency || 'USD'
+                      )}
+                    </span>
+                    {itinerary.budgetBreakdown.originalCurrency && 
+                     itinerary.budgetBreakdown.currency !== itinerary.budgetBreakdown.originalCurrency && (
+                      <span className="original-currency">
+                        ≈ {formatCurrencyService(
+                          itinerary.budgetBreakdown.extras / (itinerary.budgetBreakdown.exchangeRate || 1), 
+                          itinerary.budgetBreakdown.originalCurrency
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </div>
+                
                 <div className="budget-item budget-total">
                   <span><strong>Total Estimado</strong></span>
-                  <span><strong>{formatCurrency(itinerary.budgetBreakdown.total)}</strong></span>
+                  <div className="budget-values">
+                    <span className="primary-currency">
+                      <strong>{formatCurrencyService(
+                        itinerary.budgetBreakdown.total, 
+                        itinerary.budgetBreakdown.currency || 'USD'
+                      )}</strong>
+                    </span>
+                    {itinerary.budgetBreakdown.originalCurrency && 
+                     itinerary.budgetBreakdown.currency !== itinerary.budgetBreakdown.originalCurrency && (
+                      <span className="original-currency">
+                        <strong>≈ {formatCurrencyService(
+                          itinerary.budgetBreakdown.total / (itinerary.budgetBreakdown.exchangeRate || 1), 
+                          itinerary.budgetBreakdown.originalCurrency
+                        )}</strong>
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
