@@ -208,32 +208,37 @@ const Itineraries = () => {
     if (selectedTrip.originCountry) {
       doc.text(`País de Origen: ${selectedTrip.originCountry}`, 20, yPos + 16);
       doc.text(`Fechas: ${formatDate(selectedTrip.startDate)} - ${formatDate(selectedTrip.endDate)}`, 20, yPos + 23);
+    } else {
+      doc.text(`Fechas: ${formatDate(selectedTrip.startDate)} - ${formatDate(selectedTrip.endDate)}`, 20, yPos + 16);
+    }
     
     // Currency conversion info
     const hasCurrencyConversion = selectedTrip.destinationCurrency && 
                                   selectedTrip.currency &&
                                   selectedTrip.destinationCurrency !== selectedTrip.currency;
     
+    const startYPos = selectedTrip.originCountry ? yPos + 30 : yPos + 23;
+    
     if (hasCurrencyConversion) {
       const convertedBudget = selectedTrip.budget * (selectedTrip.exchangeRate || 1);
       const totalSpent = itinerary.budgetBreakdown?.total || 0;
       const remaining = convertedBudget - totalSpent;
       
-      doc.text(`Presupuesto Original: ${formatCurrencyService(selectedTrip.budget, selectedTrip.currency)}`, 20, yPos + 30);
-      doc.text(`Tasa de Cambio: 1 ${selectedTrip.currency} = ${(selectedTrip.exchangeRate || 1).toFixed(2)} ${selectedTrip.destinationCurrency}`, 20, yPos + 37);
-      doc.text(`Presupuesto en Destino: ${formatCurrencyService(convertedBudget, selectedTrip.destinationCurrency)}`, 20, yPos + 44);
-      doc.text(`Gasto Estimado: ${formatCurrencyService(totalSpent, selectedTrip.destinationCurrency)}`, 20, yPos + 51);
+      doc.text(`Presupuesto Original: ${formatCurrencyService(selectedTrip.budget, selectedTrip.currency)}`, 20, startYPos);
+      doc.text(`Tasa de Cambio: 1 ${selectedTrip.currency} = ${(selectedTrip.exchangeRate || 1).toFixed(2)} ${selectedTrip.destinationCurrency}`, 20, startYPos + 7);
+      doc.text(`Presupuesto en Destino: ${formatCurrencyService(convertedBudget, selectedTrip.destinationCurrency)}`, 20, startYPos + 14);
+      doc.text(`Gasto Estimado: ${formatCurrencyService(totalSpent, selectedTrip.destinationCurrency)}`, 20, startYPos + 21);
       
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(remaining >= 0 ? 0 : 255, remaining >= 0 ? 150 : 0, 0);
-      doc.text(`Sobrante: ${formatCurrencyService(remaining, selectedTrip.destinationCurrency)}`, 20, yPos + 58);
+      doc.text(`Sobrante: ${formatCurrencyService(remaining, selectedTrip.destinationCurrency)}`, 20, startYPos + 28);
       doc.setTextColor(0, 0, 0);
       doc.setFont('helvetica', 'normal');
       
-      yPos += 65;
+      yPos = startYPos + 35;
     } else {
-      doc.text(`Presupuesto Total: ${formatCurrency(selectedTrip.budget)}`, 20, yPos + 30);
-      yPos += 37;
+      doc.text(`Presupuesto Total: ${formatCurrency(selectedTrip.budget)}`, 20, startYPos);
+      yPos = startYPos + 7;
     }
     
     doc.text(`Tipo de Interés: ${itinerary.interestType}`, 20, yPos);
