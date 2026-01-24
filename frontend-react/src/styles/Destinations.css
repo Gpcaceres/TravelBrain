@@ -1518,12 +1518,13 @@
 
 /* Route Options Selector */
 .route-options {
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(45, 45, 45, 0.95) 100%);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border: 2px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(71, 245, 154, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .options-title {
@@ -1532,12 +1533,14 @@
   gap: 10px;
   font-size: 1.2rem;
   font-weight: 700;
-  color: #1f2937;
+  color: #47F59A;
   margin-bottom: 16px;
+  text-shadow: 0 2px 4px rgba(71, 245, 154, 0.2);
 }
 
 .options-title svg {
-  color: #4285F4;
+  color: #47F59A;
+  filter: drop-shadow(0 2px 4px rgba(71, 245, 154, 0.3));
 }
 
 .route-options-grid {
@@ -1547,8 +1550,8 @@
 }
 
 .route-option-card {
-  background: #ffffff;
-  border: 2px solid #e5e7eb;
+  background: rgba(20, 20, 20, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 16px;
   cursor: pointer;
@@ -1556,6 +1559,7 @@
   text-align: left;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(5px);
 }
 
 .route-option-card::before {
@@ -1571,18 +1575,20 @@
 
 .route-option-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-  border-color: #4285F4;
+  box-shadow: 0 8px 16px rgba(71, 245, 154, 0.2);
+  border-color: rgba(71, 245, 154, 0.4);
+  background: rgba(30, 30, 30, 0.8);
 }
 
 .route-option-card.active {
-  border-color: #4285F4;
-  background: linear-gradient(135deg, #ebf5ff 0%, #ffffff 100%);
-  box-shadow: 0 6px 20px rgba(66, 133, 244, 0.2);
+  border-color: #47F59A;
+  background: linear-gradient(135deg, rgba(71, 245, 154, 0.1) 0%, rgba(30, 30, 30, 0.9) 100%);
+  box-shadow: 0 6px 20px rgba(71, 245, 154, 0.3);
 }
 
 .route-option-card.active::before {
-  background: #4285F4;
+  background: #47F59A;
+  box-shadow: 0 0 10px rgba(71, 245, 154, 0.5);
 }
 
 .option-header {
@@ -1595,23 +1601,25 @@
 .option-name {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1f2937;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .option-badge {
-  background: #4285F4;
-  color: white;
+  background: linear-gradient(135deg, #47F59A 0%, #39C070 100%);
+  color: #101110;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   padding: 4px 10px;
   border-radius: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(71, 245, 154, 0.3);
 }
 
 .option-description {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.7);
   margin-bottom: 12px;
   line-height: 1.4;
 }
@@ -1621,13 +1629,13 @@
   gap: 16px;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .option-distance {
   font-size: 1rem;
   font-weight: 600;
-  color: #059669;
+  color: #47F59A;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -1640,7 +1648,7 @@
 .option-duration {
   font-size: 1rem;
   font-weight: 600;
-  color: #4285F4;
+  color: #E54A7A;
   display: flex;
   align-items: center;
   gap: 4px;
