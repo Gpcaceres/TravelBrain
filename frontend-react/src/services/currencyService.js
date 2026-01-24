@@ -1,11 +1,11 @@
 /**
  * Currency Conversion Service
- * Uses ExchangeRate-API (free tier: 1,500 requests/month)
- * API Documentation: https://www.exchangerate-api.com/docs/overview
+ * Uses Frankfurter API (free, no API key required)
+ * API Documentation: https://www.frankfurter.app/docs/
+ * Hosted by European Central Bank
  */
 
-const EXCHANGE_API_KEY = '72a0a43154a89e85a37ce4b0'; // Free tier API key
-const BASE_URL = 'https://v6.exchangerate-api.com/v6';
+const BASE_URL = 'https://api.frankfurter.app';
 
 // Currency symbols mapping
 export const CURRENCY_SYMBOLS = {
@@ -148,11 +148,11 @@ export const getCurrencyForDestination = (destination) => {
  */
 export const getSupportedCurrencies = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/${EXCHANGE_API_KEY}/codes`);
+    const response = await fetch(`${BASE_URL}/currencies`);
     const data = await response.json();
     
-    if (data.result === 'success') {
-      return data.supported_codes.map(([code, name]) => ({ code, name }));
+    if (data) {
+      return Object.entries(data).map(([code, name]) => ({ code, name }));
     }
     
     throw new Error('Failed to fetch currencies');
@@ -171,18 +171,18 @@ export const getSupportedCurrencies = async () => {
  */
 export const getExchangeRates = async (baseCurrency = 'USD') => {
   try {
-    const response = await fetch(`${BASE_URL}/${EXCHANGE_API_KEY}/latest/${baseCurrency}`);
+    const response = await fetch(`${BASE_URL}/latest?from=${baseCurrency}`);
     const data = await response.json();
     
-    if (data.result === 'success') {
+    if (data && data.rates) {
       return {
-        base: data.base_code,
-        rates: data.conversion_rates,
-        lastUpdated: data.time_last_update_utc
+        base: data.base,
+        rates: data.rates,
+        lastUpdated: data.date
       };
     }
     
-    throw new Error(data.error || 'Failed to fetch exchange rates');
+    throw new Error('Failed to fetch exchange rates');
   } catch (error) {
     console.error('Error fetching exchange rates:', error);
     throw error;
@@ -205,22 +205,30 @@ export const convertCurrency = async (amount, fromCurrency, toCurrency) => {
     }
 
     const response = await fetch(
-      `${BASE_URL}/${EXCHANGE_API_KEY}/pair/${fromCurrency}/${toCurrency}/${amount}`
+      `${BASE_URL}/latest?amount=${amount}&from=${fromCurrency}&to=${toCurrency}`
     );
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const data = await response.json();
     
-    if (data.result === 'success') {
+    if (data && data.rates && data.rates[toCurrency]) {
+      const convertedAmount = data.rates[toCurrency];
+      const rate = convertedAmount / amount;
+      
       return {
         amount: parseFloat(amount),
-        convertedAmount: data.conversion_result,
-        rate: data.conversion_rate,
-        fromCurrency: data.base_code,
-        toCurrency: data.target_code,
-        lastUpdated: data.time_last_update_utc
+        convertedAmount: convertedAmount,
+        rate: rate,
+        fromCurrency: data.base,
+        toCurrency: toCurrency,
+        lastUpdated: data.date
       };
     }
     
-    throw new Error(data.error || 'Failed to convert currency');
+    throw new Error('Failed to convert currency');
   } catch (error) {
     console.error('Error converting currency:', error);
     throw error;
