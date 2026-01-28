@@ -1,0 +1,140 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{enumitem}
+\usepackage{csquotes}
+\usepackage{natbib}
+\usepackage{setspace}
+\setstretch{1.15}
+
+% Carátula
+\begin{document}
+\begin{titlepage}
+    \centering
+    \includegraphics[width=0.3\textwidth]{logo-espe.png}\\[1cm]
+    {\scshape\LARGE UNIVERSITY OF THE ARMED FORCES ESPE\\[0.5cm]}
+    {\large Department of Computer Science\\[0.5cm]}
+    {\large NRC 27819 – Advanced web development\\[0.5cm]}
+    \vfill
+    {\Huge\bfseries Research: Big Data\\[0.5cm]}
+    \vfill
+    {\large Báez Gabriel, Cáceres Germán, Blacio Julio\\[0.5cm]}
+    {\large Docente: Ing. Edison Lascano, PhD.\\[0.5cm]}
+    {\large 27 de ene. de 26\\[1cm]}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introducción}
+La era digital ha impulsado la generación masiva de datos, dando origen al concepto de Big Data. Este informe explora los fundamentos, aplicaciones y herramientas de Big Data, con énfasis en minería de textos y sistemas de recomendación, contextualizados en el proyecto TravelBrain.
+
+\section{Fundamentos de Big Data}
+\subsection{Definición y Características}
+Big Data se refiere al manejo y análisis de grandes volúmenes de datos que no pueden ser procesados por métodos tradicionales. Sus características principales son las 5V: Volumen, Velocidad, Variedad, Veracidad y Valor \citep{Marr2016}.
+
+\subsection{Arquitectura General}
+Las arquitecturas de Big Data suelen incluir almacenamiento distribuido (ej. Hadoop), procesamiento paralelo (ej. Spark) y bases de datos NoSQL (ej. MongoDB) \citep{Hashem2015}.
+
+\section{Minería de Textos}
+\subsection{Concepto}
+La minería de textos consiste en extraer información útil de grandes volúmenes de datos textuales mediante técnicas de procesamiento de lenguaje natural (NLP) \citep{Aggarwal2012}.
+
+\subsection{Aplicaciones en TravelBrain}
+\begin{itemize}
+    \item Análisis de sentimientos en reseñas de destinos.
+    \item Extracción de características relevantes de descripciones.
+    \item Clasificación automática de destinos.
+    \item Detección de tendencias en preferencias de viaje.
+\end{itemize}
+
+\subsection{Herramientas}
+\begin{itemize}
+    \item Apache Spark NLP
+    \item NLTK, spaCy (Python)
+    \item Elasticsearch
+\end{itemize}
+
+\section{Sistemas de Recomendación}
+\subsection{Concepto}
+Los sistemas de recomendación sugieren productos o servicios personalizados a los usuarios, utilizando filtrado colaborativo, basado en contenido o enfoques híbridos \citep{Ricci2011}.
+
+\subsection{Aplicaciones en TravelBrain}
+\begin{itemize}
+    \item Recomendación de destinos y rutas personalizadas.
+    \item Filtrado colaborativo según historial de viajes.
+    \item Sugerencias basadas en preferencias y comportamientos.
+\end{itemize}
+
+\subsection{Herramientas}
+\begin{itemize}
+    \item Apache Mahout
+    \item TensorFlow Recommenders
+    \item Surprise (Python)
+    \item Neo4j (grafos)
+\end{itemize}
+
+\section{Análisis de Datos Masivos y Machine Learning}
+\subsection{Aplicaciones}
+\begin{itemize}
+    \item Predicción de demanda y tendencias de viaje.
+    \item Segmentación de usuarios.
+    \item Predicción de costos y presupuestos.
+    \item Detección de anomalías.
+\end{itemize}
+
+\subsection{Herramientas}
+\begin{itemize}
+    \item Apache Hadoop, Apache Spark
+    \item Scikit-learn, XGBoost, TensorFlow
+    \item MongoDB Atlas
+\end{itemize}
+
+\section{Procesamiento en Tiempo Real}
+\subsection{Aplicaciones}
+\begin{itemize}
+    \item Alertas de precios y clima en tiempo real.
+    \item Análisis de actividad de usuarios en vivo.
+\end{itemize}
+
+\subsection{Herramientas}
+\begin{itemize}
+    \item Apache Kafka, Apache Flink
+    \item Redis Streams
+\end{itemize}
+
+\section{Caso de Estudio: TravelBrain}
+\subsection{Arquitectura Aplicada}
+TravelBrain implementa una arquitectura de microservicios con frontend en React, backend en Node.js y MongoDB, y un microservicio de reglas de negocio. La integración de Big Data permitiría:
+\begin{itemize}
+    \item Minería de textos para analizar reseñas y preferencias.
+    \item Sistemas de recomendación personalizados.
+    \item Análisis predictivo de tendencias y presupuestos.
+    \item Procesamiento en tiempo real para alertas y dashboards.
+\end{itemize}
+
+\section{Conclusiones}
+Big Data potencia la personalización y eficiencia en aplicaciones como TravelBrain, permitiendo análisis avanzados y recomendaciones inteligentes. La integración de herramientas de minería de textos y sistemas de recomendación es clave para mejorar la experiencia del usuario.
+
+\newpage
+\begin{thebibliography}{9}
+
+\bibitem[Marr, 2016]{Marr2016}
+Marr, B. (2016). Big Data in Practice. Wiley.
+
+\bibitem[Hashem et al., 2015]{Hashem2015}
+Hashem, I. A. T., Yaqoob, I., Anuar, N. B., Mokhtar, S., Gani, A., & Khan, S. U. (2015). The rise of "big data" on cloud computing: Review and open research issues. Information Systems, 47, 98-115.
+
+\bibitem[Aggarwal, 2012]{Aggarwal2012}
+Aggarwal, C. C., & Zhai, C. (2012). Mining Text Data. Springer.
+
+\bibitem[Ricci et al., 2011]{Ricci2011}
+Ricci, F., Rokach, L., Shapira, B., & Kantor, P. B. (2011). Recommender Systems Handbook. Springer.
+
+\end{thebibliography}
+
+\end{document}
