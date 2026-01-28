@@ -57,7 +57,7 @@ services:
     ports:
       - "80:80"
     environment:
-      - VITE_API_URL=http://35.239.79.6:3004
+      - REACT_APP_API_URL=http://35.239.79.6:3004
     networks:
       - travelbrain-network
     depends_on:
