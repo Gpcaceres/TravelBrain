@@ -139,13 +139,6 @@ const CurrencySelector = ({
                 value={selectedTarget} 
                 onChange={handleTargetChange}
                 className="currency-select"
-              CurrencySelector.propTypes = {
-                sourceCurrency: PropTypes.string,
-                targetCurrency: PropTypes.string,
-                budget: PropTypes.number,
-                destination: PropTypes.string,
-                onCurrencyChange: PropTypes.func
-              };
               >
                 {currencies.map(currency => (
                   <option key={currency.code} value={currency.code}>
@@ -192,16 +185,16 @@ const CurrencySelector = ({
                       </span>
                     </div>
                   )}
-                </>
-              )}
-            </div>
-          )}
+                )
+              }
 
-          {!budget || budget <= 0 && (
-            <div className="currency-hint">
-              <span className="hint-icon">ℹ️</span>
-              <span>Ingresa un presupuesto para ver la conversión automática</span>
-            </div>
+              CurrencySelector.propTypes = {
+                sourceCurrency: PropTypes.string,
+                targetCurrency: PropTypes.string,
+                budget: PropTypes.number,
+                destination: PropTypes.string,
+                onCurrencyChange: PropTypes.func
+              };
           )}
         </div>
       )}

@@ -5,3 +5,12 @@ dist-ssr
 .git
 .gitignore
 README.md
+build
+.env
+*.log
+.cache
+.vscode
+.DS_Store
+yarn-error.log
+coverage
+*.local
