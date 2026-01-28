@@ -1,5 +1,5 @@
-import api from './api'
-import { API_CONFIG } from '../config'
+import api from './api.js'
+import { API_CONFIG } from '../config.js'
 
 export const weatherService = {
   // Get all weather searches (force fresh data)

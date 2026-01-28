@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { weatherService } from '../services/weatherService'
+import { useAuth } from '../hooks/useAuth.js'
+import { weatherService } from '../services/weatherService.js'
 import { API_KEYS, API_ENDPOINTS } from '../config/apiKeys'
 import '../styles/Weather.css'
 

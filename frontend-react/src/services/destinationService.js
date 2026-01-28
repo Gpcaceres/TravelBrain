@@ -1,5 +1,5 @@
-import api from './api'
-import { API_CONFIG } from '../config'
+import api from './api.js'
+import { API_CONFIG } from '../config.js'
 
 export const destinationService = {
   // Get all destinations

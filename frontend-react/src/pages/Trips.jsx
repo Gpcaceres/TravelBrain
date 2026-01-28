@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { tripService } from '../services/tripService'
-import CurrencySelector from '../components/CurrencySelector'
+import { useAuth } from '../hooks/useAuth.js'
+import { tripService } from '../services/tripService.js'
+import CurrencySelector from '../components/CurrencySelector.jsx'
 import '../styles/Trips.css'
 
 export default function Trips() {

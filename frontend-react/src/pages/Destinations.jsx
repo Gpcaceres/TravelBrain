@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { destinationService } from '../services/destinationService'
+import { useAuth } from '../hooks/useAuth.js'
+import { destinationService } from '../services/destinationService.js'
 import { API_KEYS, API_ENDPOINTS } from '../config/apiKeys'
 import '../styles/Destinations.css'
 

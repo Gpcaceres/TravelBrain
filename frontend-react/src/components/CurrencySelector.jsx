@@ -4,7 +4,7 @@ import {
   getCurrencyForDestination,
   convertCurrency,
   formatCurrency 
-} from '../services/currencyService';
+} from '../services/currencyService.js';
 import '../styles/CurrencySelector.css';
 
 const CurrencySelector = ({ 

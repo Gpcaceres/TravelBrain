@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import api from '../services/api';
+import { useAuth } from '../hooks/useAuth.js';
+import api from '../services/api.js';
 import '../styles/Admin.css';
 
 function Admin() {

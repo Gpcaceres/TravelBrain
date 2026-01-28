@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import api from '../services/api'
-import { API_CONFIG } from '../config'
+import { useAuth } from '../hooks/useAuth.js'
+import api from '../services/api.js'
+import { API_CONFIG } from '../config.js'
 import '../styles/Auth.css'
 
 export default function Register() {

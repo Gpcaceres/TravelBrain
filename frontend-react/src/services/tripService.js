@@ -1,5 +1,5 @@
-import api from './api'
-import { API_CONFIG } from '../config'
+import api from './api.js'
+import { API_CONFIG } from '../config.js'
 
 export const tripService = {
   // Get all trips
