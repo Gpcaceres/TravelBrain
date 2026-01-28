@@ -1020,6 +1020,7 @@ input:checked + .toggle-slider:before {
   .pagination-number {
     min-width: 32px;
     height: 32px;
+  }
 }
 
 /* Table updating indicator */

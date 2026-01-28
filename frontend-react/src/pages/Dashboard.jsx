@@ -8,7 +8,7 @@ import '../styles/Dashboard.css'
 export default function Dashboard() {
   const { getUser, logout } = useAuth()
   const navigate = useNavigate()
-  const [user, setUser] = useState(getUser())
+  const user = getUser()
   const [stats, setStats] = useState({ trips: 0, destinations: 0, favorites: 0 })
   const [showMenu, setShowMenu] = useState(false)
   const [recentActivities, setRecentActivities] = useState([])
@@ -336,31 +336,35 @@ export default function Dashboard() {
                 <div className="spinner"></div>
                 <p>Loading activities...</p>
               </div>
-            ) : recentActivities.length > 0 ? (
-              <div className="activity-list">
-                {recentActivities.map((activity, index) => (
-                  <div key={index} className="activity-item">
-                    <div className="activity-icon" style={{ background: `${activity.color}15`, color: activity.color }}>
-                      <span>{activity.icon}</span>
-                    </div>
-                    <div className="activity-content">
-                      <h4 className="activity-title">{activity.title}</h4>
-                      <p className="activity-description">{activity.description}</p>
-                      <span className="activity-time">{formatActivityDate(activity.date)}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
             ) : (
-              <div className="empty-state">
-                <svg width="64" height="64" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M8 15A7 7 0 118 1a7 7 0 010 14zm0 1A8 8 0 108 0a8 8 0 000 16z"/>
-                  <path d="M8 4a.5.5 0 01.5.5v3h3a.5.5 0 010 1h-3v3a.5.5 0 01-1 0v-3h-3a.5.5 0 010-1h3v-3A.5.5 0 018 4z"/>
-                </svg>
-                <p>No recent activity yet</p>
-                <p className="empty-state-subtitle">Start planning your first trip!</p>
-              </div>
-            )}
+              recentActivities.length > 0 
+                ? (
+                  <div className="activity-list">
+                    {recentActivities.map((activity) => (
+                      <div key={activity.id || activity.title + activity.date} className="activity-item">
+                        <div className="activity-icon" style={{ background: `${activity.color}15`, color: activity.color }}>
+                          <span>{activity.icon}</span>
+                        </div>
+                        <div className="activity-content">
+                          <h4 className="activity-title">{activity.title}</h4>
+                          <p className="activity-description">{activity.description}</p>
+                          <span className="activity-time">{formatActivityDate(activity.date)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+                : (
+                  <div className="empty-state">
+                    <svg width="64" height="64" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8 15A7 7 0 118 1a7 7 0 010 14zm0 1A8 8 0 108 0a8 8 0 000 16z"/>
+                      <path d="M8 4a.5.5 0 01.5.5v3h3a.5.5 0 010 1h-3v3a.5.5 0 01-1 0v-3h-3a.5.5 0 010-1h3v-3A.5.5 0 018 4z"/>
+                    </svg>
+                    <p>No recent activity yet</p>
+                    <p className="empty-state-subtitle">Start planning your first trip!</p>
+                  </div>
+                )
+            )
           </div>
         </section>
       </main>

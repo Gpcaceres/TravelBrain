@@ -8,7 +8,7 @@ import '../styles/Trips.css'
 export default function Trips() {
   const { getUser, logout } = useAuth()
   const navigate = useNavigate()
-  const [user, setUser] = useState(getUser())
+  const user = getUser()
   const [trips, setTrips] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -60,7 +60,7 @@ export default function Trips() {
       setLoading(true)
       const allTrips = await tripService.getAllTrips()
       const currentUser = user || getUser()
-      if (currentUser && currentUser._id) {
+      if (currentUser?._id) {
         const userTrips = allTrips.filter(trip => trip.userId === currentUser._id)
         setTrips(userTrips)
       }
@@ -171,7 +171,7 @@ export default function Trips() {
       const tripData = {
         ...formData,
         userId: user._id,
-        budget: formData.budget ? parseFloat(formData.budget) : 0,
+        budget: formData.budget ? Number.parseFloat(formData.budget) : 0,
         currency: currencyData.sourceCurrency,
         destinationCurrency: currencyData.targetCurrency,
         exchangeRate: currencyData.exchangeRate
@@ -202,7 +202,7 @@ export default function Trips() {
   }
 
   const handleDelete = async (tripId) => {
-    if (!window.confirm('Are you sure you want to delete this trip?')) return
+    if (!globalThis.confirm('Are you sure you want to delete this trip?')) return
 
     try {
       await tripService.deleteTrip(tripId)
@@ -239,8 +239,8 @@ export default function Trips() {
       const data = await response.json()
       const results = data.map(item => ({
         name: item.display_name,
-        lat: parseFloat(item.lat),
-        lng: parseFloat(item.lon),
+        lat: Number.parseFloat(item.lat),
+        lng: Number.parseFloat(item.lon),
         place_id: item.place_id
       }))
       setDestinationSuggestions(results)
@@ -285,7 +285,10 @@ export default function Trips() {
     const start = new Date(startDate)
     const end = new Date(endDate)
     const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24))
-    return days > 0 ? `${days} day${days > 1 ? 's' : ''}` : ''
+    if (days > 0) {
+      return `${days} day${days > 1 ? 's' : ''}`
+    }
+    return ''
   }
 
   const handleLogout = () => {

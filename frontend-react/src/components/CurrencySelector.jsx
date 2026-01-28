@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { 
   getPopularCurrencies, 
   getCurrencyForDestination,
@@ -107,8 +108,9 @@ const CurrencySelector = ({
         <div className="currency-content">
           <div className="currency-row">
             <div className="currency-field">
-              <label>Tu Moneda</label>
+              <label htmlFor="source-currency-select">Tu Moneda</label>
               <select 
+                id="source-currency-select"
                 value={selectedSource} 
                 onChange={handleSourceChange}
                 className="currency-select"
@@ -126,16 +128,24 @@ const CurrencySelector = ({
             </div>
 
             <div className="currency-field">
-              <label>
+              <label htmlFor="target-currency-select">
                 Moneda del Destino
                 {destination && (
                   <span className="auto-detected"> (Auto-detectada)</span>
                 )}
               </label>
               <select 
+                id="target-currency-select"
                 value={selectedTarget} 
                 onChange={handleTargetChange}
                 className="currency-select"
+              CurrencySelector.propTypes = {
+                sourceCurrency: PropTypes.string,
+                targetCurrency: PropTypes.string,
+                budget: PropTypes.number,
+                destination: PropTypes.string,
+                onCurrencyChange: PropTypes.func
+              };
               >
                 {currencies.map(currency => (
                   <option key={currency.code} value={currency.code}>

@@ -6,7 +6,7 @@ import '../styles/Admin.css';
 
 function Admin() {
   const { getUser, logout } = useAuth();
-  const [user, setUser] = useState(getUser());
+  const user = getUser();
   const [users, setUsers] = useState([]);
   const [updatingUserId, setUpdatingUserId] = useState(null);
   const [deletingUserId, setDeletingUserId] = useState(null);
@@ -160,7 +160,7 @@ function Admin() {
 
   // Eliminar usuario
   const handleDeleteUser = async (userId) => {
-    if (!window.confirm('¿Seguro que deseas eliminar este usuario?')) return;
+    if (!globalThis.confirm('¿Seguro que deseas eliminar este usuario?')) return;
     setDeletingUserId(userId);
     try {
       const response = await api.delete(`/users/${userId}`);
@@ -238,9 +238,7 @@ function Admin() {
     }
   };
 
-  const getStatusColor = (status) => {
-    return status === 'ACTIVE' ? 'status-active' : 'status-inactive';
-  };
+
 
   if (isInitialLoad) {
     return (

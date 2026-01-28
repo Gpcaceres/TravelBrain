@@ -8,7 +8,7 @@ import '../styles/Destinations.css'
 export default function Destinations() {
   const { getUser, logout } = useAuth()
   const navigate = useNavigate()
-  const [user, setUser] = useState(getUser())
+  const user = getUser()
   const [destinations, setDestinations] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -16,8 +16,7 @@ export default function Destinations() {
   const [message, setMessage] = useState({ type: '', text: '' })
   const [searchTerm, setSearchTerm] = useState('')
   const [placeSearchQuery, setPlaceSearchQuery] = useState('')
-  const [placeSearchResults, setPlaceSearchResults] = useState([])
-  const [searchingPlaces, setSearchingPlaces] = useState(false)
+
   const [selectedOrigin, setSelectedOrigin] = useState(null)
   const [selectedDestination, setSelectedDestination] = useState(null)
   const [distanceInfo, setDistanceInfo] = useState(null)
@@ -68,7 +67,7 @@ export default function Destinations() {
     
     // Load Leaflet CSS and JS dynamically
     const loadLeaflet = async () => {
-      if (typeof window.L !== 'undefined') return
+      if (typeof globalThis.L !== 'undefined') return
       
       const link = document.createElement('link')
       link.rel = 'stylesheet'
@@ -94,7 +93,7 @@ export default function Destinations() {
   const initializeMap = () => {
     if (mapInstanceRef.current) return
     
-    const L = window.L
+    const L = globalThis.L
     if (!L || !mapRef.current) return
     
     // Wait for container to be visible
@@ -131,7 +130,7 @@ export default function Destinations() {
       selectedDestination.lng !== undefined
     ) {
       // Wait for Leaflet to be loaded
-      if (typeof window.L !== 'undefined') {
+      if (typeof globalThis.L !== 'undefined') {
         // Wait a bit to ensure the container is rendered
         setTimeout(() => {
           if (mapRef.current) {
@@ -149,7 +148,7 @@ export default function Destinations() {
   }, [distanceInfo, selectedOrigin, selectedDestination])
   
   const updateMapRoute = () => {
-    const L = window.L
+    const L = globalThis.L
     if (!L) {
       console.warn('Leaflet not loaded yet')
       return
@@ -202,7 +201,7 @@ export default function Destinations() {
       const destLat = Number(selectedDestination.lat)
       const destLng = Number(selectedDestination.lng)
       
-      if (isNaN(originLat) || isNaN(originLng) || isNaN(destLat) || isNaN(destLng)) {
+      if (Number.isNaN(originLat) || Number.isNaN(originLng) || Number.isNaN(destLat) || Number.isNaN(destLng)) {
         console.error('Invalid coordinate values')
         return
       }
@@ -384,7 +383,7 @@ export default function Destinations() {
   const searchPlaces = async () => {
     if (!placeSearchQuery.trim()) return
 
-    setSearchingPlaces(true)
+
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
       const response = await fetch(
@@ -407,12 +406,12 @@ export default function Destinations() {
         },
         place_id: item.place_id
       }))
-      setPlaceSearchResults(results)
+
     } catch (error) {
       console.error('Error searching places:', error)
       setMessage({ type: 'error', text: 'Failed to search places. Please try again.' })
     } finally {
-      setSearchingPlaces(false)
+
     }
   }
 
@@ -546,7 +545,7 @@ export default function Destinations() {
       lat: place.geometry.location.lat,
       lng: place.geometry.location.lng
     })
-    setPlaceSearchResults([])
+
     setPlaceSearchQuery('')
   }
 
@@ -679,7 +678,7 @@ export default function Destinations() {
         })
       }
       
-      if (mapRef.current && !mapInstanceRef.current && typeof window.L !== 'undefined') {
+      if (mapRef.current && !mapInstanceRef.current && typeof globalThis.L !== 'undefined') {
         initializeMap()
       }
     } catch (error) {
@@ -1005,7 +1004,7 @@ export default function Destinations() {
     }
     setModalPlaceInput('')
     setModalPlaceSuggestions([])
-    setPlaceSearchResults([])
+
     setShowModal(true)
     setMessage({ type: '', text: '' })
   }
@@ -1015,7 +1014,7 @@ export default function Destinations() {
     setEditingDestination(null)
     setModalPlaceInput('')
     setModalPlaceSuggestions([])
-    setPlaceSearchResults([])
+
     setFormData({
       name: '',
       country: '',
