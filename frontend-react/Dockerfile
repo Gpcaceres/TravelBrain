@@ -19,8 +19,9 @@ COPY . .
 # Pull LFS files if any
 RUN git lfs pull 2>/dev/null || true
 
-# Expose port
-EXPOSE 5173
 
-# Start development server
-CMD ["npm", "run", "dev", "--", "--host"]
+# Expose port 80
+EXPOSE 80
+
+# Start development server on port 80
+CMD ["npm", "run", "dev", "--", "--host", "--port", "80"]

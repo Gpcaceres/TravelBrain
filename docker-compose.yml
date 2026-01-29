@@ -55,7 +55,7 @@ services:
       dockerfile: Dockerfile
     container_name: travelbrain-frontend
     ports:
-      - "5173:5173"
+      - "80:80"
     environment:
       - VITE_API_URL=http://35.239.79.6:3004
     volumes:
