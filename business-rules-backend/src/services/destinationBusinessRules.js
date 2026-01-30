@@ -148,7 +148,8 @@ class DestinationBusinessRules {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
+      data: destinationData
     };
   }
 
