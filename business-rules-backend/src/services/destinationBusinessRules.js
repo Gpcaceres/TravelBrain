@@ -109,12 +109,13 @@ class DestinationBusinessRules {
   validateCreation(destinationData) {
     const errors = [];
 
-    // Regla especial: Si el país es Perú y no contiene Lima, forzar Lima como destino
-    if (destinationData.country && destinationData.country.trim().toLowerCase() === 'perú') {
-      destinationData.country = 'Perú, Lima';
-      if (destinationData.name && destinationData.name.trim().toLowerCase() === 'perú') {
-        destinationData.name = 'Perú, Lima';
-      }
+    // Regla especial: Si el país o nombre es 'Perú', transformar ambos a 'Lima, Perú' para la consulta
+    if (
+      (destinationData.country && destinationData.country.trim().toLowerCase() === 'perú') ||
+      (destinationData.name && destinationData.name.trim().toLowerCase() === 'perú')
+    ) {
+      destinationData.country = 'Lima, Perú';
+      destinationData.name = 'Lima, Perú';
     }
 
     // BR-DEST-001: Validate name
