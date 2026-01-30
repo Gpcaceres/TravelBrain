@@ -1,3 +1,13 @@
+// GET informativo para documentar la regla de negocio Perú-Lima
+router.get('/docs/peru-lima-redirect', (req, res) => {
+  res.json({
+    rule: 'Si el país o nombre de destino es "Perú", se reemplaza automáticamente por "Perú, Lima" para evitar problemas de ruteo internacional.',
+    appliesTo: ['origen', 'destino'],
+    reason: 'El ruteo internacional Ecuador-Perú no es soportado correctamente por el proveedor de rutas. Lima sí tiene conectividad.',
+    exampleInput: { name: 'Perú', country: 'Perú' },
+    exampleOutput: { name: 'Perú, Lima', country: 'Perú, Lima' }
+  });
+});
 
 const express = require('express');
 const router = express.Router();

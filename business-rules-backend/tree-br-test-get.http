@@ -1,3 +1,7 @@
+### 2. Documentación de la regla de negocio Perú-Lima (GET informativo)
+GET http://35.239.79.6:3005/api/business-rules/docs/peru-lima-redirect
+Accept: application/json
+
 
 
 
