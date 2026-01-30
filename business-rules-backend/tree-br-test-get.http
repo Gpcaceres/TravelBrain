@@ -1,0 +1,16 @@
+
+
+### 1. Obtener plantillas de actividades de itinerario
+GET http://35.239.79.6:3005/api/business-rules/itineraries/activity-templates
+Accept: application/json
+
+### 2. (Ejemplo GET de prueba, aunque la mayoría son POST)
+GET http://35.239.79.6:3005/api/business-rules/
+Accept: application/json
+
+### 3. (GET inexistente, ejemplo de error esperado)
+GET http://35.239.79.6:3005/api/business-rules/users/validate-registration
+Accept: application/json
+
+# Nota: La mayoría de las reglas de negocio usan POST, solo 'itineraries/activity-templates' es GET.
+# Puedes modificar o agregar más pruebas según los endpoints GET que agregues en el futuro.
