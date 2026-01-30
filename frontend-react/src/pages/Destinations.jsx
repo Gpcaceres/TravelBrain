@@ -2,22 +2,23 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { destinationService } from '../services/destinationService'
-import { API_KEYS, API_ENDPOINTS } from '../config/apiKeys'
+import { businessRulesService } from '../services/businessRulesService'
+// import { API_KEYS, API_ENDPOINTS } from '../config/apiKeys'
 import '../styles/Destinations.css'
 
 export default function Destinations() {
   const { getUser, logout } = useAuth()
   const navigate = useNavigate()
-  const [user, setUser] = useState(getUser())
+  const user = getUser()
   const [destinations, setDestinations] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingDestination, setEditingDestination] = useState(null)
   const [message, setMessage] = useState({ type: '', text: '' })
   const [searchTerm, setSearchTerm] = useState('')
-  const [placeSearchQuery, setPlaceSearchQuery] = useState('')
-  const [placeSearchResults, setPlaceSearchResults] = useState([])
-  const [searchingPlaces, setSearchingPlaces] = useState(false)
+  // const [placeSearchQuery, setPlaceSearchQuery] = useState('')
+  // const [placeSearchResults, setPlaceSearchResults] = useState([])
+  // const [searchingPlaces, setSearchingPlaces] = useState(false)
   const [selectedOrigin, setSelectedOrigin] = useState(null)
   const [selectedDestination, setSelectedDestination] = useState(null)
   const [distanceInfo, setDistanceInfo] = useState(null)
@@ -516,27 +517,52 @@ export default function Destinations() {
     }, 500)
   }
 
-  const selectOrigin = (suggestion) => {
+
+  // Helper to validate/transform a place using business rules API
+  const validatePlace = async (place) => {
+    try {
+      const result = await businessRulesService.validateDestinationCreation({
+        name: place.name,
+        lat: place.lat,
+        lng: place.lng,
+        country: '', // Optionally pass country if available
+      });
+      // Use the possibly transformed name/lat/lng from the business rules
+      return {
+        ...place,
+        name: result.data?.name || place.name,
+        lat: result.data?.lat ?? place.lat,
+        lng: result.data?.lng ?? place.lng,
+      };
+    } catch (e) {
+      // Fallback to original if API fails
+      return place;
+    }
+  };
+
+  const selectOrigin = async (suggestion) => {
+    const validated = await validatePlace(suggestion);
     setSelectedOrigin({
       id: suggestion.place_id,
-      name: suggestion.name,
-      lat: suggestion.lat,
-      lng: suggestion.lng
-    })
-    setOriginInput(suggestion.name)
-    setOriginSuggestions([])
-  }
+      name: validated.name,
+      lat: validated.lat,
+      lng: validated.lng
+    });
+    setOriginInput(validated.name);
+    setOriginSuggestions([]);
+  };
 
-  const selectDestinationPlace = (suggestion) => {
+  const selectDestinationPlace = async (suggestion) => {
+    const validated = await validatePlace(suggestion);
     setSelectedDestination({
       id: suggestion.place_id,
-      name: suggestion.name,
-      lat: suggestion.lat,
-      lng: suggestion.lng
-    })
-    setDestinationInput(suggestion.name)
-    setDestinationSuggestions([])
-  }
+      name: validated.name,
+      lat: validated.lat,
+      lng: validated.lng
+    });
+    setDestinationInput(validated.name);
+    setDestinationSuggestions([]);
+  };
 
   const selectPlace = (place) => {
     setFormData({
