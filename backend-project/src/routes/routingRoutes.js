@@ -223,23 +223,121 @@ router.get('/directions', async (req, res) => {
 router.post('/multimodal', async (req, res) => {
   try {
     const { origin, destination } = req.body;
-    
     if (!origin || !destination) {
-      return res.status(400).json({
-        success: false,
-        message: 'Origin and destination are required'
-      });
+      return res.status(400).json({ success: false, message: 'Origin and destination are required' });
     }
 
-    // TODO: Implement multimodal routing logic
-    res.json({
-      success: true,
-      data: {
+    const AIRLABS_API_KEY = 'd4ca4f87-8d1a-48c5-9d3a-a85198df254e';
+    const axios = require('axios');
+    function haversine(a, b) {
+      const toRad = deg => deg * Math.PI / 180;
+      const R = 6371;
+      const dLat = toRad(b.lat - a.lat);
+      const dLng = toRad(b.lng - a.lng);
+      const lat1 = toRad(a.lat);
+      const lat2 = toRad(b.lat);
+      const aVal = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+      return R * 2 * Math.atan2(Math.sqrt(aVal), Math.sqrt(1-aVal));
+    }
+
+
+    // Buscar aeropuerto más cercano al origen
+    const originAirportsResp = await axios.get(`https://airlabs.co/api/v9/nearby?lat=${origin.lat}&lng=${origin.lng}&distance=100&api_key=${AIRLABS_API_KEY}`);
+    const originAirport = originAirportsResp.data.response.airports?.[0];
+    if (!originAirport) return res.json({ success: false, message: 'No origin airport found', segments: [], totalDistance: 0, totalDuration: 0 });
+
+    // Buscar aeropuerto más cercano al destino
+    const destAirportsResp = await axios.get(`https://airlabs.co/api/v9/nearby?lat=${destination.lat}&lng=${destination.lng}&distance=100&api_key=${AIRLABS_API_KEY}`);
+    const destAirport = destAirportsResp.data.response.airports?.[0];
+    if (!destAirport) return res.json({ success: false, message: 'No destination airport found', segments: [], totalDistance: 0, totalDuration: 0 });
+
+    let segments = [];
+    let totalDistance = 0;
+    let totalDuration = 0;
+
+
+    // 1. Tramo terrestre: origen -> aeropuerto origen (API real)
+    let ground1 = null;
+    try {
+      const response = await axios.post(
+        'http://localhost:3004/api/routing/directions',
+        {
+          start: `${origin.lng},${origin.lat}`,
+          end: `${originAirport.lng},${originAirport.lat}`,
+          profile: 'driving-car'
+        },
+        { timeout: 20000 }
+      );
+      if (response.data.success && response.data.data.features && response.data.data.features[0]) {
+        const route = response.data.data.features[0];
+        const coords = route.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+        segments.push({
+          type: 'ground',
+          coordinates: coords,
+          distance: route.properties.summary.distance / 1000,
+          label: `Drive to ${originAirport.name} Airport`
+        });
+        totalDistance += route.properties.summary.distance / 1000;
+        totalDuration += route.properties.summary.duration / 3600;
+      }
+    } catch {}
+
+    // 2. Tramo aéreo: aeropuerto origen -> aeropuerto destino
+    const airDistance = haversine({ lat: originAirport.lat, lng: originAirport.lng }, { lat: destAirport.lat, lng: destAirport.lng });
+    segments.push({
+      type: 'air',
+      coordinates: [ [originAirport.lat, originAirport.lng], [destAirport.lat, destAirport.lng] ],
+      distance: airDistance,
+      label: `${originAirport.name} to ${destAirport.name} (Flight)`
+    });
+    totalDistance += airDistance;
+    totalDuration += airDistance / 800; // 800 km/h vuelo
+
+    // 3. Tramo terrestre: aeropuerto destino -> destino (API real)
+    let ground2 = null;
+    try {
+      const response = await axios.post(
+        'http://localhost:3004/api/routing/directions',
+        {
+          start: `${destAirport.lng},${destAirport.lat}`,
+          end: `${destination.lng},${destination.lat}`,
+          profile: 'driving-car'
+        },
+        { timeout: 20000 }
+      );
+      if (response.data.success && response.data.data.features && response.data.data.features[0]) {
+        const route = response.data.data.features[0];
+        const coords = route.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+        segments.push({
+          type: 'ground',
+          coordinates: coords,
+          distance: route.properties.summary.distance / 1000,
+          label: `Drive from ${destAirport.name} Airport`
+        });
+        totalDistance += route.properties.summary.distance / 1000;
+        totalDuration += route.properties.summary.duration / 3600;
+      }
+    } catch {}
+
+    // Si ambos tramos terrestres existen, devolverlos
+    if (segments.length === 3) {
+      res.json({
+        success: true,
+        data: {
+          segments,
+          totalDistance,
+          totalDuration
+        }
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'No multimodal route found with real API',
         segments: [],
         totalDistance: 0,
         totalDuration: 0
-      }
-    });
+      });
+    }
   } catch (error) {
     console.error('Multimodal routing error:', error);
     res.status(500).json({
