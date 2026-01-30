@@ -435,18 +435,28 @@ export default function Destinations() {
       const response = await fetch(
         `${API_URL}/api/routing/geocode?q=${encodeURIComponent(query)}&limit=5`
       )
-      
+
       if (!response.ok) throw new Error('Failed to search places')
-      
+
       const result = await response.json()
       if (!result.success) throw new Error(result.message)
-      
-      const results = result.data.map(item => ({
+
+      let results = result.data.map(item => ({
         name: item.display_name,
         lat: parseFloat(item.lat),
         lng: parseFloat(item.lon),
         place_id: item.place_id
       }))
+
+      // Si el usuario busca 'Perú', reemplaza la sugerencia por 'Lima, Perú'
+      if (query.trim().toLowerCase() === 'perú') {
+        results = results.map(r =>
+          r.name.trim().toLowerCase() === 'perú'
+            ? { ...r, name: 'Lima, Perú' }
+            : r
+        )
+      }
+
       setOriginSuggestions(results)
     } catch (error) {
       console.error('Error searching origin:', error)
@@ -467,18 +477,28 @@ export default function Destinations() {
       const response = await fetch(
         `${API_URL}/api/routing/geocode?q=${encodeURIComponent(query)}&limit=5`
       )
-      
+
       if (!response.ok) throw new Error('Failed to search places')
-      
+
       const result = await response.json()
       if (!result.success) throw new Error(result.message)
-      
-      const results = result.data.map(item => ({
+
+      let results = result.data.map(item => ({
         name: item.display_name,
         lat: parseFloat(item.lat),
         lng: parseFloat(item.lon),
         place_id: item.place_id
       }))
+
+      // Si el usuario busca 'Perú', reemplaza la sugerencia por 'Lima, Perú'
+      if (query.trim().toLowerCase() === 'perú') {
+        results = results.map(r =>
+          r.name.trim().toLowerCase() === 'perú'
+            ? { ...r, name: 'Lima, Perú' }
+            : r
+        )
+      }
+
       setDestinationSuggestions(results)
     } catch (error) {
       console.error('Error searching destination:', error)
