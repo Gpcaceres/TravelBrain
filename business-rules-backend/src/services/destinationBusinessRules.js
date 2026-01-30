@@ -109,6 +109,14 @@ class DestinationBusinessRules {
   validateCreation(destinationData) {
     const errors = [];
 
+    // Regla especial: Si el país es Perú y no contiene Lima, forzar Lima como destino
+    if (destinationData.country && destinationData.country.trim().toLowerCase() === 'perú') {
+      destinationData.country = 'Perú, Lima';
+      if (destinationData.name && destinationData.name.trim().toLowerCase() === 'perú') {
+        destinationData.name = 'Perú, Lima';
+      }
+    }
+
     // BR-DEST-001: Validate name
     const nameValidation = this.validateName(destinationData.name);
     if (!nameValidation.valid) {
@@ -149,6 +157,14 @@ class DestinationBusinessRules {
    */
   validateUpdate(destinationData) {
     const errors = [];
+
+    // Regla especial: Si el país es Perú y no contiene Lima, forzar Lima como destino
+    if (destinationData.country && destinationData.country.trim().toLowerCase() === 'perú') {
+      destinationData.country = 'Perú, Lima';
+      if (destinationData.name && destinationData.name.trim().toLowerCase() === 'perú') {
+        destinationData.name = 'Perú, Lima';
+      }
+    }
 
     // Only validate provided fields
     if (destinationData.name !== undefined) {

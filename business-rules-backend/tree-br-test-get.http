@@ -1,8 +1,17 @@
 
 
-### 1. Obtener plantillas de actividades de itinerario
-GET http://35.239.79.6:3005/api/business-rules/itineraries/activity-templates
+
+### 1. Crear destino con country 'Perú' (debe cambiar a 'Perú, Lima')
+POST http://35.239.79.6:3005/api/business-rules/destinations/validate-creation
+Content-Type: application/json
 Accept: application/json
+
+{
+	"name": "Perú",
+	"country": "Perú",
+	"lat": -12.0464,
+	"lng": -77.0428
+}
 
 ### 2. (Ejemplo GET de prueba, aunque la mayoría son POST)
 GET http://35.239.79.6:3005/api/business-rules/
