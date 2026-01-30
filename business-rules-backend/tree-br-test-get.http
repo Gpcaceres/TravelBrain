@@ -1,29 +1,8 @@
-### 2. Documentación de la regla de negocio Perú-Lima (GET informativo)
-GET http://35.239.79.6:3005/api/business-rules/docs/peru-lima-redirect
-Accept: application/json
+### GET User Registration Validation
+GET http://localhost:3001/api/business-rules/users/validate-registration?email=test@example.com&username=testuser
 
+### GET Trip Creation Validation
+GET http://localhost:3001/api/business-rules/trips/validate-creation?userId=12345&title=Viaje%20a%20Lima&startDate=2026-02-01&endDate=2026-02-10&budget=1000
 
-
-
-### 1. Crear destino con country 'Perú' (debe cambiar a 'Perú, Lima')
-POST http://35.239.79.6:3005/api/business-rules/destinations/validate-creation
-Content-Type: application/json
-Accept: application/json
-
-{
-	"name": "Perú",
-	"country": "Perú",
-	"lat": -12.0464,
-	"lng": -77.0428
-}
-
-### 2. (Ejemplo GET de prueba, aunque la mayoría son POST)
-GET http://35.239.79.6:3005/api/business-rules/
-Accept: application/json
-
-### 3. (GET inexistente, ejemplo de error esperado)
-GET http://35.239.79.6:3005/api/business-rules/users/validate-registration
-Accept: application/json
-
-# Nota: La mayoría de las reglas de negocio usan POST, solo 'itineraries/activity-templates' es GET.
-# Puedes modificar o agregar más pruebas según los endpoints GET que agregues en el futuro.
+### GET Destination Creation Validation
+GET http://localhost:3001/api/business-rules/destinations/validate-creation?name=Lima&country=Peru&lat=-12.0464&lng=-77.0428

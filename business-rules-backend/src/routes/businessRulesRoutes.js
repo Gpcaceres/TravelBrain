@@ -13,16 +13,16 @@ const warningGet = (req, res) => {
 };
 
 // User validation GET warning
-router.get('/users/validate-registration', warningGet);
+router.get('/users/validate-registration', controller.validateUserRegistrationGet);
 router.get('/users/validate-update', warningGet);
 
 // Trip validation GET warning
-router.get('/trips/validate-creation', warningGet);
+router.get('/trips/validate-creation', controller.validateTripCreationGet);
 router.get('/trips/validate-update', warningGet);
 router.get('/trips/calculate-duration', warningGet);
 
 // Destination validation GET warning
-router.get('/destinations/validate-creation', warningGet);
+router.get('/destinations/validate-creation', controller.validateDestinationCreationGet);
 router.get('/destinations/validate-update', warningGet);
 router.get('/destinations/validate-coordinates', warningGet);
 router.get('/destinations/calculate-distance', warningGet);

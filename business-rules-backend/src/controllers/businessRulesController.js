@@ -19,6 +19,19 @@ exports.validateUserRegistration = (req, res) => {
   }
 };
 
+// GET version: accepts query params for validation
+exports.validateUserRegistrationGet = (req, res) => {
+  try {
+    const result = userBusinessRules.validateRegistration(req.query);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ 
+      valid: false, 
+      error: error.message 
+    });
+  }
+};
+
 exports.validateUserUpdate = (req, res) => {
   try {
     const result = userBusinessRules.validateUpdate(req.body);
@@ -37,6 +50,19 @@ exports.validateUserUpdate = (req, res) => {
 exports.validateTripCreation = (req, res) => {
   try {
     const result = tripBusinessRules.validateCreation(req.body);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ 
+      valid: false, 
+      error: error.message 
+    });
+  }
+};
+
+// GET version: accepts query params for validation
+exports.validateTripCreationGet = (req, res) => {
+  try {
+    const result = tripBusinessRules.validateCreation(req.query);
     res.json(result);
   } catch (error) {
     res.status(500).json({ 
@@ -77,6 +103,19 @@ exports.calculateTripDuration = (req, res) => {
 exports.validateDestinationCreation = (req, res) => {
   try {
     const result = destinationBusinessRules.validateCreation(req.body);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ 
+      valid: false, 
+      error: error.message 
+    });
+  }
+};
+
+// GET version: accepts query params for validation
+exports.validateDestinationCreationGet = (req, res) => {
+  try {
+    const result = destinationBusinessRules.validateCreation(req.query);
     res.json(result);
   } catch (error) {
     res.status(500).json({ 
