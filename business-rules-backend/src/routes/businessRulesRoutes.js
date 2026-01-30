@@ -1,9 +1,14 @@
+
+const express = require('express');
+const router = express.Router();
+const controller = require('../controllers/businessRulesController');
+
 // Advertencia para intentos GET en rutas que solo aceptan POST
 const warningGet = (req, res) => {
-	res.status(405).json({
-		warning: 'Método GET no permitido en esta ruta. Usa POST para validar o procesar datos.',
-		path: req.originalUrl
-	});
+  res.status(405).json({
+    warning: 'Método GET no permitido en esta ruta. Usa POST para validar o procesar datos.',
+    path: req.originalUrl
+  });
 };
 
 // User validation GET warning
@@ -30,9 +35,6 @@ router.get('/itineraries/generate', warningGet);
 router.get('/itineraries/detect-budget-type', warningGet);
 router.get('/itineraries/calculate-budget-breakdown', warningGet);
 router.get('/itineraries/validate-request', warningGet);
-const express = require('express');
-const router = express.Router();
-const controller = require('../controllers/businessRulesController');
 
 // User validation routes
 router.post('/users/validate-registration', controller.validateUserRegistration);
