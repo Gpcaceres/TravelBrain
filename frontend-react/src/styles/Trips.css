@@ -650,18 +650,26 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .trips-navbar .navbar-center {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .trips-container {
-    padding: 2rem 1rem;
+    padding: 1.5rem 1rem;
   }
 
   .trips-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 1rem;
   }
 
   .trips-title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    text-align: center;
   }
 
   .btn-primary {
@@ -671,11 +679,15 @@
 
   .trips-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .modal-content {
     max-height: 100vh;
+    max-height: 100dvh;
     border-radius: 0;
+    margin: 0;
+    width: 100%;
   }
 
   .form-row {
@@ -684,11 +696,16 @@
 
   .modal-actions {
     flex-direction: column-reverse;
+    gap: 0.75rem;
   }
 
   .modal-actions .btn-primary,
   .modal-actions .btn-secondary {
     width: 100%;
+  }
+
+  .trips-navbar .user-name {
+    display: none;
   }
 }
 
@@ -698,20 +715,47 @@
   }
 
   .trips-navbar .navbar-logo {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .trips-container {
+    padding: 1rem 0.75rem;
+  }
+
+  .trips-title {
+    font-size: 1.25rem;
   }
 
   .trip-card {
-    padding: 1.25rem;
+    padding: 1rem;
   }
 
   .trip-title {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
+  }
+
+  .trip-destination,
+  .trip-dates {
+    font-size: 0.85rem;
   }
 
   .modal-form {
-    padding: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  .modal-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 }
 

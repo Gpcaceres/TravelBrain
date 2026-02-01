@@ -501,23 +501,33 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .profile-navbar .navbar-center {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .profile-container {
-    padding: 2rem 1rem;
+    padding: 1.5rem 1rem;
   }
 
   .profile-avatar-large {
-    width: 100px;
-    height: 100px;
-    font-size: 2.5rem;
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
   }
 
   .profile-title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+  }
+
+  .profile-email {
+    font-size: 0.9rem;
   }
 
   .profile-card {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
 
   .card-header {
@@ -543,10 +553,15 @@
   .danger-content {
     flex-direction: column;
     align-items: flex-start;
+    gap: 1rem;
   }
 
   .btn-danger {
     width: 100%;
+  }
+
+  .profile-navbar .user-name {
+    display: none;
   }
 }
 
@@ -556,15 +571,43 @@
   }
 
   .profile-navbar .navbar-logo {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .profile-container {
+    padding: 1rem 0.75rem;
   }
 
   .profile-title {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
 
   .card-title {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+  }
+
+  .profile-card {
+    padding: 1rem;
+  }
+
+  .info-label {
+    font-size: 0.8rem;
+  }
+
+  .info-value {
+    font-size: 0.95rem;
+  }
+
+  .form-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .danger-title {
+    font-size: 1rem;
+  }
+
+  .danger-text {
+    font-size: 0.85rem;
   }
 }

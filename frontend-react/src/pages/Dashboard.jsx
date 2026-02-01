@@ -1,33 +1,22 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import Navbar from '../components/Navbar'
 import api from '../services/api'
 import { API_CONFIG } from '../config'
 import '../styles/Dashboard.css'
 
 export default function Dashboard() {
-  const { getUser, logout } = useAuth()
+  const { getUser } = useAuth()
   const navigate = useNavigate()
   const [user, setUser] = useState(getUser())
   const [stats, setStats] = useState({ trips: 0, destinations: 0, favorites: 0 })
-  const [showMenu, setShowMenu] = useState(false)
   const [recentActivities, setRecentActivities] = useState([])
   const [loadingActivities, setLoadingActivities] = useState(true)
 
   useEffect(() => {
     loadDashboardData()
   }, [])
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (showMenu && !e.target.closest('.user-menu')) {
-        setShowMenu(false)
-      }
-    }
-
-    document.addEventListener('click', handleClickOutside)
-    return () => document.removeEventListener('click', handleClickOutside)
-  }, [showMenu])
 
   const loadDashboardData = async () => {
     try {
@@ -97,11 +86,6 @@ export default function Dashboard() {
     }
   }
 
-  const handleLogout = () => {
-    logout()
-    navigate('/')
-  }
-
   const formatActivityDate = (date) => {
     const now = new Date()
     const activityDate = new Date(date)
@@ -118,101 +102,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-      {/* Navbar */}
-      <nav className="navbar">
-        <div className="container navbar-content">
-          <div className="navbar-left">
-            <img src="/assets/images/logo.png" alt="Logo" className="navbar-logo" />
-            <span className="navbar-brand">TravelBrain</span>
-          </div>
-
-          <div className="navbar-center">
-            <Link to="/dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/trips" className="nav-link">My Trips</Link>
-            <Link to="/itineraries" className="nav-link">Itineraries</Link>
-            <Link to="/destinations" className="nav-link">Destinations</Link>
-            <Link to="/weather" className="nav-link">Weather</Link>
-          </div>
-
-          <div className="navbar-right">
-            <div className="user-menu">
-              <button 
-                className="user-menu-btn"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setShowMenu(!showMenu)
-                }}
-              >
-                <div className="user-avatar">
-                  {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
-                </div>
-                <span className="user-name">{user?.name || user?.username || 'User'}</span>
-                <svg 
-                  className={`dropdown-arrow ${showMenu ? 'rotated' : ''}`} 
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 16 16" 
-                  fill="currentColor"
-                >
-                  <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
-                </svg>
-              </button>
-
-              {showMenu && (
-                <div className="user-menu-dropdown">
-                  <div className="dropdown-header">
-                    <div className="dropdown-user-info">
-                      <div className="dropdown-avatar">
-                        {(user?.name || user?.username || 'U').substring(0, 2).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="dropdown-name">{user?.name || user?.username}</p>
-                        <p className="dropdown-email">{user?.email}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="dropdown-divider"></div>
-                  
-                  <Link to="/profile" className="dropdown-item" onClick={() => setShowMenu(false)}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                      <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm2.5 1h-5A2.5 2.5 0 003 11.5V13a1 1 0 001 1h8a1 1 0 001-1v-1.5A2.5 2.5 0 0010.5 9z"/>
-                    </svg>
-                    My Profile
-                  </Link>
-                  
-                  {user?.role === 'ADMIN' && (
-                    <Link to="/admin" className="dropdown-item" onClick={() => setShowMenu(false)}>
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M1.5 1.5A.5.5 0 012 1h12a.5.5 0 01.5.5v2a.5.5 0 01-.128.334L10 8.692V13.5a.5.5 0 01-.342.474l-3 1A.5.5 0 016 14.5V8.692L1.628 3.834A.5.5 0 011.5 3.5v-2z"/>
-                      </svg>
-                      Admin Panel
-                    </Link>
-                  )}
-                  
-                  <button className="dropdown-item" onClick={() => setShowMenu(false)}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                      <path d="M8 4.754a3.246 3.246 0 100 6.492 3.246 3.246 0 000-6.492zM5.754 8a2.246 2.246 0 114.492 0 2.246 2.246 0 01-4.492 0z"/>
-                      <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 01-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 01-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 01.52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 011.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 011.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 01.52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 01-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 01-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 002.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 001.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 00-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 00-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 00-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 001.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 003.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 002.692-1.115l.094-.319z"/>
-                    </svg>
-                    Settings
-                  </button>
-                  
-                  <div className="dropdown-divider"></div>
-                  
-                  <button onClick={handleLogout} className="dropdown-item logout-item">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 12.5a.5.5 0 01-.5.5h-8a.5.5 0 01-.5-.5v-9a.5.5 0 01.5-.5h8a.5.5 0 01.5.5v2a.5.5 0 001 0v-2A1.5 1.5 0 009.5 2h-8A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h8a1.5 1.5 0 001.5-1.5v-2a.5.5 0 00-1 0v2z"/>
-                      <path fillRule="evenodd" d="M15.854 8.354a.5.5 0 000-.708l-3-3a.5.5 0 00-.708.708L14.293 7.5H5.5a.5.5 0 000 1h8.793l-2.147 2.146a.5.5 0 00.708.708l3-3z"/>
-                    </svg>
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Main Content */}
       <main className="dashboard-main container">

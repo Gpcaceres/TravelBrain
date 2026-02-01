@@ -232,7 +232,7 @@
 @media (max-width: 968px) {
   .auth-container {
     grid-template-columns: 1fr;
-    max-width: 550px;
+    max-width: 500px;
   }
 
   .auth-illustration-section {
@@ -240,13 +240,15 @@
   }
 
   .auth-form-section {
-    padding: 2.5rem 2rem;
+    padding: 2rem 1.5rem;
   }
 }
 
 @media (max-width: 640px) {
   .auth-page {
     padding: 1rem;
+    align-items: flex-start;
+    padding-top: 4rem;
   }
 
   .back-link {
@@ -256,30 +258,61 @@
   }
 
   .auth-form-section {
-    padding: 2rem 1.5rem;
-  }
-
-  .auth-title {
-    font-size: 1.75rem;
-  }
-
-  .auth-logo-img {
-    width: 60px;
-    height: 60px;
-  }
-}
-
-@media (max-width: 480px) {
-  .auth-form-section {
-    padding: 1.75rem 1.25rem;
+    padding: 1.5rem 1.25rem;
   }
 
   .auth-title {
     font-size: 1.5rem;
   }
 
+  .auth-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .auth-logo-img {
+    width: 50px;
+    height: 50px;
+  }
+
   .form-input {
     padding: 0.75rem;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .btn-primary {
+    padding: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding: 0.75rem;
+    padding-top: 3.5rem;
+  }
+
+  .auth-container {
+    border-radius: 0.75rem;
+  }
+
+  .auth-form-section {
+    padding: 1.25rem 1rem;
+  }
+
+  .auth-title {
+    font-size: 1.35rem;
+  }
+
+  .form-label {
+    font-size: 0.85rem;
+  }
+
+  .auth-divider {
+    margin: 1rem 0;
+  }
+
+  .auth-footer-text,
+  .auth-link {
+    font-size: 0.85rem;
   }
 }
 

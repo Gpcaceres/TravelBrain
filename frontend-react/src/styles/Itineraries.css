@@ -965,13 +965,19 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .navbar-center {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .itineraries-container {
     padding: 1rem;
   }
 
   .itineraries-header h1 {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
 
   .interest-types {
@@ -981,6 +987,7 @@
   .activity-item {
     flex-direction: column;
     gap: 0.5rem;
+    align-items: flex-start;
   }
 
   .activity-time {
@@ -988,6 +995,57 @@
   }
 
   .daily-forecasts {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .user-name {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-brand {
+    font-size: 1rem;
+  }
+
+  .navbar-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .itineraries-container {
+    padding: 0.75rem;
+  }
+
+  .itineraries-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .itinerary-card {
+    padding: 1rem;
+  }
+
+  .day-weather {
+    padding: 0.5rem;
+  }
+
+  .weather-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .weather-temp {
+    font-size: 1.1rem;
+  }
+
+  .weather-condition {
+    font-size: 0.85rem;
+  }
+
+  .download-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.85rem 1.5rem;
   }
 }
