@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import api from '../services/api'
 import { API_CONFIG } from '../config'
@@ -8,7 +7,6 @@ import '../styles/Profile.css'
 
 export default function Profile() {
   const { getUser, logout } = useAuth()
-  const navigate = useNavigate()
   const currentUser = getUser()
   
   const [isEditing, setIsEditing] = useState(false)
@@ -28,12 +26,6 @@ export default function Profile() {
   const [message, setMessage] = useState({ type: '', text: '' })
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (currentUser?._id) {
-      loadUserData()
-    }
-  }, [currentUser?._id])
-
   const loadUserData = async () => {
     try {
       const response = await api.get(`${API_CONFIG.ENDPOINTS.USER_BY_ID}/${currentUser._id}`)
@@ -48,6 +40,13 @@ export default function Profile() {
       console.error('Error loading user data:', error)
     }
   }
+
+  useEffect(() => {
+    if (currentUser?._id) {
+      loadUserData()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?._id])
 
   const handleInputChange = (e) => {
     setUser({
@@ -77,7 +76,6 @@ export default function Profile() {
 
       if (response.data) {
         // Update localStorage with new user data
-        const token = localStorage.getItem('token')
         localStorage.setItem('user', JSON.stringify(response.data))
         
         setMessage({ type: 'success', text: 'Profile updated successfully!' })
@@ -98,11 +96,6 @@ export default function Profile() {
     }
   }
 
-  const handleLogout = () => {
-    setShowMenu(false)
-    logout()
-    navigate('/login')
-  }
 
   const handleChangePassword = async (e) => {
     e.preventDefault()

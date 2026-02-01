@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { tripService } from '../services/tripService'
 import CurrencySelector from '../components/CurrencySelector'
@@ -7,9 +6,8 @@ import Navbar from '../components/Navbar'
 import '../styles/Trips.css'
 
 export default function Trips() {
-  const { getUser, logout } = useAuth()
-  const navigate = useNavigate()
-  const [user, setUser] = useState(getUser())
+  const { getUser } = useAuth()
+  const user = getUser()
   const [trips, setTrips] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -45,10 +43,6 @@ export default function Trips() {
     convertedAmount: 0
   })
 
-  useEffect(() => {
-    loadTrips()
-  }, [])
-
   const loadTrips = async () => {
     try {
       setLoading(true)
@@ -65,6 +59,11 @@ export default function Trips() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    loadTrips()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleInputChange = (e) => {
     setFormData({
@@ -332,12 +331,6 @@ export default function Trips() {
     const end = new Date(endDate)
     const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24))
     return days > 0 ? `${days} day${days > 1 ? 's' : ''}` : ''
-  }
-
-  const handleLogout = () => {
-    setShowMenu(false)
-    logout()
-    navigate('/login')
   }
 
   return (

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { tripService } from '../services/tripService';
 import { generateItinerary, getItineraryByTripId } from '../services/itineraryService';
@@ -10,9 +9,8 @@ import 'jspdf-autotable';
 import '../styles/Itineraries.css';
 
 const Itineraries = () => {
-  const { getUser, logout } = useAuth();
-  const navigate = useNavigate();
-  const [user, setUser] = useState(getUser());
+  const { getUser } = useAuth();
+  const user = getUser();
   const [trips, setTrips] = useState([]);
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [interestType, setInterestType] = useState('');
@@ -35,36 +33,36 @@ const Itineraries = () => {
   ];
 
   useEffect(() => {
-    fetchTrips();
-  }, []);
-
-  const fetchTrips = async () => {
-    try {
-      const response = await tripService.getAllTrips();
-      console.log('Response from tripService:', response);
-      console.log('Current user:', user);
-      
-      // Handle different response formats
-      let allTrips = [];
-      if (response.success && response.data) {
-        allTrips = response.data;
-      } else if (Array.isArray(response)) {
-        allTrips = response;
+    const fetchTrips = async () => {
+      try {
+        const response = await tripService.getAllTrips();
+        console.log('Response from tripService:', response);
+        console.log('Current user:', user);
+        
+        // Handle different response formats
+        let allTrips = [];
+        if (response.success && response.data) {
+          allTrips = response.data;
+        } else if (Array.isArray(response)) {
+          allTrips = response;
+        }
+        
+        // Filter trips by current user
+        const userTrips = allTrips.filter(trip => {
+          console.log(`Comparing trip.userId (${trip.userId}) with user._id (${user._id})`);
+          return String(trip.userId) === String(user._id);
+        });
+        
+        console.log(`Found ${userTrips.length} trips for user ${user._id} out of ${allTrips.length} total trips`);
+        setTrips(Array.isArray(userTrips) ? userTrips : []);
+      } catch (err) {
+        console.error('Error fetching trips:', err);
+        setError('Error al cargar los viajes');
       }
-      
-      // Filter trips by current user
-      const userTrips = allTrips.filter(trip => {
-        console.log(`Comparing trip.userId (${trip.userId}) with user._id (${user._id})`);
-        return String(trip.userId) === String(user._id);
-      });
-      
-      console.log(`Found ${userTrips.length} trips for user ${user._id} out of ${allTrips.length} total trips`);
-      setTrips(Array.isArray(userTrips) ? userTrips : []);
-    } catch (err) {
-      console.error('Error fetching trips:', err);
-      setError('Error al cargar los viajes');
-    }
-  };
+    };
+
+    fetchTrips();
+  }, [user]);
 
   const handleTripChange = async (e) => {
     const tripId = e.target.value;
@@ -81,7 +79,7 @@ const Itineraries = () => {
           setItinerary(response.data);
           setInterestType(response.data.interestType);
         }
-      } catch (err) {
+      } catch {
         // No itinerary exists yet, that's ok
         console.log('No existing itinerary found');
       }
@@ -144,9 +142,9 @@ const Itineraries = () => {
 
     // Colors - Usando verde oscuro #021509
     const primaryColor = [2, 21, 9]; // #021509 - Color principal verde oscuro
-    const darkBg = [26, 26, 26];
-    const lightText = [160, 160, 160];
-    const whiteText = [255, 255, 255];
+    // const darkBg = [26, 26, 26];
+    // const lightText = [160, 160, 160];
+    // const whiteText = [255, 255, 255];
 
     // ========== HEADER ==========
     doc.setFillColor(...primaryColor);
@@ -379,7 +377,7 @@ const Itineraries = () => {
     yPos += 10;
 
     // Iterate through each day
-    itinerary.dailyActivities.forEach((day, dayIndex) => {
+    itinerary.dailyActivities.forEach((day) => {
       // Check if we need a new page
       if (yPos > pageHeight - 60) {
         doc.addPage();
@@ -464,11 +462,6 @@ const Itineraries = () => {
     // Save PDF
     const filename = `Itinerario_${selectedTrip.destination.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(filename);
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
   };
 
   const formatDate = (date) => {

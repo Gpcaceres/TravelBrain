@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import Navbar from '../components/Navbar'
 import api from '../services/api'
@@ -8,31 +8,27 @@ import '../styles/Dashboard.css'
 
 export default function Dashboard() {
   const { getUser } = useAuth()
-  const navigate = useNavigate()
-  const [user, setUser] = useState(getUser())
+  const user = getUser()
   const [stats, setStats] = useState({ trips: 0, destinations: 0, favorites: 0 })
   const [recentActivities, setRecentActivities] = useState([])
   const [loadingActivities, setLoadingActivities] = useState(true)
 
   useEffect(() => {
-    loadDashboardData()
-  }, [])
+    const loadDashboardData = async () => {
+      try {
+        setLoadingActivities(true)
+        const [tripsRes, destinationsRes, weatherRes] = await Promise.all([
+          api.get(API_CONFIG.ENDPOINTS.TRIPS),
+          api.get(API_CONFIG.ENDPOINTS.DESTINATIONS),
+          api.get(API_CONFIG.ENDPOINTS.WEATHERS).catch(() => ({ data: [] }))
+        ])
 
-  const loadDashboardData = async () => {
-    try {
-      setLoadingActivities(true)
-      const [tripsRes, destinationsRes, weatherRes] = await Promise.all([
-        api.get(API_CONFIG.ENDPOINTS.TRIPS),
-        api.get(API_CONFIG.ENDPOINTS.DESTINATIONS),
-        api.get(API_CONFIG.ENDPOINTS.WEATHERS).catch(() => ({ data: [] }))
-      ])
+        const trips = Array.isArray(tripsRes.data) ? tripsRes.data : []
+        const destinations = Array.isArray(destinationsRes.data) ? destinationsRes.data : []
+        const weathers = Array.isArray(weatherRes.data) ? weatherRes.data : []
 
-      const trips = Array.isArray(tripsRes.data) ? tripsRes.data : []
-      const destinations = Array.isArray(destinationsRes.data) ? destinationsRes.data : []
-      const weathers = Array.isArray(weatherRes.data) ? weatherRes.data : []
-
-      setStats({
-        trips: trips.filter(t => t.userId === user._id).length,
+        setStats({
+          trips: trips.filter(t => t.userId === user?._id).length,
         destinations: destinations.length,
         favorites: 0
       })
@@ -84,7 +80,11 @@ export default function Dashboard() {
       console.error('Error loading data:', error)
       setLoadingActivities(false)
     }
-  }
+    }
+
+    loadDashboardData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const formatActivityDate = (date) => {
     const now = new Date()

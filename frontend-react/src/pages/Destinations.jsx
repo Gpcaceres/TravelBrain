@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { destinationService } from '../services/destinationService'
 import { businessRulesService } from '../services/businessRulesService'
@@ -8,8 +7,7 @@ import Navbar from '../components/Navbar'
 import '../styles/Destinations.css'
 
 export default function Destinations() {
-  const { getUser, logout } = useAuth()
-  const navigate = useNavigate()
+  const { getUser } = useAuth()
   const user = getUser()
   const [destinations, setDestinations] = useState([])
   const [loading, setLoading] = useState(true)
@@ -109,36 +107,7 @@ export default function Destinations() {
     }, 100)
   }
   
-  useEffect(() => {
-    // Only update map if we have all required data with valid coordinates
-    if (
-      distanceInfo && 
-      selectedOrigin && 
-      selectedDestination && 
-      selectedOrigin.lat !== undefined && 
-      selectedOrigin.lng !== undefined &&
-      selectedDestination.lat !== undefined &&
-      selectedDestination.lng !== undefined
-    ) {
-      // Wait for Leaflet to be loaded
-      if (typeof window.L !== 'undefined') {
-        // Wait a bit to ensure the container is rendered
-        setTimeout(() => {
-          if (mapRef.current) {
-            if (!mapInstanceRef.current) {
-              initializeMap()
-              // Wait for map initialization
-              setTimeout(() => updateMapRoute(), 600)
-            } else {
-              updateMapRoute()
-            }
-          }
-        }, 200)
-      }
-    }
-  }, [distanceInfo, selectedOrigin, selectedDestination])
-  
-  const updateMapRoute = () => {
+  const updateMapRoute = useCallback(() => {
     const L = window.L
     if (!L) {
       console.warn('Leaflet not loaded yet')
@@ -237,7 +206,7 @@ export default function Destinations() {
         // Draw each segment with appropriate style
         const routeLines = []
         
-        segments.forEach((segment, index) => {
+        segments.forEach((segment) => {
           let routeStyle = {}
           let segmentIcon = ''
           
@@ -349,7 +318,36 @@ export default function Destinations() {
     } catch (error) {
       console.error('Error updating map route:', error)
     }
-  }
+  }, [selectedOrigin, selectedDestination, distanceInfo])
+
+  useEffect(() => {
+    // Only update map if we have all required data with valid coordinates
+    if (
+      distanceInfo && 
+      selectedOrigin && 
+      selectedDestination && 
+      selectedOrigin.lat !== undefined && 
+      selectedOrigin.lng !== undefined &&
+      selectedDestination.lat !== undefined &&
+      selectedDestination.lng !== undefined
+    ) {
+      // Wait for Leaflet to be loaded
+      if (typeof window.L !== 'undefined') {
+        // Wait a bit to ensure the container is rendered
+        setTimeout(() => {
+          if (mapRef.current) {
+            if (!mapInstanceRef.current) {
+              initializeMap()
+              // Wait for map initialization
+              setTimeout(() => updateMapRoute(), 600)
+            } else {
+              updateMapRoute()
+            }
+          }
+        }, 200)
+      }
+    }
+  }, [distanceInfo, selectedOrigin, selectedDestination, updateMapRoute])
 
   const loadDestinations = async () => {
     try {
@@ -371,46 +369,7 @@ export default function Destinations() {
     })
   }
 
-  const searchPlaces = async () => {
-    if (!placeSearchQuery.trim()) return
-
-    setSearchingPlaces(true)
-    try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
-      const response = await fetch(
-        `${API_URL}/api/routing/geocode?q=${encodeURIComponent(placeSearchQuery)}&limit=5`
-      )
-      
-      if (!response.ok) throw new Error('Failed to search places')
-      
-      const result = await response.json()
-      if (!result.success) throw new Error(result.message)
-      
-      const results = result.data.map(item => ({
-        name: item.display_name,
-        formatted_address: item.display_name,
-        geometry: {
-          location: {
-            lat: parseFloat(item.lat),
-            lng: parseFloat(item.lon)
-          }
-        },
-        place_id: item.place_id
-      }))
-      setPlaceSearchResults(results)
-    } catch (error) {
-      console.error('Error searching places:', error)
-      setMessage({ type: 'error', text: 'Failed to search places. Please try again.' })
-    } finally {
-      setSearchingPlaces(false)
-    }
-  }
-
-  const handleLogout = () => {
-    setShowMenu(false)
-    logout()
-    navigate('/login')
-  }
+  // Unused functions removed - searchPlaces, handleLogout, selectPlace
 
   const searchOriginSuggestions = async (query) => {
     if (!query.trim() || query.length < 3) {
@@ -543,7 +502,7 @@ export default function Destinations() {
         lat: result.data?.lat ?? place.lat,
         lng: result.data?.lng ?? place.lng,
       };
-    } catch (e) {
+    } catch {
       // Fallback to original if API fails
       return place;
     }
@@ -572,18 +531,6 @@ export default function Destinations() {
     setDestinationInput(validated.name);
     setDestinationSuggestions([]);
   };
-
-  const selectPlace = (place) => {
-    setFormData({
-      ...formData,
-      name: place.name || place.formatted_address.split(',')[0],
-      country: place.formatted_address.split(',').slice(-1)[0].trim(),
-      lat: place.geometry.location.lat,
-      lng: place.geometry.location.lng
-    })
-    setPlaceSearchResults([])
-    setPlaceSearchQuery('')
-  }
 
   const calculateDistance = async () => {
     if (!selectedOrigin || !selectedDestination) {
@@ -614,7 +561,7 @@ export default function Destinations() {
       
       if (needsSeaRoute) {
         // Option 1: Multimodal (land + sea + land)
-        const multimodalRoute = await calculateMultimodalRoute(selectedOrigin, selectedDestination, straightDistance)
+        const multimodalRoute = await calculateMultimodalRoute(selectedOrigin, selectedDestination)
         options.push({
           ...multimodalRoute,
           name: '🌐 Multimodal (Land + Sea)',
@@ -748,7 +695,6 @@ export default function Destinations() {
   
   // Detect if route crosses a major ocean
   const detectOceanCrossing = (origin, dest, distance) => {
-    const latDiff = Math.abs(dest.lat - origin.lat)
     const lonDiff = Math.abs(dest.lng - origin.lng)
     
     // Check for transoceanic routes
@@ -821,7 +767,7 @@ export default function Destinations() {
   }
   
   // Calculate multimodal route (ground + sea + ground)
-  const calculateMultimodalRoute = async (origin, dest, straightDistance) => {
+  const calculateMultimodalRoute = async (origin, dest) => {
     // Major port coordinates (simplified database)
     const ports = {
       // European ports
@@ -991,26 +937,6 @@ export default function Destinations() {
     
     return path
   }
-  
-  // OLD FUNCTION REMOVED
-  const determineTransportType = (distance, origin, dest) => {
-    if (distance > 500) {
-      const latDiff = Math.abs(dest.lat - origin.lat)
-      const lonDiff = Math.abs(dest.lng - origin.lng)
-      
-      if (distance > 2000 && (latDiff > 20 || lonDiff > 30)) {
-        if (Math.abs(lonDiff) > 40) {
-          return 'mixed'
-        }
-        return 'air'
-      }
-      return 'air'
-    } else if (distance > 200 && distance <= 500) {
-      return 'ground'
-    } else {
-      return 'ground'
-    }
-  }
 
   const openModal = (destination = null) => {
     if (destination) {
@@ -1040,7 +966,6 @@ export default function Destinations() {
     }
     setModalPlaceInput('')
     setModalPlaceSuggestions([])
-    setPlaceSearchResults([])
     setShowModal(true)
     setMessage({ type: '', text: '' })
   }
@@ -1050,7 +975,6 @@ export default function Destinations() {
     setEditingDestination(null)
     setModalPlaceInput('')
     setModalPlaceSuggestions([])
-    setPlaceSearchResults([])
     setFormData({
       name: '',
       country: '',

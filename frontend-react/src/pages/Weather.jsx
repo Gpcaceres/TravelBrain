@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { weatherService } from '../services/weatherService'
 import { API_KEYS, API_ENDPOINTS } from '../config/apiKeys'
@@ -7,8 +6,7 @@ import Navbar from '../components/Navbar'
 import '../styles/Weather.css'
 
 export default function Weather() {
-  const { getUser, logout } = useAuth()
-  const navigate = useNavigate()
+  const { getUser } = useAuth()
   const [user, setUser] = useState(getUser())
   const [weatherData, setWeatherData] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -16,7 +14,6 @@ export default function Weather() {
   const [searchQuery, setSearchQuery] = useState('')
   const [savedSearches, setSavedSearches] = useState([])
   const [loadingSearches, setLoadingSearches] = useState(true)
-  const [message, setMessage] = useState({ type: '', text: '' })
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const searchTimeoutRef = useRef(null)
@@ -28,6 +25,7 @@ export default function Weather() {
     if (currentUser && currentUser._id !== user?._id) {
       setUser(currentUser)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Load saved searches when component mounts or user changes
@@ -35,6 +33,7 @@ export default function Weather() {
     if (user && user._id) {
       loadSavedSearches()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id])
 
   // Auto-update relative times every minute
@@ -59,11 +58,6 @@ export default function Weather() {
     document.addEventListener('click', handleClickOutside)
     return () => document.removeEventListener('click', handleClickOutside)
   }, [showSuggestions])
-
-  const handleLogout = () => {
-    logout()
-    navigate('/')
-  }
 
   // Format date to show if it's today or relative time
   const formatSearchDate = (dateString) => {
@@ -254,14 +248,10 @@ export default function Weather() {
       
       // Reload from server to ensure sync
       await loadSavedSearches()
-      
-      setMessage({ type: 'success', text: 'Weather search deleted successfully!' })
-      setTimeout(() => setMessage({ type: '', text: '' }), 3000)
+      console.log('Weather search deleted successfully!')
     } catch (error) {
       console.error('Error deleting search:', error)
       console.error('Error details:', error.response?.data || error.message)
-      setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to delete weather search' })
-      setTimeout(() => setMessage({ type: '', text: '' }), 3000)
     }
   }
 
