@@ -1,3 +1,5 @@
+// GET /weather/location?q=...&limit=5 - Proxy para búsqueda de lugares (Nominatim)
+router.get('/weather/location', weatherController.searchLocation);
 
 const express = require('express');
 const router = express.Router();
