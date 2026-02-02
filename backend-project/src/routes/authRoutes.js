@@ -36,6 +36,7 @@ router.get('/google/callback',
     session: false
   }),
   (req, res) => {
+    console.log('✅ GOOGLE CALLBACK HANDLER EJECUTÁNDOSE - Usuario:', req.user ? req.user.email : 'NO USER');
     try {
       // Generar JWT token
       const token = jwt.sign(
