@@ -1,10 +1,12 @@
-// GET /weather/current?lat=...&lon=... - Consulta clima actual desde OpenWeather
-router.get('/weather/current', weatherController.getCurrentWeatherFromAPI);
+
 const express = require('express');
 const router = express.Router();
 const weatherController = require('../controllers/weatherController');
 const { cacheMiddleware } = require('../middlewares/cache');
 const { authenticate } = require('../middlewares/auth');
+
+// GET /weather/current?lat=...&lon=... - Consulta clima actual desde OpenWeather
+router.get('/weather/current', weatherController.getCurrentWeatherFromAPI);
 
 /**
  * Weather Routes
