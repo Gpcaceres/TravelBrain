@@ -22,20 +22,29 @@ router.get('/verify', authController.verifyToken);
 // ===== Google OAuth Routes =====
 
 // GET /api/auth/google - Iniciar autenticación con Google
-router.get('/google',
-  passport.authenticate('google', { 
+router.get('/google', (req, res, next) => {
+  console.log('🚀 INICIANDO AUTENTICACIÓN CON GOOGLE');
+  console.log('CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'Configurado' : 'NO CONFIGURADO');
+  console.log('CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? 'Configurado' : 'NO CONFIGURADO');
+  console.log('CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL);
+  next();
+}, passport.authenticate('google', { 
     scope: ['profile', 'email'],
     session: false
   })
 );
 
 // GET /api/auth/google/callback - Callback de Google
-router.get('/google/callback',
-  passport.authenticate('google', { 
+router.get('/google/callback', (req, res, next) => {
+  console.log('📞 CALLBACK RECIBIDO DE GOOGLE');
+  console.log('Query params:', req.query);
+  next();
+}, passport.authenticate('google', { 
     failureRedirect: `${process.env.FRONTEND_URL || 'http://travelbrain.ddns.net'}/login?error=auth_failed`,
     session: false
   }),
   (req, res) => {
+    console.log('✅ GOOGLE CALLBACK HANDLER EJECUTÁNDOSE - Usuario:', req.user ? req.user.email : 'NO USER');
     try {
       // Generar JWT token
       const token = jwt.sign(

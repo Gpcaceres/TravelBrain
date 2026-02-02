@@ -2,13 +2,20 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/User');
 
+console.log('🔧 Configurando Passport con Google OAuth Strategy...');
+console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'Configurado ✓' : '❌ NO CONFIGURADO');
+console.log('GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? 'Configurado ✓' : '❌ NO CONFIGURADO');
+console.log('GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL || 'http://travelbrain.ddns.net/api/auth/google/callback');
+
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://travelbrain.ddns.net/api/auth/google/callback",
-    passReqToCallback: true
+    passReqToCallback: true,
+    scope: ['profile', 'email']
   },
   async (req, accessToken, refreshToken, profile, done) => {
+    console.log('🔥 PASSPORT STRATEGY EJECUTÁNDOSE - Profile ID:', profile.id);
     try {
       // Buscar usuario existente por googleId
       let user = await User.findOne({ googleId: profile.id });
@@ -63,5 +70,7 @@ passport.deserializeUser(async (id, done) => {
     done(error, null);
   }
 });
+
+module.exports = passport;
 
 module.exports = passport;

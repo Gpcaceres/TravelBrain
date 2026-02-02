@@ -1,5 +1,3 @@
-// GET /weather/location?q=...&limit=5 - Proxy para búsqueda de lugares (Nominatim)
-router.get('/weather/location', weatherController.searchLocation);
 // GET /weather/current?lat=...&lon=... - Consulta clima actual desde OpenWeather
 router.get('/weather/current', weatherController.getCurrentWeatherFromAPI);
 const express = require('express');

@@ -53,6 +53,7 @@ const createApp = () => {
   // Initialize Passport
   app.use(passport.initialize());
   app.use(passport.session());
+  console.log('✅ Passport inicializado correctamente');
 
   // Request logger
   app.use(requestLogger);
