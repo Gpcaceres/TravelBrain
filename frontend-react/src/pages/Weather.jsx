@@ -133,7 +133,7 @@ export default function Weather() {
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`
+        `http://35.239.79.6:3004/weather/location?q=${encodeURIComponent(query)}&limit=5`
       )
       const data = await response.json()
       const formattedSuggestions = data.map(item => ({

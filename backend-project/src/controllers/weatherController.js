@@ -1,3 +1,20 @@
+const { searchNominatim } = require('../utils/nominatimClient');
+/**
+ * Proxy para búsqueda de lugares con Nominatim
+ * @route GET /weather/location?q=...&limit=5
+ */
+exports.searchLocation = async (req, res) => {
+  const { q, limit } = req.query;
+  if (!q) {
+    return res.status(400).json({ message: 'El parámetro q es requerido' });
+  }
+  try {
+    const results = await searchNominatim(q, limit);
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ message: 'Error consultando Nominatim', error });
+  }
+};
 const { getCurrentWeather } = require('../utils/openWeatherClient');
 /**
  * Consulta el clima actual usando OpenWeather
