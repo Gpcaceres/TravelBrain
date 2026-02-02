@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import api from '../services/api'
 import { API_CONFIG } from '../config'
+import GoogleLoginButton from '../components/GoogleLoginButton'
 import '../styles/Auth.css'
 
 export default function Login() {
@@ -89,6 +90,9 @@ export default function Login() {
           <div className="auth-divider">
             <span>or</span>
           </div>
+
+          {/* Google Login Button */}
+          <GoogleLoginButton text="Continuar con Google" />
 
           <div className="auth-footer">
             <p className="auth-footer-text">Don't have an account?</p>

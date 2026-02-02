@@ -49,6 +49,11 @@ const userSchema = new mongoose.Schema(
     picture: {
       type: String
     },
+    provider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local'
+    },
     createdAt: {
       type: Date,
       default: Date.now

@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const config = require('./config/env');
+const session = require('express-session');
+const passport = require('./config/passport');
 const {
   requestLogger,
   notFoundHandler,
@@ -36,6 +38,21 @@ const createApp = () => {
     origin: config.corsOrigins,
     credentials: true
   }));
+
+  // Session configuration (necesaria para Passport)
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000 // 24 horas
+    }
+  }));
+
+  // Initialize Passport
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   // Request logger
   app.use(requestLogger);

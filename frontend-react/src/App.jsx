@@ -10,6 +10,7 @@ import Destinations from './pages/Destinations'
 import Weather from './pages/Weather'
 import Admin from './pages/Admin'
 import Itineraries from './pages/Itineraries'
+import AuthSuccess from './pages/AuthSuccess'
 import './App.css'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/auth/success" element={<AuthSuccess />} />
       <Route 
         path="/dashboard" 
         element={
