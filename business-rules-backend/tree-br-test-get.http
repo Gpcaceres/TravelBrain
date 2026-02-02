@@ -1,8 +1,11 @@
 ### GET User Registration Validation
-GET http://localhost:3001/api/business-rules/users/validate-registration?email=test@example.com&username=testuser
+# Checks if the provided email and username meet business rules for user registration (required, format, uniqueness).
+GET http://35.239.79.6:3005/api/business-rules/users/validate-registration?email=test@example.com&username=testuser
 
 ### GET Trip Creation Validation
-GET http://localhost:3001/api/business-rules/trips/validate-creation?userId=12345&title=Viaje%20a%20Lima&startDate=2026-02-01&endDate=2026-02-10&budget=1000
+# Validates trip creation data, ensuring required fields (userId, title, dates, budget) comply with business rules (mandatory, valid ranges).
+GET http://35.239.79.6:3005/api/business-rules/trips/validate-creation?userId=12345&title=Viaje%20a%20Lima&startDate=2026-02-01&endDate=2026-02-10&budget=1000
 
 ### GET Destination Creation Validation
-GET http://localhost:3001/api/business-rules/destinations/validate-creation?name=Lima&country=Peru&lat=-12.0464&lng=-77.0428
+# Verifies destination data (name, country, coordinates) against business rules, such as required fields and valid coordinate ranges.
+GET http://35.239.79.6:3005/api/business-rules/destinations/validate-creation?name=Lima&country=Peru&lat=-12.0464&lng=-77.0428
