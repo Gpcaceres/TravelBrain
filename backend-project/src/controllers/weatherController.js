@@ -1,3 +1,20 @@
+const { getCurrentWeather } = require('../utils/openWeatherClient');
+/**
+ * Consulta el clima actual usando OpenWeather
+ * @route GET /weather/current?lat=...&lon=...
+ */
+exports.getCurrentWeatherFromAPI = async (req, res) => {
+  const { lat, lon, units, lang } = req.query;
+  if (!lat || !lon) {
+    return res.status(400).json({ message: 'lat y lon son requeridos' });
+  }
+  try {
+    const weather = await getCurrentWeather(lat, lon, units, lang);
+    res.json(weather);
+  } catch (error) {
+    res.status(500).json({ message: 'Error consultando OpenWeather', error });
+  }
+};
 const Weather = require('../models/Weather');
 const { invalidateCache } = require('../utils/cache');
 

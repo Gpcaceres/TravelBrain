@@ -5,6 +5,7 @@ require('dotenv').config();
  * Centralizes all environment variables with validation and defaults
  */
 const config = {
+    openWeatherApiKey: process.env.OPENWEATHER_API_KEY || 'd6a817b048e7c3eaa39880d9cf44b3d4',
   // Server
   port: process.env.PORT || 3004,
   nodeEnv: process.env.NODE_ENV || 'development',
@@ -14,7 +15,6 @@ const config = {
   mongoDB: process.env.MONGO_DB || 'travel_brain',
   
   // API Keys
-  openWeatherApiKey: process.env.OPENWEATHER_API_KEY || '51355211649b0894257fe06250faa40d',
   mapboxToken: process.env.MAPBOX_TOKEN || 'pk.eyJ1Ijoic3JqY2JtIiwiYSI6ImNtZ3g0eGV5NDAwZzYya3BvdmFveWU2dnEifQ.yYCrLmlo9lW-AJf56akVCw',
   
   // Google OAuth
