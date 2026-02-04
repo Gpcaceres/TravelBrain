@@ -229,11 +229,12 @@ export default function Weather() {
       setTimeout(() => {
         loadSavedSearches()
       }, 1000)
-      
-      // Clear the search query after successful search
+
+      // Limpiar el estado después de buscar
       setSearchQuery('')
       setSuggestions([])
       setShowSuggestions(false)
+      setSelectedLocation(null)
       
     } catch (error) {
       setError(error.message || 'Failed to fetch weather data')
