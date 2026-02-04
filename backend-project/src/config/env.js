@@ -5,7 +5,7 @@ require('dotenv').config();
  * Centralizes all environment variables with validation and defaults
  */
 const config = {
-    openWeatherApiKey: process.env.OPENWEATHER_API_KEY || 'd6a817b048e7c3eaa39880d9cf44b3d4',
+    openWeatherApiKey: process.env.OPENWEATHER_API_KEY || 'cfd36a88ab16724ab2a98e46438514e5',
   // Server
   port: process.env.PORT || 3004,
   nodeEnv: process.env.NODE_ENV || 'development',
