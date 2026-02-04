@@ -168,6 +168,7 @@ export default function Weather() {
 
   const selectSuggestion = (suggestion) => {
     setSearchQuery(suggestion.name)
+    setSelectedLocation(suggestion)
     setShowSuggestions(false)
     setSuggestions([])
   }
