@@ -16,6 +16,7 @@ export default function Weather() {
   const [loadingSearches, setLoadingSearches] = useState(true)
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [selectedLocation, setSelectedLocation] = useState(null)
   const searchTimeoutRef = useRef(null)
   const suggestionsRef = useRef(null)
 
@@ -182,15 +183,30 @@ export default function Weather() {
     setError('')
 
     try {
+      let lat, lon;
+      if (selectedLocation && selectedLocation.lat && selectedLocation.lon) {
+        lat = selectedLocation.lat;
+        lon = selectedLocation.lon;
+      } else {
+        // Buscar coordenadas por nombre usando el backend
+        const locRes = await fetch(`http://35.239.79.6:3004/weather/location?q=${encodeURIComponent(searchQuery)}&limit=1`);
+        const locData = await locRes.json();
+        if (Array.isArray(locData) && locData.length > 0) {
+          lat = locData[0].lat;
+          lon = locData[0].lon;
+        } else {
+          throw new Error('No se encontró la ubicación.');
+        }
+      }
       // Consultar clima al backend (OpenWeather)
       const response = await fetch(
-        `http://35.239.79.6:3004/weather/current?lat=${selectedLocation?.lat || ''}&lon=${selectedLocation?.lon || ''}`
-      )
+        `http://35.239.79.6:3004/weather/current?lat=${lat}&lon=${lon}`
+      );
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || 'City not found')
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'City not found');
       }
-      const data = await response.json()
+      const data = await response.json();
       const weatherInfo = {
         label: data.name || searchQuery,
         lat: data.coord?.lat,
@@ -201,10 +217,10 @@ export default function Weather() {
         windSpeed: data.wind?.speed,
         description: data.weather?.[0]?.description,
         icon: data.weather?.[0]?.icon
-      }
-      setWeatherData(weatherInfo)
+      };
+      setWeatherData(weatherInfo);
       // Save to database
-      console.log('Saving weather search...')
+      console.log('Saving weather search...');
       const savedWeather = await weatherService.createWeatherSearch(weatherInfo)
       console.log('Weather search saved:', savedWeather)
       
