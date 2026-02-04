@@ -182,40 +182,27 @@ export default function Weather() {
     setError('')
 
     try {
-      // Check if API key is configured
-      if (!API_KEYS.WEATHER || API_KEYS.WEATHER === 'demo_key') {
-        throw new Error('Weather API key not configured. Please contact administrator.')
-      }
-
-      // Use WeatherAPI.com (Free tier: 1M calls/month)
+      // Consultar clima al backend (OpenWeather)
       const response = await fetch(
-        `${API_ENDPOINTS.WEATHER}/current.json?key=${API_KEYS.WEATHER}&q=${encodeURIComponent(searchQuery)}&aqi=no`
+        `http://35.239.79.6:3004/weather/current?lat=${selectedLocation?.lat || ''}&lon=${selectedLocation?.lon || ''}`
       )
-      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        if (response.status === 401 || response.status === 403) {
-          throw new Error('Invalid API key. Please configure a valid WeatherAPI.com API key.')
-        }
-        throw new Error(errorData.error?.message || 'City not found')
+        throw new Error(errorData.message || 'City not found')
       }
-
       const data = await response.json()
-      
       const weatherInfo = {
-        label: data.location.name,
-        lat: data.location.lat,
-        lon: data.location.lon,
-        temp: Math.round(data.current.temp_c),
-        condition: data.current.condition.text,
-        humidity: data.current.humidity,
-        windSpeed: Number((data.current.wind_kph / 3.6).toFixed(2)), // Convert kph to m/s and round to 2 decimals
-        description: data.current.condition.text,
-        icon: data.current.condition.icon
+        label: data.name || searchQuery,
+        lat: data.coord?.lat,
+        lon: data.coord?.lon,
+        temp: Math.round(data.main?.temp),
+        condition: data.weather?.[0]?.description,
+        humidity: data.main?.humidity,
+        windSpeed: data.wind?.speed,
+        description: data.weather?.[0]?.description,
+        icon: data.weather?.[0]?.icon
       }
-
       setWeatherData(weatherInfo)
-      
       // Save to database
       console.log('Saving weather search...')
       const savedWeather = await weatherService.createWeatherSearch(weatherInfo)
