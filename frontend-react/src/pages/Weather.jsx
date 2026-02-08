@@ -20,22 +20,21 @@ export default function Weather() {
   const searchTimeoutRef = useRef(null)
   const suggestionsRef = useRef(null)
 
-  // Update user state when auth changes
+  // Load saved searches when component mounts
   useEffect(() => {
     const currentUser = getUser()
-    if (currentUser && currentUser._id !== user?._id) {
-      setUser(currentUser)
+    setUser(currentUser)
+    
+    // Load searches immediately if user is available
+    if (currentUser && currentUser._id) {
+      console.log('🔄 Loading saved searches for user:', currentUser._id)
+      loadSavedSearches()
+    } else {
+      console.log('⚠️ No user found, skipping search load')
+      setLoadingSearches(false)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  // Load saved searches when component mounts or user changes
-  useEffect(() => {
-    if (user && user._id) {
-      loadSavedSearches()
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?._id])
 
   // Auto-update relative times every minute
   useEffect(() => {
