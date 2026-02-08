@@ -63,6 +63,9 @@ services:
       - OPENWEATHER_API_KEY=51355211649b0894257fe06250faa40d
       - MAPBOX_TOKEN=pk.eyJ1Ijoic3JqY2JtIiwiYSI6ImNtZ3g0eGV5NDAwZzYya3BvdmFveWU2dnEifQ.yYCrLmlo9lW-AJf56akVCw
       - GOOGLE_CLIENT_ID=713160370468-sb3jjg16idaaakn3n6fe870nu6cn2h4b.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=https://travelbrain.ddns.net/api/auth/google/callback
+      - FRONTEND_URL=https://travelbrain.ddns.net
       - JWT_SECRET=travelbrain-super-secret-key-2026-production
       - JWT_EXPIRES_IN=7d
       - APP_TIMEZONE=America/Guayaquil

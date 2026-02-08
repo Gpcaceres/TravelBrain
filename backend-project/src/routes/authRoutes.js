@@ -40,7 +40,7 @@ router.get('/google/callback', (req, res, next) => {
   console.log('Query params:', req.query);
   next();
 }, passport.authenticate('google', { 
-    failureRedirect: `${process.env.FRONTEND_URL || 'http://travelbrain.ddns.net'}/login?error=auth_failed`,
+    failureRedirect: `${process.env.FRONTEND_URL || 'https://travelbrain.ddns.net'}/login?error=auth_failed`,
     session: false
   }),
   (req, res) => {
@@ -59,11 +59,11 @@ router.get('/google/callback', (req, res, next) => {
       );
       
       // Redirigir al frontend con el token
-      const frontendUrl = process.env.FRONTEND_URL || 'http://travelbrain.ddns.net';
+      const frontendUrl = process.env.FRONTEND_URL || 'https://travelbrain.ddns.net';
       res.redirect(`${frontendUrl}/auth/success?token=${token}`);
     } catch (error) {
       console.error('Error en callback de Google:', error);
-      const frontendUrl = process.env.FRONTEND_URL || 'http://travelbrain.ddns.net';
+      const frontendUrl = process.env.FRONTEND_URL || 'https://travelbrain.ddns.net';
       res.redirect(`${frontendUrl}/login?error=token_generation_failed`);
     }
   }

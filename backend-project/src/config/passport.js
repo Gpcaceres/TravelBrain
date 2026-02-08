@@ -5,12 +5,12 @@ const User = require('../models/User');
 console.log('🔧 Configurando Passport con Google OAuth Strategy...');
 console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'Configurado ✓' : '❌ NO CONFIGURADO');
 console.log('GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? 'Configurado ✓' : '❌ NO CONFIGURADO');
-console.log('GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL || 'http://travelbrain.ddns.net/api/auth/google/callback');
+console.log('GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL || 'https://travelbrain.ddns.net/api/auth/google/callback');
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://travelbrain.ddns.net/api/auth/google/callback",
+    callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://travelbrain.ddns.net/api/auth/google/callback",
     passReqToCallback: true,
     scope: ['profile', 'email']
   },
