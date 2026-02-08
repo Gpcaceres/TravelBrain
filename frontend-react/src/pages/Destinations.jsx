@@ -379,7 +379,7 @@ export default function Destinations() {
 
     setSearchingOrigin(true)
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
+      const API_URL = import.meta.env.VITE_API_URL || ''
       const response = await fetch(
         `${API_URL}/api/routing/geocode?q=${encodeURIComponent(query)}&limit=5`
       )
@@ -421,7 +421,7 @@ export default function Destinations() {
 
     setSearchingDestination(true)
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
+      const API_URL = import.meta.env.VITE_API_URL || ''
       const response = await fetch(
         `${API_URL}/api/routing/geocode?q=${encodeURIComponent(query)}&limit=5`
       )
@@ -721,7 +721,7 @@ export default function Destinations() {
   // Calculate driving route using backend proxy (avoids CORS)
   const calculateDrivingRoute = async (origin, dest) => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
+      const API_URL = import.meta.env.VITE_API_URL || ''
       const response = await fetch(
         `${API_URL}/api/routing/directions`,
         {
@@ -1041,7 +1041,7 @@ export default function Destinations() {
 
     setSearchingModalPlaces(true)
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
+      const API_URL = import.meta.env.VITE_API_URL || ''
       const response = await fetch(
         `${API_URL}/api/routing/geocode?q=${encodeURIComponent(query)}&limit=5`
       )
