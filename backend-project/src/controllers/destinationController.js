@@ -6,9 +6,16 @@ const Destination = require('../models/Destination');
  */
 exports.getAllDestinations = async (req, res) => {
   try {
-    console.log('Fetching all destinations...');
-    const destinations = await Destination.find();
-    console.log(`Found ${destinations.length} destination records`);
+    console.log('Fetching destinations for user:', req.user._id);
+    // Filter destinations by authenticated user OR public destinations (no userId)
+    const destinations = await Destination.find({
+      $or: [
+        { userId: req.user._id },
+        { userId: { $exists: false } },
+        { userId: null }
+      ]
+    });
+    console.log(`Found ${destinations.length} destination records for user`);
     res.json(destinations);
   } catch (error) {
     console.error('Error fetching destinations:', error);

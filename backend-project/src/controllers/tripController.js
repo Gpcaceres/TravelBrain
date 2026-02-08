@@ -7,9 +7,10 @@ const businessRulesClient = require('../utils/businessRulesClient');
  */
 exports.getAllTrips = async (req, res) => {
   try {
-    console.log('Fetching all trips...');
-    const trips = await Trip.find();
-    console.log(`Found ${trips.length} trip records`);
+    console.log('Fetching trips for user:', req.user._id);
+    // Filter trips by authenticated user
+    const trips = await Trip.find({ userId: req.user._id });
+    console.log(`Found ${trips.length} trip records for user`);
     res.json(trips);
   } catch (error) {
     console.error('Error fetching trips:', error);

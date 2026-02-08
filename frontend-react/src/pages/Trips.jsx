@@ -46,12 +46,9 @@ export default function Trips() {
   const loadTrips = async () => {
     try {
       setLoading(true)
-      const allTrips = await tripService.getAllTrips()
-      const currentUser = user || getUser()
-      if (currentUser && currentUser._id) {
-        const userTrips = allTrips.filter(trip => trip.userId === currentUser._id)
-        setTrips(userTrips)
-      }
+      // Backend already filters by authenticated user
+      const userTrips = await tripService.getAllTrips()
+      setTrips(userTrips)
     } catch (error) {
       console.error('Error loading trips:', error)
       setMessage({ type: 'error', text: 'Failed to load trips' })
