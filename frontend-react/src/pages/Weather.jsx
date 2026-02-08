@@ -209,7 +209,7 @@ export default function Weather() {
         locationName = selectedLocation.name;
       } else {
         // Buscar coordenadas por nombre usando el backend
-        const locRes = await fetch(`${API_CONFIG.BASE_URL}/weather/location?q=${encodeURIComponent(searchQuery)}&limit=5`);
+        const locRes = await fetch(`/api/weather/location?q=${encodeURIComponent(searchQuery)}&limit=5`);
         const locData = await locRes.json();
         if (Array.isArray(locData) && locData.length > 0) {
           // Tomar el primer resultado (ya está ordenado por relevancia en el backend)
@@ -224,7 +224,7 @@ export default function Weather() {
       }
       // Consultar clima al backend (OpenWeather)
       const response = await fetch(
-        `${API_CONFIG.BASE_URL}/weather/current?lat=${lat}&lon=${lon}`
+        `/api/weather/current?lat=${lat}&lon=${lon}`
       );
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
