@@ -29,20 +29,22 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API routes
-app.use('/api/business-rules', businessRulesRoutes);
-
-// Root endpoint
+// Root endpoint info
 app.get('/', (req, res) => {
   res.json({
     message: 'TravelBrain Business Rules API',
     version: '1.0.0',
     endpoints: {
       health: '/health',
-      businessRules: '/api/business-rules'
+      destinations: '/destinations/validate-creation',
+      trips: '/trips/validate-creation',
+      users: '/users/validate-registration'
     }
   });
 });
+
+// API routes - mounted at root since Nginx handles /business-rules/ prefix
+app.use('/', businessRulesRoutes);
 
 // 404 handler
 app.use((req, res) => {
