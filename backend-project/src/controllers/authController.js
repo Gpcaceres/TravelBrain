@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const config = require('../config/env');
 
@@ -72,11 +73,21 @@ exports.simpleLogin = async (req, res) => {
       });
     }
 
+
     // Verificar si el usuario está activo
     if (user.status !== 'ACTIVE') {
       return res.status(403).json({
         success: false,
         message: 'Tu cuenta ha sido desactivada. Contacta al administrador.'
+      });
+    }
+
+    // Validar contraseña
+    const passwordValida = await bcrypt.compare(password, user.password);
+    if (!passwordValida) {
+      return res.status(401).json({
+        success: false,
+        message: 'Contraseña incorrecta'
       });
     }
 
