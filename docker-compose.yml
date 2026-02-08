@@ -1,18 +1,46 @@
 version: '3.8'
 
 services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: travelbrain-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    networks:
+      - travelbrain-network
+    depends_on:
+      - backend
+      - frontend
+      - business-rules
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot
+    container_name: travelbrain-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
   business-rules:
     build:
       context: ./business-rules-backend
       dockerfile: Dockerfile
     container_name: travelbrain-business-rules
-    ports:
-      - "3005:3005"
+    expose:
+      - "3005"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=3005
       - APP_TIMEZONE=America/Guayaquil
-      - CORS_ORIGINS=http://localhost:5173,http://localhost:8000,http://localhost:3004,http://35.239.79.6:5173,http://35.222.67.75:5173,http://travelbrain.ddns.net
+      - CORS_ORIGINS=https://travelbrain.ddns.net,http://localhost:5173
     volumes:
       - ./business-rules-backend:/app
       - /app/node_modules
@@ -25,20 +53,20 @@ services:
       context: ./backend-project
       dockerfile: Dockerfile
     container_name: travelbrain-backend
-    ports:
-      - "3004:3004"
+    expose:
+      - "3004"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=3004
       - MONGO_URI=mongodb+srv://SrJCBM:bdd2025@cluster0.tjvfmrk.mongodb.net/
       - MONGO_DB=travel_brain
       - OPENWEATHER_API_KEY=51355211649b0894257fe06250faa40d
       - MAPBOX_TOKEN=pk.eyJ1Ijoic3JqY2JtIiwiYSI6ImNtZ3g0eGV5NDAwZzYya3BvdmFveWU2dnEifQ.yYCrLmlo9lW-AJf56akVCw
       - GOOGLE_CLIENT_ID=713160370468-sb3jjg16idaaakn3n6fe870nu6cn2h4b.apps.googleusercontent.com
-      - JWT_SECRET=development-secret-key-change-in-production
+      - JWT_SECRET=travelbrain-super-secret-key-2026-production
       - JWT_EXPIRES_IN=7d
       - APP_TIMEZONE=America/Guayaquil
-      - CORS_ORIGINS=http://35.239.79.6:5173,http://35.222.67.75:5173,http://localhost:5173,http://localhost:8000,http://travelbrain.ddns.net
+      - CORS_ORIGINS=https://travelbrain.ddns.net,http://localhost:5173
       - BUSINESS_RULES_API_URL=http://business-rules:3005
     volumes:
       - ./backend-project:/app
@@ -54,10 +82,10 @@ services:
       context: ./frontend-react
       dockerfile: Dockerfile
     container_name: travelbrain-frontend
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     environment:
-      - VITE_API_URL=http://35.239.79.6:3004
+      - VITE_API_URL=https://travelbrain.ddns.net
     volumes:
       - ./frontend-react:/app
       - /app/node_modules

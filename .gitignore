@@ -1,0 +1,32 @@
+# SSL Certificates - Do not commit to repository
+certbot/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.test
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if any in root)
+node_modules/
+
+# Docker volumes
+docker-volumes/
