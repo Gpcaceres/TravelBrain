@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../hooks/useAuth'
+import { useNavigate } from 'react-router-dom'
 import { tripService } from '../services/tripService'
 import CurrencySelector from '../components/CurrencySelector'
 import Navbar from '../components/Navbar'
 import '../styles/Trips.css'
 
-export default function Trips() {
   const { getUser } = useAuth()
   const user = getUser()
+  const navigate = useNavigate()
   const [trips, setTrips] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -57,9 +58,15 @@ export default function Trips() {
     }
   }
 
+
   useEffect(() => {
+    // Si no hay usuario autenticado, redirigir a login
+    if (!user || !user._id) {
+      navigate('/login', { replace: true })
+      return
+    }
     loadTrips()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleInputChange = (e) => {
