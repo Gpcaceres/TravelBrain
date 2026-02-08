@@ -1,11 +1,10 @@
 /**
  * Currency Conversion Service
- * Uses Frankfurter API (free, no API key required)
- * API Documentation: https://www.frankfurter.app/docs/
- * Hosted by European Central Bank
+ * Uses open.er-api.com (free, no API key required)
+ * API Documentation: https://www.exchangerate-api.com/docs/free
  */
 
-const BASE_URL = 'https://api.frankfurter.app';
+const BASE_URL = 'https://open.er-api.com/v6/latest';
 
 // Currency symbols mapping
 export const CURRENCY_SYMBOLS = {
@@ -204,31 +203,29 @@ export const convertCurrency = async (amount, fromCurrency, toCurrency) => {
       };
     }
 
-    // Try Frankfurter API first
+    // Try open.er-api.com first
     try {
       const response = await fetch(
-        `${BASE_URL}/latest?amount=${amount}&from=${fromCurrency}&to=${toCurrency}`
+        `${BASE_URL}/${fromCurrency}`
       );
-      
       if (response.ok) {
         const data = await response.json();
-        
-        if (data && data.rates && data.rates[toCurrency]) {
-          const convertedAmount = data.rates[toCurrency];
-          const rate = convertedAmount / amount;
-          
+        if (data && data.result === 'success' && data.rates && data.rates[toCurrency]) {
+          const rate = data.rates[toCurrency];
+          const convertedAmount = parseFloat(amount) * rate;
           return {
             amount: parseFloat(amount),
             convertedAmount: convertedAmount,
             rate: rate,
-            fromCurrency: data.base,
+            fromCurrency: fromCurrency,
             toCurrency: toCurrency,
-            lastUpdated: data.date
+            lastUpdated: data.time_last_update_utc,
+            isFallback: false
           };
         }
       }
     } catch (apiError) {
-      console.warn('Frankfurter API failed, using fallback rates:', apiError);
+      console.warn('open.er-api.com failed, using fallback rates:', apiError);
     }
 
     // Fallback: Use approximate exchange rates (updated Jan 2026)
