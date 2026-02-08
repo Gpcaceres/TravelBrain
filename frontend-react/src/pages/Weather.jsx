@@ -134,7 +134,7 @@ export default function Weather() {
 
     try {
       const response = await fetch(
-        `${API_CONFIG.BASE_URL}/weather/location?q=${encodeURIComponent(query)}&limit=5`
+        `${API_CONFIG.ENDPOINTS.WEATHER_LOCATION}?q=${encodeURIComponent(query)}&limit=5`
       )
       const data = await response.json()
       const formattedSuggestions = data.map(item => {
