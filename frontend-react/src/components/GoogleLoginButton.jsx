@@ -1,11 +1,10 @@
 import React from 'react';
-import { API_CONFIG } from '../config';
 import './GoogleLoginButton.css';
 
 const GoogleLoginButton = ({ text = 'Continuar con Google' }) => {
   const handleGoogleLogin = () => {
     // Redirigir al endpoint de autenticación de Google
-    window.location.href = `${API_CONFIG.BASE_URL}/auth/google`;
+    window.location.href = '/api/auth/google';
   };
 
   return (
