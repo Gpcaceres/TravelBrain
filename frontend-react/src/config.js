@@ -7,26 +7,26 @@ export const API_CONFIG = {
     VERIFY: '/api/auth/verify',
     
     // Users
-    USERS: '/api/users',
-    USER_BY_ID: (id) => `/api/users/${id}`,
+    USERS: '/users',
+    USER_BY_ID: (id) => `/users/${id}`,
     
     // Destinations
-    DESTINATIONS: '/api/destinations',
-    DESTINATION_BY_ID: (id) => `/api/destinations/${id}`,
+    DESTINATIONS: '/destinations',
+    DESTINATION_BY_ID: (id) => `/destinations/${id}`,
     
     // Trips
-    TRIPS: '/api/trips',
-    TRIP_BY_ID: (id) => `/api/trips/${id}`,
+    TRIPS: '/trips',
+    TRIP_BY_ID: (id) => `/trips/${id}`,
     
     // Favorite Routes
-    FAVORITE_ROUTES: '/api/favorite-routes',
-    FAVORITE_ROUTE_BY_ID: (id) => `/api/favorite-routes/${id}`,
+    FAVORITE_ROUTES: '/favorite-routes',
+    FAVORITE_ROUTE_BY_ID: (id) => `/favorite-routes/${id}`,
     
     // Weather
-    WEATHERS: '/api/weathers',
-    WEATHER_BY_ID: (id) => `/api/weathers/${id}`,
-    WEATHER_SEARCH: '/api/weather',
-    WEATHER_LOCATION: '/api/weather/location'
+    WEATHERS: '/weathers',
+    WEATHER_BY_ID: (id) => `/weathers/${id}`,
+    WEATHER_SEARCH: '/weather',
+    WEATHER_LOCATION: '/weather/location'
   }
 }
 
