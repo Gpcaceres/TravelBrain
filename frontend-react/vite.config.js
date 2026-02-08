@@ -9,13 +9,5 @@ export default defineConfig({
     host: true,
     allowedHosts: ["travelbrain.ddns.net"],
     strictPort: true,
-    // Enable SPA routing fallback
-    proxy: {
-      '/api': {
-        target: 'http://backend:3004',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
   },
 })

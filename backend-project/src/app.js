@@ -69,14 +69,14 @@ const createApp = () => {
   });
 
   // ===== API Routes =====
-  app.use('/api/auth', authRoutes);
-  app.use('/', userRoutes);
-  app.use('/', destinationRoutes);
-  app.use('/', tripRoutes);
-  app.use('/', favoriteRouteRoutes);
-  app.use('/', weatherRoutes);
-  app.use('/api/itineraries', itineraryRoutes);
-  app.use('/api/routing', routingRoutes);
+  app.use('/api/auth', authRoutes);  // Routes: /register, /login, /verify, /google
+  app.use('/api/itineraries', itineraryRoutes);  // Routes: /generate, /, /:id
+  app.use('/api/routing', routingRoutes);  // Routes: /geocode, /directions, /multimodal
+  app.use('/api', userRoutes);  // Routes: /users, /users/:id
+  app.use('/api', destinationRoutes);  // Routes: /destinations, /destinations/:id
+  app.use('/api', tripRoutes);  // Routes: /trips, /trips/:id
+  app.use('/api', favoriteRouteRoutes);  // Routes: /favorite-routes, /favorite-routes/:id
+  app.use('/api', weatherRoutes);  // Routes: /weather, /weathers, /weathers/:id
 
   // Root endpoint
   app.get('/', (req, res) => {
