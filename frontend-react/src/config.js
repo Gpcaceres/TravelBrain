@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  BASE_URL: 'http://35.239.79.6:3004',
+  BASE_URL: '',  // Use relative paths - Nginx will proxy to backend
   ENDPOINTS: {
     // Auth
     LOGIN: '/api/auth/login',
