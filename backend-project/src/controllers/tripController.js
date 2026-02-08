@@ -42,7 +42,10 @@ exports.getTripById = async (req, res) => {
 exports.createTrip = async (req, res) => {
   try {
     // Validate trip data using business rules
-    const validation = await businessRulesClient.validateTripCreation(req.body);
+    const validation = await businessRulesClient.validateTripCreation({
+      ...req.body,
+      userId: req.user.id
+    });
     
     if (!validation.valid) {
       return res.status(400).json({ 
