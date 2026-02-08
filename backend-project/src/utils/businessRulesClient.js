@@ -9,7 +9,7 @@ const BUSINESS_RULES_API_URL = process.env.BUSINESS_RULES_API_URL || 'http://loc
 class BusinessRulesClient {
   constructor() {
     this.client = axios.create({
-      baseURL: `${BUSINESS_RULES_API_URL}/api/business-rules`,
+      baseURL: `${BUSINESS_RULES_API_URL}`,
       timeout: 5000,
       headers: {
         'Content-Type': 'application/json'
