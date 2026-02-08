@@ -123,6 +123,15 @@ export default function Navbar() {
                     </svg>
                     Profile
                   </Link>
+                  {user?.role === 'ADMIN' && (
+                    <Link to="/admin" className="dropdown-item admin-item">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
+                      </svg>
+                      Admin Panel
+                    </Link>
+                  )}
                   <div className="dropdown-divider"></div>
                   <button onClick={handleLogout} className="dropdown-item logout-item">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -197,6 +206,11 @@ export default function Navbar() {
           <Link to="/profile" className="nav-link">
             Profile
           </Link>
+          {user?.role === 'ADMIN' && (
+            <Link to="/admin" className="nav-link admin-link">
+              Admin Panel
+            </Link>
+          )}
           <button onClick={handleLogout} className="nav-link logout-link">
             Logout
           </button>
