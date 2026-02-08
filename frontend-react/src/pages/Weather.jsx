@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { weatherService } from '../services/weatherService'
-import { API_KEYS, API_ENDPOINTS } from '../config/apiKeys'
+import { API_CONFIG } from '../config'
 import Navbar from '../components/Navbar'
 import '../styles/Weather.css'
 
@@ -134,15 +134,34 @@ export default function Weather() {
 
     try {
       const response = await fetch(
-        `http://35.239.79.6:3004/weather/location?q=${encodeURIComponent(query)}&limit=5`
+        `${API_CONFIG.BASE_URL}/weather/location?q=${encodeURIComponent(query)}&limit=5`
       )
       const data = await response.json()
-      const formattedSuggestions = data.map(item => ({
-        display_name: item.display_name,
-        name: item.name || item.display_name.split(',')[0],
-        lat: item.lat,
-        lon: item.lon
-      }))
+      const formattedSuggestions = data.map(item => {
+        // Extraer el nombre principal del lugar
+        const nameParts = item.display_name.split(',');
+        const mainName = item.name || nameParts[0].trim();
+        
+        // Crear un display_name más limpio
+        let cleanDisplayName = item.display_name;
+        
+        // Si es un país, mostrarlo claramente
+        if (item.type === 'country') {
+          cleanDisplayName = `${mainName} (País)`;
+        } else if (item.type === 'city' || item.type === 'administrative') {
+          // Para ciudades, mostrar: Ciudad, País o Ciudad, Estado, País
+          const parts = nameParts.slice(0, 3).map(p => p.trim());
+          cleanDisplayName = parts.join(', ');
+        }
+        
+        return {
+          display_name: cleanDisplayName,
+          name: mainName,
+          lat: item.lat,
+          lon: item.lon,
+          type: item.type
+        };
+      })
       setSuggestions(formattedSuggestions)
       setShowSuggestions(formattedSuggestions.length > 0)
     } catch (error) {
@@ -184,24 +203,29 @@ export default function Weather() {
     setError('')
 
     try {
-      let lat, lon;
+      let lat, lon, locationName;
       if (selectedLocation && selectedLocation.lat && selectedLocation.lon) {
         lat = selectedLocation.lat;
         lon = selectedLocation.lon;
+        locationName = selectedLocation.name;
       } else {
         // Buscar coordenadas por nombre usando el backend
-        const locRes = await fetch(`http://35.239.79.6:3004/weather/location?q=${encodeURIComponent(searchQuery)}&limit=1`);
+        const locRes = await fetch(`${API_CONFIG.BASE_URL}/weather/location?q=${encodeURIComponent(searchQuery)}&limit=5`);
         const locData = await locRes.json();
         if (Array.isArray(locData) && locData.length > 0) {
-          lat = locData[0].lat;
-          lon = locData[0].lon;
+          // Tomar el primer resultado (ya está ordenado por relevancia en el backend)
+          const bestMatch = locData[0];
+          lat = bestMatch.lat;
+          lon = bestMatch.lon;
+          // Usar el nombre del lugar encontrado (país, ciudad principal, etc.)
+          locationName = bestMatch.name || bestMatch.display_name?.split(',')[0] || searchQuery;
         } else {
           throw new Error('No se encontró la ubicación.');
         }
       }
       // Consultar clima al backend (OpenWeather)
       const response = await fetch(
-        `http://35.239.79.6:3004/weather/current?lat=${lat}&lon=${lon}`
+        `${API_CONFIG.BASE_URL}/weather/current?lat=${lat}&lon=${lon}`
       );
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -209,7 +233,7 @@ export default function Weather() {
       }
       const data = await response.json();
       const weatherInfo = {
-        label: data.name || searchQuery,
+        label: locationName || data.name || searchQuery,
         lat: data.coord?.lat,
         lon: data.coord?.lon,
         temp: Math.round(data.main?.temp),
