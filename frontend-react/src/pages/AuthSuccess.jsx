@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { API_CONFIG, STORAGE_KEYS } from '../config';
+import { STORAGE_KEYS } from '../config';
 import './AuthSuccess.css';
 
 const AuthSuccess = () => {
@@ -28,7 +28,7 @@ const AuthSuccess = () => {
           localStorage.setItem(STORAGE_KEYS.TOKEN, token);
           
           // Obtener datos del usuario
-          const response = await fetch(`${API_CONFIG.BASE_URL}/auth/verify`, {
+          const response = await fetch('/api/auth/verify', {
             headers: {
               'Authorization': `Bearer ${token}`
             }
