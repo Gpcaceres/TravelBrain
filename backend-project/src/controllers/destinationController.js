@@ -6,11 +6,11 @@ const Destination = require('../models/Destination');
  */
 exports.getAllDestinations = async (req, res) => {
   try {
-    console.log('Fetching destinations for user:', req.user._id);
+    console.log('Fetching destinations for user:', req.user.id);
     // Filter destinations by authenticated user OR public destinations (no userId)
     const destinations = await Destination.find({
       $or: [
-        { userId: req.user._id },
+        { userId: req.user.id },
         { userId: { $exists: false } },
         { userId: null }
       ]

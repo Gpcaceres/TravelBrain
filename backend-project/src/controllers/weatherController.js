@@ -41,11 +41,11 @@ const { invalidateCache } = require('../utils/cache');
  */
 exports.getAllWeathers = async (req, res) => {
   try {
-    console.log('Fetching weathers for user:', req.user._id);
+    console.log('Fetching weathers for user:', req.user.id);
     // Filter by authenticated user
-    const weathers = await Weather.find({ userId: req.user._id })
+    const weathers = await Weather.find({ userId: req.user.id })
       .sort({ createdAt: -1 }); // Most recent first
-    console.log(`Found ${weathers.length} weather records for user ${req.user._id}`);
+    console.log(`Found ${weathers.length} weather records for user ${req.user.id}`);
     res.json(weathers);
   } catch (error) {
     console.error('Error fetching weathers:', error);
@@ -76,9 +76,9 @@ exports.getWeatherById = async (req, res) => {
  */
 exports.createWeather = async (req, res) => {
   try {
-    console.log('Creating weather for user:', req.user._id);
+    console.log('Creating weather for user:', req.user.id);
     const weather = new Weather({
-      userId: req.user._id, // Use authenticated user ID
+      userId: req.user.id, // Use authenticated user ID
       label: req.body.label,
       lat: req.body.lat,
       lon: req.body.lon,
@@ -150,11 +150,11 @@ exports.updateWeather = async (req, res) => {
  */
 exports.deleteWeather = async (req, res) => {
   try {
-    console.log(`Deleting weather with id: ${req.params.id} for user: ${req.user._id}`);
+    console.log(`Deleting weather with id: ${req.params.id} for user: ${req.user.id}`);
     // Find weather and verify it belongs to the authenticated user
     const weather = await Weather.findOne({ 
       _id: req.params.id, 
-      userId: req.user._id 
+      userId: req.user.id 
     });
     
     if (!weather) {
