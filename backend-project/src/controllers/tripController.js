@@ -52,7 +52,7 @@ exports.createTrip = async (req, res) => {
     }
 
     const trip = new Trip({
-      userId: req.body.userId,
+      userId: req.user.id,
       title: req.body.title,
       destination: req.body.destination,
       originCountry: req.body.originCountry,
