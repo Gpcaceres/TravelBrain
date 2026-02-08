@@ -1,3 +1,10 @@
+import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { tripService } from '../services/tripService';
+import CurrencySelector from '../components/CurrencySelector';
+import Navbar from '../components/Navbar';
+import '../styles/Trips.css';
 
 export default function Trips() {
   const { getUser } = useAuth()
