@@ -25,14 +25,10 @@ export default function Weather() {
     const currentUser = getUser()
     setUser(currentUser)
     
-    // Load searches immediately if user is available
-    if (currentUser && currentUser._id) {
-      console.log('🔄 Loading saved searches for user:', currentUser._id)
-      loadSavedSearches()
-    } else {
-      console.log('⚠️ No user found, skipping search load')
-      setLoadingSearches(false)
-    }
+    // Always try to load searches - token is sent automatically via axios interceptor
+    // If token is invalid, axios will redirect to login
+    console.log('🔄 Loading saved searches...')
+    loadSavedSearches()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
