@@ -160,8 +160,35 @@ export default function Trips() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
+    // Validación de campos obligatorios
+    const requiredFields = [
+      { key: 'title', label: 'Title' },
+      { key: 'destination', label: 'Destination' },
+      { key: 'startDate', label: 'Start Date' },
+      { key: 'endDate', label: 'End Date' }
+    ];
+    const missing = requiredFields.filter(f => !formData[f.key] || formData[f.key].toString().trim() === '');
+    if (!user?._id) {
+      setMessage({ type: 'error', text: 'User not authenticated.' });
+      return;
+    }
+    if (missing.length > 0) {
+      setMessage({
+        type: 'error',
+        text: `Please fill in all required fields: ${missing.map(f => f.label).join(', ')}`
+      });
+      return;
+    }
+    if (formData.budget !== '' && (isNaN(formData.budget) || Number(formData.budget) < 0)) {
+      setMessage({
+        type: 'error',
+        text: 'Budget must be a number greater than or equal to 0.'
+      });
+      return;
+    }
+
     try {
       const tripData = {
         ...formData,
@@ -170,7 +197,7 @@ export default function Trips() {
         currency: currencyData.sourceCurrency,
         destinationCurrency: currencyData.targetCurrency,
         exchangeRate: currencyData.exchangeRate
-      }
+      };
 
       console.log('💾 Trips: Submitting trip with data:', {
         currency: tripData.currency,
@@ -179,22 +206,31 @@ export default function Trips() {
       });
 
       if (editingTrip) {
-        await tripService.updateTrip(editingTrip._id, tripData)
-        setMessage({ type: 'success', text: 'Trip updated successfully!' })
+        await tripService.updateTrip(editingTrip._id, tripData);
+        setMessage({ type: 'success', text: 'Trip updated successfully!' });
       } else {
-        await tripService.createTrip(tripData)
-        setMessage({ type: 'success', text: 'Trip created successfully!' })
+        await tripService.createTrip(tripData);
+        setMessage({ type: 'success', text: 'Trip created successfully!' });
       }
 
-      closeModal()
-      loadTrips()
+      closeModal();
+      loadTrips();
     } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.message || 'Failed to save trip' 
-      })
+      // Mostrar errores detallados del backend si existen
+      const backendErrors = error.response?.data?.errors;
+      if (backendErrors && Array.isArray(backendErrors) && backendErrors.length > 0) {
+        setMessage({
+          type: 'error',
+          text: backendErrors.map(e => e.message).join(' | ')
+        });
+      } else {
+        setMessage({
+          type: 'error',
+          text: error.response?.data?.message || 'Failed to save trip'
+        });
+      }
     }
-  }
+  };
 
   const handleDelete = async (tripId) => {
     if (!window.confirm('Are you sure you want to delete this trip?')) return
