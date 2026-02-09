@@ -1,3 +1,5 @@
+import React from 'react';
+import React from 'react';
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { weatherService } from '../services/weatherService'

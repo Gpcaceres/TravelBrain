@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { tripService } from '../services/tripService'

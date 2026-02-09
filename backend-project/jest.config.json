@@ -1,0 +1,11 @@
+{
+  "collectCoverage": true,
+  "collectCoverageFrom": [
+    "src/**/*.js",
+    "!src/**/index.js",
+    "!src/**/config.js",
+    "!src/**/env.js"
+  ],
+  "coverageDirectory": "coverage",
+  "coverageReporters": ["lcov", "text", "cobertura"]
+}

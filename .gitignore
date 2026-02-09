@@ -1,3 +1,9 @@
+# SonarQube
+.scannerwork/
+sonar-report/
+sonarcloud-report/
+sonar-project.properties
+sonar-scanner.log
 # SSL Certificates - Do not commit to repository
 certbot/
 
