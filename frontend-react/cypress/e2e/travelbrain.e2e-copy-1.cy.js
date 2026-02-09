@@ -25,7 +25,7 @@ describe('TravelBrain E2E', () => {
       // Verifica que NO redirige al dashboard
       cy.url().should('include', '/login')
       // Opcional: verifica el mensaje de error si es visible
-      cy.contains('Login failed. Please try again.').should('exist')
+      cy.contains('Contraseña incorrecta').should('exist')
   })
 
   it('Crear un viaje', () => {
