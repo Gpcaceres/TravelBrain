@@ -17,7 +17,7 @@ describe('TravelBrain E2E', () => {
 
   it('Login fallido con contraseña incorrecta', () => {
     cy.visit('https://travelbrain.ddns.net/login')
-    cy.get('input#email').type('ithopc@gmail.com')
+    cy.get('input#email').type('test@test.com')
     cy.get('input[type="password"]').type('incorrecta123')
     cy.get('button[type="submit"]').click()
       // Espera un poco para que la respuesta se procese
@@ -25,7 +25,7 @@ describe('TravelBrain E2E', () => {
       // Verifica que NO redirige al dashboard
       cy.url().should('include', '/login')
       // Opcional: verifica el mensaje de error si es visible
-      cy.contains('Login failed. Please try again.').should('exist')
+      cy.contains('Contraseña incorrecta.').should('exist')
   })
 
   it('Crear un viaje', () => {
