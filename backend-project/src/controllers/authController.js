@@ -83,7 +83,21 @@ exports.simpleLogin = async (req, res) => {
     }
 
     // Validar contraseña
-    const passwordValida = await bcrypt.compare(password, user.password);
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Contraseña es requerida'
+      });
+    }
+
+    if (!user.passwordHash) {
+      return res.status(401).json({
+        success: false,
+        message: 'Este usuario no tiene contraseña configurada. Por favor, usa el inicio de sesión con Google.'
+      });
+    }
+
+    const passwordValida = await bcrypt.compare(password, user.passwordHash);
     if (!passwordValida) {
       return res.status(401).json({
         success: false,
@@ -141,6 +155,20 @@ exports.register = async (req, res) => {
       });
     }
 
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Contraseña es requerida'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'La contraseña debe tener al menos 6 caracteres'
+      });
+    }
+
     // Verificar si el usuario ya existe
     const existingUser = await User.findOne({ 
       $or: [
@@ -158,12 +186,19 @@ exports.register = async (req, res) => {
 
     // Crear nuevo usuario
     const newUsername = username || email.split('@')[0];
+    
+    // Hash password
+    const salt = await bcrypt.genSalt(12);
+    const passwordHash = await bcrypt.hash(password, salt);
+    
     const user = new User({
       email: email.toLowerCase(),
       username: newUsername,
       name: name || newUsername,
+      passwordHash: passwordHash,
       role: 'USER',
-      status: 'ACTIVE'
+      status: 'ACTIVE',
+      provider: 'local'
     });
 
     await user.save();
