@@ -61,7 +61,7 @@ describe('TravelBrain E2E', () => {
 
   it('Navegar al dashboard después del login', () => {
     cy.visit('https://travelbrain.ddns.net/login')
-    cy.get('input#email').type('ithopc@gmail.com')
+    cy.get('input#email').type('test@test.com')
     cy.get('input[type="password"]').type('admin1234')
     cy.get('button[type="submit"]').click()
     cy.url().should('include', '/dashboard')
@@ -72,7 +72,7 @@ describe('TravelBrain E2E', () => {
   it('Acceder a la página de destinos', () => {
     // Login first
     cy.visit('https://travelbrain.ddns.net/login')
-    cy.get('input#email').type('ithopc@gmail.com')
+    cy.get('input#email').type('test@test.com')
     cy.get('input[type="password"]').type('admin1234')
     cy.get('button[type="submit"]').click()
     cy.url().should('include', '/dashboard')
@@ -86,7 +86,7 @@ describe('TravelBrain E2E', () => {
   it('Acceder a la página del clima', () => {
     // Login first
     cy.visit('https://travelbrain.ddns.net/login')
-    cy.get('input#email').type('ithopc@gmail.com')
+    cy.get('input#email').type('test@test.com')
     cy.get('input[type="password"]').type('admin1234')
     cy.get('button[type="submit"]').click()
     cy.url().should('include', '/dashboard')
@@ -100,7 +100,7 @@ describe('TravelBrain E2E', () => {
   it('Acceder a la página de perfil', () => {
     // Login first
     cy.visit('https://travelbrain.ddns.net/login')
-    cy.get('input#email').type('ithopc@gmail.com')
+    cy.get('input#email').type('test@test.com')
     cy.get('input[type="password"]').type('admin1234')
     cy.get('button[type="submit"]').click()
     cy.url().should('include', '/dashboard')
