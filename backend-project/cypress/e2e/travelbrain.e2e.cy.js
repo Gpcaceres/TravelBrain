@@ -9,7 +9,7 @@ describe('TravelBrain E2E', () => {
 
   it('Login exitoso con credenciales válidas', () => {
     cy.visit('https://travelbrain.ddns.net/login')
-    cy.get('input#email').type('ithopc@gmail.com')
+    cy.get('input#email').type('test@test.com')
     cy.get('input[type="password"]').type('admin1234')
     cy.get('button[type="submit"]').click()
     cy.url().should('include', '/dashboard')
@@ -25,13 +25,13 @@ describe('TravelBrain E2E', () => {
       // Verifica que NO redirige al dashboard
       cy.url().should('include', '/login')
       // Opcional: verifica el mensaje de error si es visible
-      cy.contains('Contraseña incorrecta.').should('exist')
+      cy.contains('Contraseña incorrecta').should('exist')
   })
 
   it('Crear un viaje', () => {
     // First login
     cy.visit('https://travelbrain.ddns.net/login')
-    cy.get('input#email').type('ithopc@gmail.com')
+    cy.get('input#email').type('test@test.com')
     cy.get('input[type="password"]').type('admin1234')
     cy.get('button[type="submit"]').click()
     cy.url().should('include', '/dashboard')
@@ -41,21 +41,20 @@ describe('TravelBrain E2E', () => {
     cy.wait(1000) // Wait for page to load
     
     // Click create trip button (using class since there's no ID)
-    cy.get('button.btn-primary').contains('Create New Trip').click()
+    cy.get('button.btn-primary').contains('Create Trip').click()
     cy.wait(500)
     
     // Fill in trip form
     cy.get('input#title').type('Viaje E2E Cypress')
-    cy.get('input#destination').type('Paris, France')
+    cy.get('input#destination').type('Quito Canton, Pichincha, Ecuador').click()
     cy.wait(500)
-    cy.get('input#startDate').type('2026-06-01')
-    cy.get('input#endDate').type('2026-06-15')
-    cy.get('input#budget').type('5000')
-    
+    cy.get('input#startDate').should('be.visible').should('be.enabled').type('2026-06-01')
+    cy.get('input#endDate').should('be.visible').should('be.enabled').type('2026-06-15')
+    cy.get('input#budget').type('500')
+    cy.get('textarea#description').type('test');
     // Submit form
     cy.get('button[type="submit"]').click()
     cy.wait(2000)
-    
     // Verify trip was created
     cy.contains('Viaje E2E Cypress').should('exist')
   })
