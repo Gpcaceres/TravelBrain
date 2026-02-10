@@ -23,7 +23,7 @@ passport.use(new GoogleStrategy({
       if (user) {
         // Usuario ya existe, actualizar información si es necesario
         user.name = user.name || profile.displayName;
-        user.picture = profile.photos && profile.photos[0] ? profile.photos[0].value : user.picture;
+        user.picture = profile.photos?.[0]?.value || user.picture;
         await user.save();
         return done(null, user);
       }
@@ -34,22 +34,41 @@ passport.use(new GoogleStrategy({
       if (user) {
         // Vincular cuenta de Google con usuario existente
         user.googleId = profile.id;
-        user.picture = profile.photos && profile.photos[0] ? profile.photos[0].value : user.picture;
+        user.picture = profile.photos?.[0]?.value || user.picture;
         user.name = user.name || profile.displayName;
         await user.save();
         return done(null, user);
       }
       
       // Crear nuevo usuario
+      // Generar username único basado en email
+      let baseUsername = '';
+      if (profile.emails?.[0]?.value) {
+        baseUsername = profile.emails[0].value.split('@')[0];
+      } else {
+        baseUsername = profile.id;
+      }
+
+      // Verificar si el username ya existe
+      let username = baseUsername;
+      let usernameExists = await User.findOne({ username });
+      let suffix = 1;
+      while (usernameExists) {
+        username = `${baseUsername}${suffix}`;
+        usernameExists = await User.findOne({ username });
+        suffix++;
+      }
+
       user = await User.create({
         googleId: profile.id,
         email: profile.emails[0].value,
         name: profile.displayName,
-        picture: profile.photos && profile.photos[0] ? profile.photos[0].value : '',
+        picture: profile.photos?.[0]?.value || '',
         role: 'USER',
-        status: 'ACTIVE'
+        status: 'ACTIVE',
+        username: username,
+        provider: 'google'
       });
-      
       return done(null, user);
     } catch (error) {
       console.error('Error en estrategia de Google OAuth:', error);
