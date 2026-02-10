@@ -41,14 +41,20 @@ passport.use(new GoogleStrategy({
       }
       
       // Crear nuevo usuario
-      user = await User.create({
-        googleId: profile.id,
-        email: profile.emails[0].value,
-        name: profile.displayName,
-        picture: profile.photos && profile.photos[0] ? profile.photos[0].value : '',
-        role: 'USER',
-        status: 'ACTIVE'
-      });
+        // Generar username único
+        let username = profile.emails && profile.emails[0] && profile.emails[0].value
+          ? profile.emails[0].value.split('@')[0]
+          : (profile.displayName ? profile.displayName.replace(/\s+/g, '').toLowerCase() : `googleuser_${profile.id}`);
+
+        user = await User.create({
+          googleId: profile.id,
+          email: profile.emails[0].value,
+          name: profile.displayName,
+          picture: profile.photos && profile.photos[0] ? profile.photos[0].value : '',
+          role: 'USER',
+          status: 'ACTIVE',
+          username: username
+        });
       
       return done(null, user);
     } catch (error) {
