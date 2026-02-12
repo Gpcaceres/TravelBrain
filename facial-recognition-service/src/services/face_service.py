@@ -101,6 +101,7 @@ class FaceRecognitionService:
     def _calculate_euclidean_distance(self, embedding1: list, embedding2: list) -> float:
         """
         Calculate euclidean distance between two face embeddings
+        Uses L2 normalization for Facenet512 embeddings
         
         Args:
             embedding1: First face embedding
@@ -111,13 +112,18 @@ class FaceRecognitionService:
         """
         emb1 = np.array(embedding1)
         emb2 = np.array(embedding2)
-        return np.linalg.norm(emb1 - emb2)
+        
+        # L2 normalization for Facenet512
+        emb1_norm = emb1 / np.linalg.norm(emb1)
+        emb2_norm = emb2 / np.linalg.norm(emb2)
+        
+        return np.linalg.norm(emb1_norm - emb2_norm)
     
     async def find_similar_face(
         self,
         new_embedding: list,
         existing_embeddings: list,
-        threshold: float = 0.5
+        threshold: float = 0.4  # Adjusted for normalized Facenet512
     ) -> Optional[Dict]:
         """
         Find if a similar face already exists in database
@@ -125,7 +131,7 @@ class FaceRecognitionService:
         Args:
             new_embedding: Embedding of the new face to check
             existing_embeddings: List of existing face embeddings from database
-            threshold: Similarity threshold (default 0.5 for Facenet512)
+            threshold: Similarity threshold (0.4 for normalized Facenet512)
             
         Returns:
             Dictionary with matched user info if found, None otherwise
@@ -141,13 +147,15 @@ class FaceRecognitionService:
             
             # If distance is below threshold, faces are similar
             if distance < threshold:
+                # Convert distance to similarity percentage (distance 0 = 100%, distance 1.4 = 0%)
+                similarity = max(0, min(100, (1 - (distance / 1.4)) * 100))
                 return {
                     "matched": True,
                     "user_id": existing.get("user_id"),
                     "username": existing.get("username"),
                     "email": existing.get("email"),
                     "distance": float(distance),
-                    "similarity_percentage": round((1 - distance) * 100, 2)
+                    "similarity_percentage": round(similarity, 2)
                 }
         
         return None
@@ -200,7 +208,7 @@ class FaceRecognitionService:
                 similar_face = await self.find_similar_face(
                     new_embedding=new_embedding,
                     existing_embeddings=existing_embeddings,
-                    threshold=0.5  # Facenet512 threshold (adjust if needed)
+                    threshold=0.4  # Normalized Facenet512 threshold
                 )
                 
                 if similar_face:

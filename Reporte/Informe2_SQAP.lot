@@ -1,0 +1,36 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {table}{\numberline {1}{\ignorespaces Resumen del Estado de Ejecución}}{5}{table.1}%
+\contentsline {table}{\numberline {2}{\ignorespaces Requisitos Funcionales - Autenticación}}{6}{table.2}%
+\contentsline {table}{\numberline {3}{\ignorespaces Requisitos Funcionales - Biometría}}{6}{table.3}%
+\contentsline {table}{\numberline {4}{\ignorespaces Requisitos Funcionales - Viajes}}{7}{table.4}%
+\contentsline {table}{\numberline {5}{\ignorespaces Requisitos Funcionales - Clima}}{7}{table.5}%
+\contentsline {table}{\numberline {6}{\ignorespaces Requisitos Funcionales - Admin}}{7}{table.6}%
+\contentsline {table}{\numberline {7}{Matriz de Rastreabilidad - Requisitos vs Casos de Prueba}}{8}{table.7}%
+\contentsline {table}{\numberline {8}{\ignorespaces TC-AUTH-U01: Hashing de Contraseñas}}{11}{table.8}%
+\contentsline {table}{\numberline {9}{\ignorespaces TC-AUTH-U02: Generación de JWT}}{13}{table.9}%
+\contentsline {table}{\numberline {10}{\ignorespaces TC-FE-U01: Renderizado de BiometricLogin}}{15}{table.10}%
+\contentsline {table}{\numberline {11}{\ignorespaces TC-AUTH-003: Email Inválido}}{17}{table.11}%
+\contentsline {table}{\numberline {12}{\ignorespaces TC-BIO-003: Extracción de Encoding}}{18}{table.12}%
+\contentsline {table}{\numberline {13}{\ignorespaces TC-TRIP-006: Protección IDOR}}{19}{table.13}%
+\contentsline {table}{\numberline {14}{\ignorespaces TC-AUTH-005: Login Exitoso}}{20}{table.14}%
+\contentsline {table}{\numberline {15}{\ignorespaces TC-AUTH-006: Login Fallido}}{21}{table.15}%
+\contentsline {table}{\numberline {16}{\ignorespaces TC-TRIP-001: Crear Viaje}}{21}{table.16}%
+\contentsline {table}{\numberline {17}{\ignorespaces TC-LAND-001: Carga Página Principal}}{22}{table.17}%
+\contentsline {table}{\numberline {18}{\ignorespaces TC-SEC-001: IDOR Prevention}}{23}{table.18}%
+\contentsline {table}{\numberline {19}{\ignorespaces TC-SEC-003: XSS Detection}}{24}{table.19}%
+\contentsline {table}{\numberline {20}{\ignorespaces TC-SEC-005: Security Headers}}{25}{table.20}%
+\contentsline {table}{\numberline {21}{\ignorespaces Resumen de Ejecución por Nivel}}{25}{table.21}%
+\contentsline {table}{\numberline {22}{\ignorespaces Análisis de Calidad - SonarQube}}{26}{table.22}%
+\contentsline {table}{\numberline {23}{\ignorespaces Cobertura por Módulo Backend}}{26}{table.23}%
+\contentsline {table}{\numberline {24}{\ignorespaces Componentes Frontend Probados}}{27}{table.24}%
+\contentsline {table}{\numberline {25}{\ignorespaces Pruebas Backend Ejecutadas}}{27}{table.25}%
+\contentsline {table}{\numberline {26}{\ignorespaces Pruebas Business Rules Ejecutadas}}{28}{table.26}%
+\contentsline {table}{\numberline {27}{\ignorespaces Pruebas E2E Cypress Completadas}}{28}{table.27}%
+\contentsline {table}{\numberline {28}{\ignorespaces Issues Críticos por Categoría}}{28}{table.28}%
+\contentsline {table}{\numberline {29}{\ignorespaces Plan de Corrección de Issues}}{29}{table.29}%
+\contentsline {table}{\numberline {30}{\ignorespaces Resumen de Casos de Prueba por Nivel}}{30}{table.30}%
+\contentsline {table}{\numberline {31}{\ignorespaces Distribución por Módulo con Estado Actual}}{30}{table.31}%
+\contentsline {table}{\numberline {32}{\ignorespaces Objetivos y Métricas Objetivo}}{30}{table.32}%
+\contentsline {table}{\numberline {33}{\ignorespaces Cronograma Sprint de Calidad 3}}{31}{table.33}%
+\contentsline {table}{\numberline {34}{\ignorespaces Evaluación General del Estado de Calidad}}{33}{table.34}%
+\contentsline {table}{\numberline {35}{\ignorespaces Ejemplos de Issues Detectados por SonarQube}}{37}{table.35}%

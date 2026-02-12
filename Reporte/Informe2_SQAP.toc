@@ -1,0 +1,72 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{Resumen Ejecutivo}{4}{Doc-Start}%
+\contentsline {section}{\numberline {1}Introducción}{5}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Propósito del Documento}{5}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Alcance del Diseño}{5}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Referencias}{5}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Estado Actual de Ejecución}{5}{subsection.1.4}%
+\contentsline {section}{\numberline {2}Requisitos Funcionales del Sistema}{6}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Módulo de Autenticación}{6}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Módulo de Autenticación Biométrica}{6}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Módulo de Gestión de Viajes}{7}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Módulo de Clima}{7}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Módulo de Administración}{7}{subsection.2.5}%
+\contentsline {section}{\numberline {3}Matriz de Rastreabilidad: Requisitos vs Casos de Prueba}{7}{section.3}%
+\contentsline {section}{\numberline {4}Diseño de Casos de Prueba Unitarias}{11}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Casos de Prueba Unitaria - Backend (Jest)}{11}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}TC-AUTH-U01: Hashing de Contraseñas con bcrypt}{11}{subsubsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.2}TC-AUTH-U02: Generación y Expiración de JWT}{13}{subsubsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.2}Casos de Prueba Unitaria - Frontend (Jest + RTL)}{15}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}TC-FE-U01: Componente BiometricLogin Renderiza Correctamente}{15}{subsubsection.4.2.1}%
+\contentsline {section}{\numberline {5}Diseño de Casos de Prueba de Integración}{17}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Casos de Prueba de Integración - APIs (Postman)}{17}{subsection.5.1}%
+\contentsline {subsubsection}{\numberline {5.1.1}TC-AUTH-003: Validación de Email Inválido}{17}{subsubsection.5.1.1}%
+\contentsline {subsubsection}{\numberline {5.1.2}TC-BIO-003: Extracción de Encoding 128D}{18}{subsubsection.5.1.2}%
+\contentsline {subsubsection}{\numberline {5.1.3}TC-TRIP-006: Protección IDOR en Viajes}{19}{subsubsection.5.1.3}%
+\contentsline {section}{\numberline {6}Diseño de Casos de Prueba End-to-End}{20}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Casos de Prueba E2E - Frontend (Cypress)}{20}{subsection.6.1}%
+\contentsline {subsubsection}{\numberline {6.1.1}TC-AUTH-005: Login Tradicional Exitoso}{20}{subsubsection.6.1.1}%
+\contentsline {subsubsection}{\numberline {6.1.2}TC-AUTH-006: Login Fallido con Credenciales Inválidas}{21}{subsubsection.6.1.2}%
+\contentsline {subsubsection}{\numberline {6.1.3}TC-TRIP-001: Crear Viaje Exitosamente}{21}{subsubsection.6.1.3}%
+\contentsline {subsubsection}{\numberline {6.1.4}TC-LAND-001: Carga de Página Principal}{22}{subsubsection.6.1.4}%
+\contentsline {section}{\numberline {7}Diseño de Casos de Prueba de Seguridad}{23}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Casos de Prueba de Seguridad - OWASP ZAP}{23}{subsection.7.1}%
+\contentsline {subsubsection}{\numberline {7.1.1}TC-SEC-001: Protección IDOR}{23}{subsubsection.7.1.1}%
+\contentsline {subsubsection}{\numberline {7.1.2}TC-SEC-003: Cross-Site Scripting (XSS)}{24}{subsubsection.7.1.2}%
+\contentsline {subsubsection}{\numberline {7.1.3}TC-SEC-005: Headers de Seguridad}{25}{subsubsection.7.1.3}%
+\contentsline {section}{\numberline {8}Resultados de Ejecución y Análisis}{25}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Estado Actual de Ejecución}{25}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Resultados de SonarQube}{26}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Análisis de Cobertura por Módulo}{26}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.4}Pruebas Unitarias Ejecutadas}{27}{subsection.8.4}%
+\contentsline {subsubsection}{\numberline {8.4.1}Frontend React - Pruebas Completadas}{27}{subsubsection.8.4.1}%
+\contentsline {subsubsection}{\numberline {8.4.2}Backend - Pruebas Ejecutadas con Fallos}{27}{subsubsection.8.4.2}%
+\contentsline {subsubsection}{\numberline {8.4.3}Business Rules - Pruebas Ejecutadas con Fallos}{28}{subsubsection.8.4.3}%
+\contentsline {subsection}{\numberline {8.5}Pruebas E2E Ejecutadas Exitosamente}{28}{subsection.8.5}%
+\contentsline {section}{\numberline {9}Análisis de Issues y Problemas Detectados}{28}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Issues Críticos Identificados}{28}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Áreas Problemáticas Específicas}{29}{subsection.9.2}%
+\contentsline {subsubsection}{\numberline {9.2.1}Backend Project - Cobertura por Servicio}{29}{subsubsection.9.2.1}%
+\contentsline {subsubsection}{\numberline {9.2.2}Problemas en Pruebas Unitarias}{29}{subsubsection.9.2.2}%
+\contentsline {subsection}{\numberline {9.3}Recomendaciones de Corrección Inmediata}{29}{subsection.9.3}%
+\contentsline {section}{\numberline {10}Matriz Resumen de Casos de Prueba}{30}{section.10}%
+\contentsline {section}{\numberline {11}Plan de Acción para Sprint de Calidad 3}{30}{section.11}%
+\contentsline {subsection}{\numberline {11.1}Objetivos del Sprint 3}{30}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.2}Cronograma de Actividades}{31}{subsection.11.2}%
+\contentsline {subsection}{\numberline {11.3}Recursos Necesarios}{31}{subsection.11.3}%
+\contentsline {section}{\numberline {12}Conclusiones y Recomendaciones}{31}{section.12}%
+\contentsline {subsection}{\numberline {12.1}Logros Alcanzados}{31}{subsection.12.1}%
+\contentsline {subsection}{\numberline {12.2}Áreas de Mejora Críticas}{32}{subsection.12.2}%
+\contentsline {subsection}{\numberline {12.3}Recomendaciones Técnicas}{32}{subsection.12.3}%
+\contentsline {subsubsection}{\numberline {12.3.1}Inmediatas (Sprint 3):}{32}{subsubsection.12.3.1}%
+\contentsline {subsubsection}{\numberline {12.3.2}Mediano Plazo:}{32}{subsubsection.12.3.2}%
+\contentsline {subsubsection}{\numberline {12.3.3}Largo Plazo:}{32}{subsubsection.12.3.3}%
+\contentsline {subsection}{\numberline {12.4}Evaluación General}{33}{subsection.12.4}%
+\contentsline {subsection}{\numberline {12.5}Conclusión Final}{33}{subsection.12.5}%
+\contentsline {section}{\numberline {A}Anexos}{34}{appendix.Alph1}%
+\contentsline {subsection}{\numberline {A.1}Anexo A: Configuración de Cypress}{34}{subsection.Alph1.1}%
+\contentsline {subsection}{\numberline {A.2}Anexo B: Comandos Personalizados Cypress Ejecutados}{34}{subsection.Alph1.2}%
+\contentsline {subsection}{\numberline {A.3}Anexo C: Configuración de Jest para Backend}{35}{subsection.Alph1.3}%
+\contentsline {subsection}{\numberline {A.4}Anexo D: Reporte de SonarQube (Extracto)}{35}{subsection.Alph1.4}%
+\contentsline {subsection}{\numberline {A.5}Anexo E: Pruebas E2E Ejecutadas - Evidencia}{36}{subsection.Alph1.5}%
+\contentsline {subsection}{\numberline {A.6}Anexo F: Issues de SonarQube - Ejemplos}{37}{subsection.Alph1.6}%

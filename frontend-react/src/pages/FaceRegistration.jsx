@@ -184,7 +184,35 @@ export default function FaceRegistration() {
         }, 2000)
       }
     } catch (err) {
-      // Si es un registro nuevo y falla, eliminar el usuario de la base de datos
+      console.error('Error en registro facial:', err)
+      
+      // Verificar si es un error de rostro duplicado
+      const errorMessage = err.response?.data?.detail || err.response?.data?.message || ''
+      const isDuplicateFace = errorMessage.includes('ya está registrado en el sistema') || 
+                              errorMessage.includes('Usuario existente')
+      
+      if (isDuplicateFace) {
+        // ERROR DE ROSTRO DUPLICADO: NO eliminar usuario, mostrar mensaje específico
+        setError(`⚠️ Rostro Duplicado\n\n${errorMessage}\n\nPor favor, utiliza un rostro diferente o inicia sesión con tu cuenta existente.`)
+        setStep('preview')
+        setLoading(false)
+        
+        // Si es registro nuevo, eliminar el usuario porque no puede completar el registro
+        if (isNewRegistration && userData?._id && authToken) {
+          try {
+            await api.delete(`/api/users/${userData._id}`, {
+              headers: {
+                'Authorization': `Bearer ${authToken}`
+              }
+            })
+          } catch (deleteErr) {
+            console.error('Error al eliminar usuario duplicado:', deleteErr)
+          }
+        }
+        return
+      }
+      
+      // Si es un registro nuevo y falla CON OTRO ERROR, eliminar el usuario de la base de datos
       if (isNewRegistration && userData?._id && authToken) {
         try {
           await api.delete(`/api/users/${userData._id}`, {

@@ -1,0 +1,1808 @@
+\documentclass[12pt,a4paper]{article}
+
+% Paquetes necesarios
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{newunicodechar}
+\newunicodechar{⚠}{\textwarning} % or replace with a suitable LaTeX symbol
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{pdflscape}
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+
+% Configuración de márgenes
+\geometry{top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm}
+\setlength{\headheight}{14pt}
+
+% Configuración de encabezados y pies de página
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Diseño de Pruebas - TravelBrain}
+\fancyhead[R]{\small ESPE 2026}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Configuración de hipervínculos
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    citecolor=blue,
+    pdftitle={Diseño de Pruebas - TravelBrain},
+    pdfauthor={Cáceres Germán, Anthony Villareal},
+}
+
+% Configuración de colores para código
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Definir lenguaje JavaScript para listings
+\lstdefinelanguage{JavaScript}{
+keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, const, let, async, await, class, extends, export, import, require},
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={class, export, boolean, throw, implements, import, this},
+ndkeywordstyle=\color{darkgray}\bfseries,
+identifierstyle=\color{black},
+sensitive=false,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{codegreen}\ttfamily,
+stringstyle=\color{codepurple}\ttfamily,
+morestring=[b]",
+morestring=[b]'
+}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    literate=
+        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+        {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+}
+
+\lstset{style=mystyle}
+
+% Archivo de bibliografía
+\addbibresource{referencias.bib}
+
+% Símbolos para estados (usando LaTeX seguro)
+\newcommand{\estadook}{\textcolor{green}{$\checkmark$}}
+\newcommand{\estadowarning}{\textcolor{orange}{\textbf{!}}}
+\newcommand{\estadopending}{\textcolor{blue}{\textbf{...}}}
+\newcommand{\estadofailed}{\textcolor{red}{\textbf{X}}}
+
+\begin{document}
+
+% ============================================================
+% PORTADA
+% ============================================================
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    
+    {\Large \textbf{UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE}} \\[0.5cm]
+    {\large Departamento de Ciencias de la Computación} \\[1.5cm]
+    
+    \includegraphics[width=0.3\textwidth]{img/espe.png} \\[1cm]
+    
+    {\LARGE \textbf{Proyecto Final: Plan de Aseguramiento de la Calidad (SQAP)}} \\[0.5cm]
+    {\Large \textbf{Sistema TravelBrain}} \\[1.cm]
+    
+    {\large \textbf{Informe 2: Diseño de Casos de Prueba y Matrices de Rastreabilidad}} \\[1cm]
+    
+    {\large \textbf{ACTUALIZADO CON RESULTADOS DE EJECUCIÓN}} \\[0.5cm]
+    {\small (Estado al 21 de enero de 2026)} \\[1.5cm]
+    
+    \begin{tabular}{ll}
+        \textbf{Asignatura:} & Desarrollo De software Seguro \\
+        \textbf{NRC:} & 27886 \\
+        \textbf{Estudiantes:} & Cáceres Germán (Scrum Master \& Tech Lead) \\
+                            & Ponce Diego (Development Team) \\
+        \textbf{Docente:} & Ing. Angel Cudco, Mgs. \\
+        \textbf{Fecha:} & 12 de febrero de 2026 \\
+    \end{tabular}
+    
+    \vfill
+    
+    {\large Sangolquí, Ecuador} \\
+    {\large 2026}
+\end{titlepage}
+
+% ============================================================
+% ÍNDICE
+% ============================================================
+\tableofcontents
+\newpage
+
+% ============================================================
+% LISTA DE TABLAS
+% ============================================================
+\listoftables
+\newpage
+
+% ============================================================
+% RESUMEN EJECUTIVO
+% ============================================================
+\section*{Resumen Ejecutivo}
+\addcontentsline{toc}{section}{Resumen Ejecutivo}
+
+El presente documento constituye el \textbf{Diseño Detallado de Casos de Prueba} para el sistema TravelBrain, complementando el Plan Maestro de Pruebas establecido en el Informe 1.
+
+Este informe proporciona especificaciones técnicas completas de los casos de prueba diseñados para cada nivel (unitario, integración, funcional y seguridad), matrices de rastreabilidad que vinculan requisitos con casos de prueba, y scripts automatizados listos para ejecución.
+
+\subsection*{Estado Actual de Ejecución}
+\textbf{Actualización basada en resultados reales obtenidos:}
+
+\begin{itemize}
+    \item \textbf{Pruebas E2E (Cypress):} 9 casos ejecutados exitosamente
+    \item \textbf{Pruebas Unitarias Frontend (Jest + RTL):} 14 componentes y 7 servicios probados
+    \item \estadowarning \textbf{Pruebas Unitarias Backend (Jest):} 10 conjuntos ejecutados con fallos
+    \item \estadowarning \textbf{Pruebas Business Rules:} 5 conjuntos ejecutados con fallos
+    \item \estadopending \textbf{Pruebas de Seguridad (OWASP ZAP):} Pendientes de ejecución
+\end{itemize}
+
+\subsection*{Métricas Clave Actuales:}
+\begin{itemize}
+    \item \textbf{Cobertura Total:} 15.3\% (SonarQube)
+    \item \textbf{Issues Abiertos:} 381 (1 Seguridad, 94 Confiabilidad, 286 Mantenibilidad)
+    \item \textbf{Tasa de Éxito Pruebas:} 34.5\% de 87 casos diseñados
+    \item \textbf{Pruebas E2E Completadas:} 9/16 casos diseñados
+\end{itemize}
+
+\subsection*{Total de Casos Diseñados:} 
+87 casos de prueba distribuidos en 4 niveles.
+
+\subsection*{Próximos Pasos Críticos:}
+\begin{enumerate}
+    \item Corregir pruebas unitarias fallidas en backend
+    \item Mejorar cobertura de código al menos al 70\%
+    \item Ejecutar pruebas de integración y seguridad
+    \item Resolver issues de confiabilidad (94 abiertos)
+\end{enumerate}
+
+\textbf{Palabras clave:} Casos de Prueba, Matriz de Rastreabilidad, Test Design, Cypress, Jest, Postman, OWASP ZAP, Ejecución Real, SonarQube.
+
+\newpage
+
+% ============================================================
+% 1. INTRODUCCIÓN
+% ============================================================
+\section{Introducción}
+
+\subsection{Propósito del Documento}
+
+Este documento detalla el diseño completo de casos de prueba para el sistema TravelBrain, proporcionando especificaciones técnicas que servirán como guía durante la fase de ejecución del Sprint de Calidad.
+
+\subsection{Alcance del Diseño}
+
+El diseño cubre los siguientes niveles de prueba:
+
+\begin{enumerate}
+    \item \textbf{Pruebas Unitarias:} Componentes individuales (Frontend + Backend)
+    \item \textbf{Pruebas de Integración:} APIs RESTful y comunicación entre servicios
+    \item \textbf{Pruebas Funcionales E2E:} Flujos completos de usuario
+    \item \textbf{Pruebas de Seguridad:} Vulnerabilidades OWASP Top 10
+\end{enumerate}
+
+\subsection{Referencias}
+
+Este documento se basa en:
+
+\begin{itemize}
+    \item \textbf{Informe 1:} Plan Maestro de Pruebas (SQAP)
+    \item \textbf{ARCHITECTURE.md:} Documentación técnica del sistema
+    \item \textbf{IEEE 829:} Estándar para documentación de pruebas \cite{ieee829}
+    \item \textbf{ISO/IEC/IEEE 29119:} Estándar de pruebas de software \cite{iso29119}
+    \item \textbf{Resultados reales de ejecución:} Evidencias de Cypress, Jest y SonarQube
+\end{itemize}
+
+\subsection{Estado Actual de Ejecución}
+
+Basado en las evidencias obtenidas, se presenta el siguiente estado de ejecución:
+
+\begin{table}[H]
+\centering
+\caption{Resumen del Estado de Ejecución}
+\label{tab:estado_resumen}
+\begin{tabular}{|l|c|c|p{4cm}|}
+\hline
+\textbf{Tipo de Prueba} & \textbf{Diseñados} & \textbf{Ejecutados} & \textbf{Estado} \\ \hline
+Unitarias (Frontend) & 15 & 21+ &  Completado \\ \hline
+Unitarias (Backend) & 18 & 10+ & \estadowarning Con fallos \\ \hline
+Pruebas E2E & 16 & 9 &  Completado \\ \hline
+Integración & 28 & 0 & \estadopending Pendiente \\ \hline
+Seguridad & 10 & 0 & \estadopending Pendiente \\ \hline
+\textbf{TOTAL} & \textbf{87} & \textbf{40+} & \textbf{34.5\% completado} \\ \hline
+\end{tabular}
+\end{table}
+
+% ============================================================
+% 2. REQUISITOS FUNCIONALES
+% ============================================================
+\section{Requisitos Funcionales del Sistema}
+
+\subsection{Módulo de Autenticación}
+
+\begin{table}[H]
+\centering
+\caption{Requisitos Funcionales - Autenticación}
+\label{tab:req_autenticacion}
+\small
+\begin{tabularx}{\textwidth}{|l|X|c|}
+\hline
+\textbf{ID} & \textbf{Requisito} & \textbf{Prioridad} \\ \hline
+RF-AUTH-01 & El sistema debe permitir registro de usuarios con email, username y password & Alta \\ \hline
+RF-AUTH-02 & El sistema debe validar formato de email (RFC 5322) & Alta \\ \hline
+RF-AUTH-03 & El sistema debe requerir contraseñas con mínimo 8 caracteres & Alta \\ \hline
+RF-AUTH-04 & El sistema debe hashear contraseñas con bcrypt antes de almacenar & Alta \\ \hline
+RF-AUTH-05 & El sistema debe permitir login con email y password & Alta \\ \hline
+RF-AUTH-06 & El sistema debe generar token JWT con expiración de 24h tras login exitoso & Alta \\ \hline
+RF-AUTH-07 & El sistema debe rechazar credenciales inválidas con mensaje apropiado & Alta \\ \hline
+RF-AUTH-08 & El sistema debe permitir logout y invalidar token JWT & Media \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Módulo de Autenticación Biométrica}
+
+\begin{table}[H]
+\centering
+\caption{Requisitos Funcionales - Biometría}
+\label{tab:req_biometria}
+\small
+\begin{tabularx}{\textwidth}{|l|X|c|}
+\hline
+\textbf{ID} & \textbf{Requisito} & \textbf{Prioridad} \\ \hline
+RF-BIO-01 & El sistema debe permitir registro de datos biométricos faciales & Alta \\ \hline
+RF-BIO-02 & El sistema debe generar challenge token temporal (TTL 2 min) para verificación & Alta \\ \hline
+RF-BIO-03 & El sistema debe extraer encoding 128D mediante microservicio facial & Alta \\ \hline
+RF-BIO-04 & El sistema debe cifrar encodings con AES-256-CBC antes de almacenar & Alta \\ \hline
+RF-BIO-05 & El sistema debe validar liveness score >= 0.6 & Alta \\ \hline
+RF-BIO-06 & El sistema debe validar quality score >= 0.6 & Alta \\ \hline
+RF-BIO-07 & El sistema debe comparar encodings con threshold 0.6 para autenticación & Alta \\ \hline
+RF-BIO-08 & El sistema debe registrar auditoría de intentos biométricos & Media \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Módulo de Gestión de Viajes}
+
+\begin{table}[H]
+\centering
+\caption{Requisitos Funcionales - Viajes}
+\label{tab:req_viajes}
+\small
+\begin{tabularx}{\textwidth}{|l|X|c|}
+\hline
+\textbf{ID} & \textbf{Requisito} & \textbf{Prioridad} \\ \hline
+RF-TRIP-01 & El sistema debe permitir crear viajes con título, destino, fechas y presupuesto & Alta \\ \hline
+RF-TRIP-02 & El sistema debe validar que startDate < endDate & Alta \\ \hline
+RF-TRIP-03 & El sistema debe permitir listar viajes del usuario autenticado & Alta \\ \hline
+RF-TRIP-04 & El sistema debe permitir actualizar datos de un viaje propio & Media \\ \hline
+RF-TRIP-05 & El sistema debe permitir eliminar un viaje propio & Media \\ \hline
+RF-TRIP-06 & El sistema debe impedir acceso a viajes de otros usuarios (IDOR protection) & Alta \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Módulo de Clima}
+
+\begin{table}[H]
+\centering
+\caption{Requisitos Funcionales - Clima}
+\label{tab:req_clima}
+\small
+\begin{tabularx}{\textwidth}{|l|X|c|}
+\hline
+\textbf{ID} & \textbf{Requisito} & \textbf{Prioridad} \\ \hline
+RF-WEAT-01 & El sistema debe buscar clima actual mediante OpenWeather API & Media \\ \hline
+RF-WEAT-02 & El sistema debe almacenar historial de búsquedas de clima & Media \\ \hline
+RF-WEAT-03 & El sistema debe mostrar temperatura, condiciones e ícono & Media \\ \hline
+RF-WEAT-04 & El sistema debe permitir listar historial de búsquedas & Baja \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Módulo de Administración}
+
+\begin{table}[H]
+\centering
+\caption{Requisitos Funcionales - Admin}
+\label{tab:req_admin}
+\small
+\begin{tabularx}{\textwidth}{|l|X|c|}
+\hline
+\textbf{ID} & \textbf{Requisito} & \textbf{Prioridad} \\ \hline
+RF-ADM-01 & El sistema debe permitir a ADMIN listar todos los usuarios & Alta \\ \hline
+RF-ADM-02 & El sistema debe permitir a ADMIN cambiar roles de usuarios & Alta \\ \hline
+RF-ADM-03 & El sistema debe impedir a usuarios regulares acceder a rutas admin & Alta \\ \hline
+\end{tabularx}
+\end{table}
+
+% ============================================================
+% 3. MATRIZ DE RASTREABILIDAD
+% ============================================================
+\section{Matriz de Rastreabilidad: Requisitos vs Casos de Prueba}
+
+\begin{landscape}
+\begin{longtable}{|l|l|p{6cm}|l|l|l|}
+\caption{Matriz de Rastreabilidad - Requisitos vs Casos de Prueba} \label{tab:rastreabilidad} \\
+\hline
+\textbf{ID Req.} & \textbf{ID Caso} & \textbf{Nombre del Caso de Prueba} & \textbf{Nivel} & \textbf{Herramienta} & \textbf{Estado Ejecución} \\ \hline
+\endfirsthead
+
+\multicolumn{6}{c}{\tablename\ \thetable\ -- Continuación} \\
+\hline
+\textbf{ID Req.} & \textbf{ID Caso} & \textbf{Nombre del Caso de Prueba} & \textbf{Nivel} & \textbf{Herramienta} & \textbf{Estado Ejecución} \\ \hline
+\endhead
+
+\hline \multicolumn{6}{r}{Continúa en la siguiente página...} \\
+\endfoot
+
+\hline
+\endlastfoot
+
+% AUTENTICACIÓN
+RF-AUTH-01 & TC-AUTH-001 & Registro exitoso con datos válidos & E2E & Cypress & \estadopending \\ \hline
+RF-AUTH-01 & TC-AUTH-002 & Registro falla con email duplicado & E2E & Cypress & \estadopending \\ \hline
+RF-AUTH-02 & TC-AUTH-003 & Registro rechaza email inválido & Integración & Postman & \estadopending \\ \hline
+RF-AUTH-03 & TC-AUTH-004 & Registro rechaza password corto & Integración & Postman & \estadopending \\ \hline
+RF-AUTH-04 & TC-AUTH-U01 & bcrypt hashea contraseñas correctamente & Unitaria & Jest & \estadowarning \\ \hline
+RF-AUTH-05 & TC-AUTH-005 & Login exitoso con credenciales válidas & E2E & Cypress & \\ \hline
+RF-AUTH-06 & TC-AUTH-U02 & JWT generado contiene userId y expira en 24h & Unitaria & Jest & \estadowarning \\ \hline
+RF-AUTH-07 & TC-AUTH-006 & Login fallido con credenciales inválidas & E2E & Cypress & \\ \hline
+RF-AUTH-08 & TC-AUTH-007 & Logout exitoso elimina token del cliente & E2E & Cypress & \estadopending \\ \hline
+
+% BIOMETRÍA
+RF-BIO-01 & TC-BIO-001 & Registro biométrico exitoso con imagen válida & E2E & Cypress & \estadopending \\ \hline
+RF-BIO-02 & TC-BIO-002 & Challenge token generado expira en 2 minutos & Integración & Postman & \estadopending \\ \hline
+RF-BIO-03 & TC-BIO-003 & Microservicio extrae encoding 128D correctamente & Integración & Postman & \estadopending \\ \hline
+RF-BIO-04 & TC-BIO-U01 & Encoding cifrado con AES-256 puede descifrarse & Unitaria & Jest & \estadowarning \\ \hline
+RF-BIO-05 & TC-BIO-004 & Verificación rechaza imagen con liveness bajo & Integración & Postman & \estadopending \\ \hline
+RF-BIO-06 & TC-BIO-005 & Verificación rechaza imagen de baja calidad & Integración & Postman & \estadopending \\ \hline
+RF-BIO-07 & TC-BIO-006 & Login biométrico exitoso con rostro registrado & E2E & Cypress & \estadopending \\ \hline
+RF-BIO-08 & TC-BIO-U02 & Auditoría registra timestamp e IP del intento & Unitaria & Jest & \estadowarning \\ \hline
+
+% VIAJES
+RF-TRIP-01 & TC-TRIP-001 & Crear viaje exitosamente con datos completos & E2E & Cypress &  \\ \hline
+RF-TRIP-02 & TC-TRIP-002 & Creación rechaza startDate posterior a endDate & Integración & Postman & \estadopending \\ \hline
+RF-TRIP-03 & TC-TRIP-003 & Listar viajes retorna solo viajes propios & Integración & Postman & \estadopending \\ \hline
+RF-TRIP-04 & TC-TRIP-004 & Actualizar viaje propio exitosamente & E2E & Cypress & \estadopending \\ \hline
+RF-TRIP-05 & TC-TRIP-005 & Eliminar viaje propio exitosamente & E2E & Cypress & \estadopending \\ \hline
+RF-TRIP-06 & TC-TRIP-006 & Acceso a viaje ajeno retorna 403 Forbidden & Integración & Postman & \estadopending \\ \hline
+RF-TRIP-06 & TC-SEC-001 & Prevención de IDOR en endpoint /trips/:id & Seguridad & OWASP ZAP & \estadopending \\ \hline
+
+% CLIMA
+RF-WEAT-01 & TC-WEAT-001 & Búsqueda de clima retorna datos válidos & Integración & Postman & \estadopending \\ \hline
+RF-WEAT-02 & TC-WEAT-002 & Búsqueda almacena registro en BD & Unitaria & Jest & \estadowarning \\ \hline
+RF-WEAT-03 & TC-WEAT-003 & Respuesta incluye temp, description e icon & Integración & Postman & \estadopending \\ \hline
+RF-WEAT-04 & TC-WEAT-004 & Listar historial retorna búsquedas ordenadas & E2E & Cypress & \estadopending \\ \hline
+
+% ADMINISTRACIÓN
+RF-ADM-01 & TC-ADM-001 & Admin lista todos los usuarios & Integración & Postman & \estadopending \\ \hline
+RF-ADM-02 & TC-ADM-002 & Admin cambia rol de usuario exitosamente & Integración & Postman & \estadopending \\ \hline
+RF-ADM-03 & TC-ADM-003 & Usuario regular no accede a /api/users & Integración & Postman & \estadopending \\ \hline
+RF-ADM-03 & TC-SEC-002 & Protección de rutas admin sin bypass & Seguridad & OWASP ZAP & \estadopending \\ \hline
+
+% SEGURIDAD GENERAL
+- & TC-SEC-003 & Detección de vulnerabilidades XSS en formularios & Seguridad & OWASP ZAP & \estadopending \\ \hline
+- & TC-SEC-004 & Detección de SQL Injection en parámetros & Seguridad & OWASP ZAP & \estadopending \\ \hline
+- & TC-SEC-005 & Headers de seguridad presentes (CSP, HSTS) & Seguridad & OWASP ZAP & \estadopending \\ \hline
+- & TC-SEC-006 & Sin exposición de información sensible en errores & Seguridad & OWASP ZAP & \estadopending \\ \hline
+- & TC-SEC-007 & JWT no puede ser manipulado sin invalidar firma & Seguridad & Manual & \estadopending \\ \hline
+
+% PRUEBAS REALMENTE EJECUTADAS (adicionales)
+- & TC-LAND-001 & Carga la página principal & E2E & Cypress &  \\ \hline
+- & TC-NAV-001 & Navegar al dashboard después del login & E2E & Cypress &  \\ \hline
+- & TC-NAV-002 & Acceder a la página de destinos & E2E & Cypress & \\ \hline
+- & TC-NAV-003 & Acceder a la página del clima & E2E & Cypress & \\ \hline
+- & TC-NAV-004 & Acceder a la página de perfil & E2E & Cypress & \\ \hline
+- & TC-SEC-002A & Verificar protección de rutas sin autenticación & E2E & Cypress & \\ \hline
+
+\end{longtable}
+\end{landscape}
+
+% ============================================================
+% 4. DISEÑO DE CASOS DE PRUEBA UNITARIAS
+% ============================================================
+\section{Diseño de Casos de Prueba Unitarias}
+
+\subsection{Casos de Prueba Unitaria - Backend (Jest)}
+
+\subsubsection{TC-AUTH-U01: Hashing de Contraseñas con bcrypt}
+
+\begin{table}[H]
+\centering
+\caption{TC-AUTH-U01: Hashing de Contraseñas}
+\label{tab:tc_auth_u01}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-AUTH-U01 \\ \hline
+\textbf{Nombre} & Verificar hashing correcto de contraseñas con bcrypt \\ \hline
+\textbf{Módulo} & authController.js - register() \\ \hline
+\textbf{Prioridad} & Alta \\ \hline
+\textbf{Precondiciones} & Módulo bcrypt importado. Función register() disponible. \\ \hline
+\textbf{Datos de Entrada} & password: "Test123!" \\ \hline
+\textbf{Pasos} & 
+1. Mock de User.findOne() retornando null\newline
+2. Mock de bcrypt.hash() retornando hash predeterminado\newline
+3. Llamar a register() con datos de prueba\newline
+4. Verificar que bcrypt.hash fue llamado con password \\ \hline
+\textbf{Resultado Esperado} & 
+1. bcrypt.hash() llamado exactamente 1 vez\newline
+2. Password no almacenado en texto plano\newline
+3. Hash almacenado en BD es string de 60 caracteres \\ \hline
+\textbf{Resultado Obtenido} & \estadowarning \textbf{No ejecutado exitosamente} - Suite de pruebas fallida \\ \hline
+\textbf{Estado} & Fallido - Requiere corrección \\ \hline
+\end{tabularx}
+\end{table}
+
+\textbf{Script de Prueba:}
+
+\begin{lstlisting}[language=JavaScript, caption={TC-AUTH-U01: Jest Script}]
+const { register } = require("../src/controllers/authController");
+const User = require("../src/models/User");
+const bcrypt = require("bcrypt");
+
+jest.mock("../src/models/User");
+jest.mock("bcrypt");
+
+describe("TC-AUTH-U01: Password Hashing with bcrypt", () => {
+let req, res;
+
+beforeEach(() => {
+    req = {
+    body: {
+        email: "test@mail.com",
+        password: "Test123!",
+        username: "testuser"
+    }
+    };
+    res = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn()
+    };
+});
+
+afterEach(() => {
+    jest.clearAllMocks();
+});
+
+it("should hash password with bcrypt before storing", async () => {
+    // Arrange
+    const hashedPassword = "$2b$10$abcdefghijklmnopqrstuvwxyz123456";
+    User.findOne.mockResolvedValue(null);
+    bcrypt.hash.mockResolvedValue(hashedPassword);
+    User.prototype.save = jest.fn().mockResolvedValue({
+    _id: "123",
+    email: "test@mail.com",
+    password: hashedPassword
+    });
+
+    // Act
+    await register(req, res);
+
+    // Assert
+    expect(bcrypt.hash).toHaveBeenCalledTimes(1);
+    expect(bcrypt.hash).toHaveBeenCalledWith("Test123!", 10);
+    expect(User.prototype.save).toHaveBeenCalled();
+    const savedUser = await User.prototype.save.mock.results[0].value;
+    expect(savedUser.password).toBe(hashedPassword);
+    expect(savedUser.password).toHaveLength(60);
+});
+
+it("should not store password in plain text", async () => {
+    User.findOne.mockResolvedValue(null);
+    bcrypt.hash.mockResolvedValue("hashedPassword");
+    User.prototype.save = jest.fn().mockResolvedValue({
+    password: "hashedPassword"
+    });
+
+    await register(req, res);
+
+    const savedUser = await User.prototype.save.mock.results[0].value;
+    expect(savedUser.password).not.toBe("Test123!");
+});
+});
+\end{lstlisting}
+
+\subsubsection{TC-AUTH-U02: Generación y Expiración de JWT}
+
+\begin{table}[H]
+\centering
+\caption{TC-AUTH-U02: Generación de JWT}
+\label{tab:tc_auth_u02}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-AUTH-U02 \\ \hline
+\textbf{Nombre} & Verificar generación correcta de JWT con userId y expiración 24h \\ \hline
+\textbf{Módulo} & authController.js - login() \\ \hline
+\textbf{Prioridad} & Alta \\ \hline
+\textbf{Precondiciones} & Módulo jsonwebtoken importado. JWT\_SECRET configurado. \\ \hline
+\textbf{Datos de Entrada} & userId: "507f1f77bcf86cd799439011" \\ \hline
+\textbf{Pasos} & 
+1. Mock de User.findOne() retornando usuario válido\newline
+2. Mock de bcrypt.compare() retornando true\newline
+3. Llamar a login() con credenciales válidas\newline
+4. Decodificar JWT retornado\newline
+5. Verificar payload y expiración \\ \hline
+\textbf{Resultado Esperado} & 
+1. JWT contiene userId en payload\newline
+2. exp (expiration) = iat + 24 horas (86400 seg)\newline
+3. JWT firma válida con JWT\_SECRET \\ \hline
+\textbf{Resultado Obtenido} & \estadowarning \textbf{No ejecutado exitosamente} - Parte de suite fallida \\ \hline
+\textbf{Estado} & Fallido - Requiere corrección \\ \hline
+\end{tabularx}
+\end{table}
+
+\textbf{Script de Prueba:}
+
+\begin{lstlisting}[language=JavaScript, caption={TC-AUTH-U02: Jest Script}]
+const { login } = require("../src/controllers/authController");
+const User = require("../src/models/User");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+jest.mock("../src/models/User");
+jest.mock("bcrypt");
+
+describe("TC-AUTH-U02: JWT Generation and Expiration", () => {
+const JWT_SECRET = "test-secret-key";
+process.env.JWT_SECRET = JWT_SECRET;
+
+let req, res;
+
+beforeEach(() => {
+    req = {
+    body: {
+        email: "test@mail.com",
+        password: "Test123!"
+    }
+    };
+    res = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn()
+    };
+});
+
+it("should generate JWT with userId and 24h expiration", async () => {
+    // Arrange
+    const mockUser = {
+    _id: "507f1f77bcf86cd799439011",
+    email: "test@mail.com",
+    password: "hashedPassword",
+    username: "testuser"
+    };
+    User.findOne.mockResolvedValue(mockUser);
+    bcrypt.compare.mockResolvedValue(true);
+
+    // Act
+    await login(req, res);
+
+    // Assert
+    expect(res.status).toHaveBeenCalledWith(200);
+    const response = res.json.mock.calls[0][0];
+    const token = response.data.token;
+
+    // Decode JWT
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    expect(decoded.userId).toBe(mockUser._id);
+    
+    // Verify 24h expiration (86400 seconds)
+    const expirationTime = decoded.exp - decoded.iat;
+    expect(expirationTime).toBe(86400);
+});
+
+it("should sign JWT with JWT_SECRET", async () => {
+    const mockUser = {
+    _id: "123",
+    email: "test@mail.com",
+    password: "hashedPassword"
+    };
+    User.findOne.mockResolvedValue(mockUser);
+    bcrypt.compare.mockResolvedValue(true);
+
+    await login(req, res);
+
+    const response = res.json.mock.calls[0][0];
+    const token = response.data.token;
+
+    // Should not throw error
+    expect(() => {
+    jwt.verify(token, JWT_SECRET);
+    }).not.toThrow();
+
+    // Should throw with wrong secret
+    expect(() => {
+    jwt.verify(token, "wrong-secret");
+    }).toThrow();
+});
+});
+\end{lstlisting}
+
+\subsection{Casos de Prueba Unitaria - Frontend (Jest + RTL)}
+
+\subsubsection{TC-FE-U01: Componente BiometricLogin Renderiza Correctamente}
+
+\begin{table}[H]
+\centering
+\caption{TC-FE-U01: Renderizado de BiometricLogin}
+\label{tab:tc_fe_u01}
+\begin{tabular}{|l|p{\dimexpr\textwidth-3cm}|}
+\hline
+\textbf{ID} & TC-FE-U01 \\ \hline
+\textbf{Nombre} & Verificar renderizado correcto de BiometricLogin component \\ \hline
+\textbf{Componente} & BiometricLoginAdvanced.jsx \\ \hline
+\textbf{Prioridad} & Media \\ \hline
+\textbf{Precondiciones} & React Testing Library configurado. face-api.js mockeado. \\ \hline
+\textbf{Pasos} & 
+1. Renderizar componente BiometricLoginAdvanced\newline
+2. Buscar elementos clave del DOM\newline
+3. Verificar visibilidad de botones \\ \hline
+\textbf{Resultado Esperado} & 
+1. Input de email visible\newline
+2. Botón "Start Face Detection" visible\newline
+3. Canvas de video presente en DOM \\ \hline
+\textbf{Resultado Obtenido} & \textbf{Ejecutado exitosamente} - Parte de pruebas frontend completadas \\ \hline
+\textbf{Estado} & Completado \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{Script de Prueba:}
+
+\begin{lstlisting}[language=JavaScript, caption={TC-FE-U01: RTL Script}]
+import { render, screen } from "@testing-library/react";
+import { BrowserRouter } from "react-router-dom";
+import BiometricLoginAdvanced from "../src/components/BiometricLoginAdvanced";
+
+// Mock face-api.js
+jest.mock("face-api.js", () => ({
+nets: {
+    tinyFaceDetector: { loadFromUri: jest.fn() },
+    faceLandmark68Net: { loadFromUri: jest.fn() },
+    faceExpressionNet: { loadFromUri: jest.fn() }
+},
+detectSingleFace: jest.fn(),
+TinyFaceDetectorOptions: jest.fn()
+}));
+
+describe("TC-FE-U01: BiometricLogin Component Rendering", () => {
+it("should render email input field", () => {
+    render(
+    <BrowserRouter>
+        <BiometricLoginAdvanced />
+    </BrowserRouter>
+    );
+
+    const emailInput = screen.getByLabelText(/email/i);
+    expect(emailInput).toBeInTheDocument();
+    expect(emailInput).toHaveAttribute("type", "email");
+});
+
+it("should render start detection button", () => {
+    render(
+    <BrowserRouter>
+        <BiometricLoginAdvanced />
+    </BrowserRouter>
+    );
+
+    const startButton = screen.getByText(/start face detection/i);
+    expect(startButton).toBeInTheDocument();
+    expect(startButton).toBeEnabled();
+});
+
+it("should render video canvas element", () => {
+    const { container } = render(
+    <BrowserRouter>
+        <BiometricLoginAdvanced />
+    </BrowserRouter>
+    );
+
+    const canvas = container.querySelector("canvas");
+    expect(canvas).toBeInTheDocument();
+});
+});
+\end{lstlisting}
+
+% ============================================================
+% 5. DISEÑO DE CASOS DE PRUEBA DE INTEGRACIÓN
+% ============================================================
+\section{Diseño de Casos de Prueba de Integración}
+
+\subsection{Casos de Prueba de Integración - APIs (Postman)}
+
+\subsubsection{TC-AUTH-003: Validación de Email Inválido}
+
+\begin{table}[H]
+\centering
+\caption{TC-AUTH-003: Email Inválido}
+\label{tab:tc_auth_003}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-AUTH-003 \\ \hline
+\textbf{Nombre} & Registro rechaza email con formato inválido \\ \hline
+\textbf{Endpoint} & POST /api/auth/register \\ \hline
+\textbf{Prioridad} & Alta \\ \hline
+\textbf{Precondiciones} & Backend desplegado en http://localhost:4000. Base de datos accesible. \\ \hline
+\textbf{Headers} & Content-Type: application/json \\ \hline
+\textbf{Body (JSON)} & 
+\{\newline
+"email": "invalid-email-format",\newline
+"password": "Test123!",\newline
+"username": "testuser"\newline
+\} \\ \hline
+\textbf{Resultado Esperado} & 
+1. Status Code: 400 Bad Request\newline
+2. Response: \{"success": false, "message": "Invalid email format"\}\newline
+3. No se crea usuario en BD \\ \hline
+\textbf{Test Script (Postman)} & 
+pm.test("Status is 400", () => \{\newline
+pm.response.to.have.status(400);\newline
+\});\newline
+\newline
+pm.test("Error message present", () => \{\newline
+const json = pm.response.json();\newline
+pm.expect(json.success).to.be.false;\newline
+pm.expect(json.message).to.include("email");\newline
+\}); \\ \hline
+\textbf{Resultado Obtenido} & \estadopending \textbf{Pendiente de ejecución} \\ \hline
+\textbf{Estado} & No Ejecutado \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{TC-BIO-003: Extracción de Encoding 128D}
+
+\begin{table}[H]
+\centering
+\caption{TC-BIO-003: Extracción de Encoding}
+\label{tab:tc_bio_003}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-BIO-003 \\ \hline
+\textbf{Nombre} & Microservicio extrae encoding 128D correctamente de imagen facial \\ \hline
+\textbf{Endpoint} & POST http://localhost:8001/extract-features (Interno) \\ \hline
+\textbf{Prioridad} & Alta \\ \hline
+\textbf{Precondiciones} & 
+Facial service desplegado. Backend tiene acceso a red interna. INTERNAL\_SERVICE\_TOKEN configurado. \\ \hline
+\textbf{Headers} & X-Internal-Token: \{\{internal\_service\_token\}\} \\ \hline
+\textbf{Body (multipart)} & face: [archivo face.jpg válido] \\ \hline
+\textbf{Resultado Esperado} & 
+1. Status Code: 200 OK\newline
+2. Response contiene encoding: array de 128 floats\newline
+3. liveness score: 0.0-1.0\newline
+4. quality score: 0.0-1.0\newline
+5. confidence: 0.0-1.0 \\ \hline
+\textbf{Test Script} & 
+pm.test("Status is 200", () => \{\newline
+pm.response.to.have.status(200);\newline
+\});\newline
+\newline
+pm.test("Encoding is 128D array", () => \{\newline
+const json = pm.response.json();\newline
+pm.expect(json.encoding).to.be.an("array");\newline
+pm.expect(json.encoding).to.have.lengthOf(128);\newline
+\});\newline
+\newline
+pm.test("Liveness score present", () => \{\newline
+const json = pm.response.json();\newline
+pm.expect(json.liveness\_score).to.be.a("number");\newline
+pm.expect(json.liveness\_score).to.be.within(0, 1);\newline
+\}); \\ \hline
+\textbf{Resultado Obtenido} & \estadopending \textbf{Pendiente de ejecución} \\ \hline
+\textbf{Estado} & No Ejecutado \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{TC-TRIP-006: Protección IDOR en Viajes}
+
+\begin{table}[H]
+\centering
+\caption{TC-TRIP-006: Protección IDOR}
+\label{tab:tc_trip_006}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-TRIP-006 \\ \hline
+\textbf{Nombre} & Usuario no puede acceder a viajes de otros usuarios (IDOR prevention) \\ \hline
+\textbf{Endpoint} & GET /trips/:tripId \\ \hline
+\textbf{Prioridad} & Alta \\ \hline
+\textbf{Precondiciones} & 
+Usuario A autenticado (JWT token en variable). Usuario B tiene viaje con \_id conocido. \\ \hline
+\textbf{Headers} & Authorization: Bearer \{\{jwt\_token\_userA\}\} \\ \hline
+\textbf{URL} & GET http://localhost:4000/trips/\{\{trip\_id\_userB\}\} \\ \hline
+\textbf{Resultado Esperado} & 
+1. Status Code: 403 Forbidden\newline
+2. Response: \{"success": false, "message": "Access denied"\}\newline
+3. No se retornan datos del viaje ajeno \\ \hline
+\textbf{Test Script} & 
+pm.test("Status is 403", () => \{\newline
+pm.response.to.have.status(403);\newline
+\});\newline
+\newline
+pm.test("Access denied message", () => \{\newline
+const json = pm.response.json();\newline
+pm.expect(json.success).to.be.false;\newline
+pm.expect(json.message).to.include("denied");\newline
+\}); \\ \hline
+\textbf{Resultado Obtenido} & \estadopending \textbf{Pendiente de ejecución} \\ \hline
+\textbf{Estado} & No Ejecutado \\ \hline
+\end{tabularx}
+\end{table}
+
+% ============================================================
+% 6. DISEÑO DE CASOS DE PRUEBA E2E
+% ============================================================
+\section{Diseño de Casos de Prueba End-to-End}
+
+\subsection{Casos de Prueba E2E - Frontend (Cypress)}
+
+\subsubsection{TC-AUTH-005: Login Tradicional Exitoso}
+
+\begin{table}[H]
+\centering
+\caption{TC-AUTH-005: Login Exitoso}
+\label{tab:tc_auth_005}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-AUTH-005 \\ \hline
+\textbf{Nombre} & Login tradicional exitoso con credenciales válidas \\ \hline
+\textbf{Flujo} & Autenticación \\ \hline
+\textbf{Prioridad} & Alta \\ \hline
+\textbf{Precondiciones} & 
+Usuario registrado: test@test.com / admin1234. Frontend accesible en http://localhost:3001. Backend funcional. \\ \hline
+\textbf{Pasos} & 
+1. Navegar a http://travelbrain.ddns.net/login\newline
+2. Ingresar email: test@test.com\newline
+3. Ingresar password: admin1234\newline
+4. Hacer clic en botón "Sign in"\newline
+5. Esperar redirección \\ \hline
+\textbf{Resultado Esperado} & 
+1. Redirección a /dashboard\newline
+2. Mensaje de bienvenida visible\newline
+3. Token JWT almacenado en localStorage\newline
+4. Navbar muestra nombre del usuario \\ \hline
+\textbf{Resultado Obtenido} & \estadook \textbf{Ejecutado exitosamente} \\ \hline
+\textbf{Estado} & Completado \\ \hline
+\end{tabularx}
+\end{table}
+
+\textbf{Script Cypress Ejecutado:}
+
+\begin{lstlisting}[language=JavaScript, caption={TC-AUTH-005: Cypress Script Ejecutado}]
+describe('Login de usuario', () => {
+  it('Login exitoso con credenciales válidas', () => {
+    cy.visit('https://travelbrain.ddns.net/login')
+    
+    // Ingresar credenciales válidas
+    cy.get('input[name="email"]').type('test@test.com')
+    cy.get('input[type="password"]').type('admin1234')
+    
+    // Hacer clic en el botón de login
+    cy.get('button[type="submit"]').click()
+    
+    // Verificar redirección al dashboard
+    cy.url().should('include', '/dashboard')
+    
+    // Verificar elementos del dashboard
+    cy.contains('Welcome back').should('be.visible')
+    cy.contains('Total Trips').should('be.visible')
+  })
+})
+\end{lstlisting}
+
+\subsubsection{TC-AUTH-006: Login Fallido con Credenciales Inválidas}
+
+\begin{table}[H]
+\centering
+\caption{TC-AUTH-006: Login Fallido}
+\label{tab:tc_auth_006}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-AUTH-006 \\ \hline
+\textbf{Nombre} & Login fallido con credenciales inválidas \\ \hline
+\textbf{Flujo} & Autenticación \\ \hline
+\textbf{Prioridad} & Alta \\ \hline
+\textbf{Precondiciones} & Frontend accesible. Usuario no registrado. \\ \hline
+\textbf{Pasos} & 
+1. Navegar a https://travelbrain.ddns.net/login\newline
+2. Ingresar email: ihopc@gmail.com\newline
+3. Ingresar password: incorrecta123\newline
+4. Hacer clic en botón "Sign in"\newline
+5. Esperar respuesta \\ \hline
+\textbf{Resultado Esperado} & 
+1. Permanece en página /login\newline
+2. Mensaje de error visible\newline
+3. No se redirige al dashboard\newline
+4. Token no almacenado \\ \hline
+\textbf{Resultado Obtenido} & \estadook \textbf{Ejecutado exitosamente} - Mensaje "Login failed. Please try again." \\ \hline
+\textbf{Estado} & Completado \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{TC-TRIP-001: Crear Viaje Exitosamente}
+
+\begin{table}[H]
+\centering
+\caption{TC-TRIP-001: Crear Viaje}
+\label{tab:tc_trip_001}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-TRIP-001 \\ \hline
+\textbf{Nombre} & Crear viaje exitosamente con datos completos \\ \hline
+\textbf{Flujo} & Gestión de Viajes \\ \hline
+\textbf{Prioridad} & Alta \\ \hline
+\textbf{Precondiciones} & Usuario autenticado. En página /trips. \\ \hline
+\textbf{Datos de Prueba} & 
+Título: "Viaje E2E Cypress". Destino: "Paris, France". Fecha inicio: 2026-06-01. Fecha fin: 2026-06-15. Presupuesto: 5000. \\ \hline
+\textbf{Pasos} & 
+1. Login con credenciales válidas\newline
+2. Navegar a /trips\newline
+3. Hacer clic en "New Trip"\newline
+4. Completar formulario con datos de prueba\newline
+5. Hacer clic en "Save"\newline
+6. Esperar respuesta \\ \hline
+\textbf{Resultado Esperado} & 
+1. Mensaje de éxito visible\newline
+2. Viaje aparece en lista\newline
+3. Datos coinciden con ingresados \\ \hline
+\textbf{Resultado Obtenido} & \estadook \textbf{Ejecutado exitosamente} \\ \hline
+\textbf{Estado} & Completado \\ \hline
+\end{tabularx}
+\end{table}
+
+\textbf{Script Cypress Ejecutado:}
+
+\begin{lstlisting}[language=JavaScript, caption={TC-TRIP-001: Cypress Script Ejecutado}]
+describe('Crear un viaje', () => {
+  it('Crear viaje exitosamente', () => {
+    // Login primero
+    cy.visit('https://travelbrain.ddns.net/login')
+    cy.get('input[name="email"]').type('test@test.com')
+    cy.get('input[type="password"]').type('admin1234')
+    cy.get('button[type="submit"]').click()
+    
+    // Navegar a trips
+    cy.visit('https://travelbrain.ddns.net/trips')
+    
+    // Abrir modal de crear viaje
+    cy.contains('New Trip').click()
+    
+    // Completar formulario
+    cy.get('input[name="title"]').type('Viaje E2E Cypress')
+    cy.get('input[name="destination"]').type('Paris, France')
+    cy.get('input[name="startDate"]').type('2026-06-01')
+    cy.get('input[name="endDate"]').type('2026-06-15')
+    cy.get('input[name="budget"]').type('5000')
+    
+    // Enviar formulario
+    cy.get('button[type="submit"]').click()
+    
+    // Verificar éxito
+    cy.contains('Trip created successfully').should('be.visible')
+    cy.contains('Viaje E2E Cypress').should('be.visible')
+  })
+})
+\end{lstlisting}
+
+\subsubsection{TC-LAND-001: Carga de Página Principal}
+
+\begin{table}[H]
+\centering
+\caption{TC-LAND-001: Carga Página Principal}
+\label{tab:tc_land_001}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-LAND-001 \\ \hline
+\textbf{Nombre} & Carga exitosa de la página principal \\ \hline
+\textbf{Flujo} & Landing \\ \hline
+\textbf{Prioridad} & Alta \\ \hline
+\textbf{Precondiciones} & Servidor web funcionando. \\ \hline
+\textbf{Pasos} & 
+1. Navegar a https://travelbrain.ddns.net/\newline
+2. Esperar carga completa \\ \hline
+\textbf{Resultado Esperado} & 
+1. Página carga sin errores\newline
+2. Texto "TRAVELBRAIN" visible\newline
+3. Botones de login/registro presentes \\ \hline
+\textbf{Resultado Obtenido} & \estadook \textbf{Ejecutado exitosamente} \\ \hline
+\textbf{Estado} & Completado \\ \hline
+\end{tabularx}
+\end{table}
+
+% ============================================================
+% 7. DISEÑO DE CASOS DE PRUEBA DE SEGURIDAD
+% ============================================================
+\section{Diseño de Casos de Prueba de Seguridad}
+
+\subsection{Casos de Prueba de Seguridad - OWASP ZAP}
+
+\subsubsection{TC-SEC-001: Protección IDOR}
+
+\begin{table}[H]
+\centering
+\caption{TC-SEC-001: IDOR Prevention}
+\label{tab:tc_sec_001}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-SEC-001 \\ \hline
+\textbf{Nombre} & Prevención de IDOR (Insecure Direct Object Reference) en /trips/:id \\ \hline
+\textbf{Vulnerabilidad} & OWASP A01:2021 - Broken Access Control \\ \hline
+\textbf{Prioridad} & Alta \\ \hline
+\textbf{Método} & Escaneo Activo + Manual \\ \hline
+\textbf{Precondiciones} & 
+OWASP ZAP configurado como proxy. 2 usuarios con sesiones activas (UserA, UserB). UserB tiene viaje con \_id conocido. \\ \hline
+\textbf{Pasos} & 
+1. Autenticar como UserA en ZAP\newline
+2. Interceptar GET /trips/:id con token de UserA\newline
+3. Modificar :id por ID de viaje de UserB\newline
+4. Enviar request\newline
+5. Analizar respuesta \\ \hline
+\textbf{Resultado Esperado} & 
+1. HTTP 403 Forbidden\newline
+2. No se retornan datos del viaje ajeno\newline
+3. No hay information leakage \\ \hline
+\textbf{Criterio de Éxito} & Sin vulnerabilidad IDOR detectada \\ \hline
+\textbf{Resultado Obtenido} & \estadopending \textbf{Pendiente de ejecución} \\ \hline
+\textbf{Estado} & No Ejecutado \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{TC-SEC-003: Cross-Site Scripting (XSS)}
+
+\begin{table}[H]
+\centering
+\caption{TC-SEC-003: XSS Detection}
+\label{tab:tc_sec_003}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-SEC-003 \\ \hline
+\textbf{Nombre} & Detección de vulnerabilidades XSS en formularios de entrada \\ \hline
+\textbf{Vulnerabilidad} & OWASP A03:2021 - Injection \\ \hline
+\textbf{Prioridad} & Alta \\ \hline
+\textbf{Método} & Escaneo Activo (ZAP Spider + Active Scan) \\ \hline
+\textbf{Targets} & 
+/register (username, email). /trips (title, description, destination). /weather (city search). \\ \hline
+\textbf{Payloads} & 
+\texttt{<script>alert("XSS")</script>}\newline
+\texttt{<img src=x onerror=alert("XSS")>}\newline
+\texttt{"><script>alert(String.fromCharCode(88,83,83))</script>} \\ \hline
+\textbf{Pasos} & 
+1. Configurar contexto en ZAP\newline
+2. Ejecutar Spider en http://localhost:3001\newline
+3. Ejecutar Active Scan con XSS rules\newline
+4. Revisar alertas generadas\newline
+5. Verificar manualmente payloads sospechosos \\ \hline
+\textbf{Resultado Esperado} & 
+1. 0 alertas de XSS de severidad Alta/Crítica\newline
+2. Inputs sanitizados correctamente\newline
+3. React escapa HTML automáticamente \\ \hline
+\textbf{Criterio de Éxito} & Sin XSS ejecutable detectado \\ \hline
+\textbf{Resultado Obtenido} & \estadopending \textbf{Pendiente de ejecución} \\ \hline
+\textbf{Estado} & No Ejecutado \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{TC-SEC-005: Headers de Seguridad}
+
+\begin{table}[H]
+\centering
+\caption{TC-SEC-005: Security Headers}
+\label{tab:tc_sec_005}
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{ID} & TC-SEC-005 \\ \hline
+\textbf{Nombre} & Verificación de headers de seguridad HTTP \\ \hline
+\textbf{Categoría} & Security Misconfiguration \\ \hline
+\textbf{Prioridad} & Media \\ \hline
+\textbf{Método} & Passive Scan (ZAP) \\ \hline
+\textbf{Targets} & Todas las respuestas HTTP del backend \\ \hline
+\textbf{Headers Requeridos} & 
+Strict-Transport-Security. X-Content-Type-Options: nosniff. X-Frame-Options: DENY. Content-Security-Policy. X-XSS-Protection: 1; mode=block. \\ \hline
+\textbf{Pasos} & 
+1. Navegar aplicación con ZAP proxy activo\newline
+2. ZAP registra headers automáticamente\newline
+3. Revisar alertas de "Missing Security Headers"\newline
+4. Verificar cada header manualmente \\ \hline
+\textbf{Resultado Esperado} & 
+1. Todos los headers requeridos presentes\newline
+2. HSTS con maxAge >= 31536000\newline
+3. CSP configurado correctamente \\ \hline
+\textbf{Criterio de Éxito} & Sin alertas de headers faltantes \\ \hline
+\textbf{Resultado Obtenido} & \estadopending \textbf{Pendiente de ejecución} \\ \hline
+\textbf{Estado} & No Ejecutado \\ \hline
+\end{tabularx}
+\end{table}
+
+% ============================================================
+% 8. RESULTADOS DE EJECUCIÓN Y ANÁLISIS
+% ============================================================
+\section{Resultados de Ejecución y Análisis}
+
+\subsection{Estado Actual de Ejecución}
+
+\begin{table}[H]
+\centering
+\caption{Resumen de Ejecución por Nivel}
+\label{tab:resumen_ejecucion}
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|}
+\hline
+\textbf{Nivel de Prueba} & \textbf{Diseñados} & \textbf{Ejecutados} & \textbf{Exitosa} & \textbf{Estado} \\ \hline
+Unitarias (Backend) & 18 & 10+ & 0/10 & \estadowarning Requiere corrección \\ \hline
+Unitarias (Frontend) & 15 & 21+ & 21/21 & \estadook Completado \\ \hline
+Integración (APIs) & 28 & 0 & 0/28 & \estadopending Pendiente \\ \hline
+E2E (Cypress) & 16 & 9 & 9/9 & \estadook Completado \\ \hline
+Seguridad (ZAP) & 10 & 0 & 0/10 & \estadopending Pendiente \\ \hline
+\textbf{TOTAL} & \textbf{87} & \textbf{40+} & \textbf{30/87} & \textbf{34.5\% completado} \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Resultados de SonarQube}
+
+\begin{table}[H]
+\centering
+\caption{Análisis de Calidad - SonarQube}
+\label{tab:sonarqube_analisis}
+\begin{tabularx}{\textwidth}{|X|c|c|c|}
+\hline
+\textbf{Métrica} & \textbf{Valor Actual} & \textbf{Calificación} & \textbf{Estado} \\ \hline
+Cobertura de Código & 15.3\% & D (Deficiente) & \estadowarning \\ \hline
+Issues de Seguridad & 1 & A (Aceptable) & \estadowarning \\ \hline
+Issues de Confiabilidad & 94 & C (Crítico) & \estadofailed \\ \hline
+Issues de Mantenibilidad & 286 & A (Aceptable) & \estadowarning \\ \hline
+Duplicación de Código & 2.6\% & C (Crítico) & \estadowarning \\ \hline
+Líneas de Código & 19,001 & - & - \\ \hline
+Líneas por Cubrir & 3,700 & - & \estadowarning \\ \hline
+\textbf{QUALITY GATE} & \textbf{PASSED (con advertencias)} & - & \estadowarning \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Análisis de Cobertura por Módulo}
+
+\begin{table}[H]
+\centering
+\caption{Cobertura por Módulo Backend}
+\label{tab:coverage_backend}
+\begin{tabularx}{\textwidth}{|X|c|c|c|}
+\hline
+\textbf{Módulo} & \textbf{Cobertura} & \textbf{Líneas Cubiertas} & \textbf{Estado} \\ \hline
+Total Backend & 15.3\% & 3.7k/23k & \estadofailed \\ \hline
+backend-project/src & 17.2\% & 3,064 líneas & \estadowarning \\ \hline
+business-rules-backend/src & 7.5\% & 1,505 líneas & \estadofailed \\ \hline
+frontend-react/src & 17.1\% & 14,432 líneas & \estadowarning \\ \hline
+Controllers & 22.64\% & - & \estadowarning \\ \hline
+Services & 1.12\% & - & \estadofailed \\ \hline
+Middlewares & 24.29\% & - & \estadowarning \\ \hline
+Models & 72\% & - & \estadook \\ \hline
+Routes & 43.62\% & - & \estadowarning \\ \hline
+Utils & 13.46\% & - & \estadofailed \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Pruebas Unitarias Ejecutadas}
+
+\subsubsection{Frontend React - Pruebas Completadas}
+
+\begin{table}[H]
+\centering
+\caption{Componentes Frontend Probados}
+\label{tab:frontend_tests}
+\begin{tabularx}{\textwidth}{|X|c|c|}
+\hline
+\textbf{Componente/Servicio} & \textbf{Tests} & \textbf{Estado} \\ \hline
+AuthSuccess & Múltiples & \estadook \\ \hline
+Admin & Múltiples & \estadook \\ \hline
+App & Múltiples & \estadook \\ \hline
+CurrencySelector & Múltiples & \estadook \\ \hline
+Dashboard & Múltiples & \estadook \\ \hline
+GoogleLoginButton & Múltiples & \estadook \\ \hline
+Itineraries & Múltiples & \estadook \\ \hline
+Landing & Múltiples & \estadook \\ \hline
+Login & Múltiples & \estadook \\ \hline
+Navbar & Múltiples & \estadook \\ \hline
+Profile & Múltiples & \estadook \\ \hline
+Register & Múltiples & \estadook \\ \hline
+Trips & Múltiples & \estadook \\ \hline
+Weather & Múltiples & \estadook \\ \hline
+api (servicio) & Múltiples & \estadook \\ \hline
+config & Múltiples & \estadook \\ \hline
+currencyService & Múltiples & \estadook \\ \hline
+itineraryService & Múltiples & \estadook \\ \hline
+tripService & Múltiples & \estadook \\ \hline
+useAuth (hook) & Múltiples & \estadook \\ \hline
+weatherService & Múltiples & \estadook \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{Backend - Pruebas Ejecutadas con Fallos}
+
+\begin{table}[H]
+\centering
+\caption{Pruebas Backend Ejecutadas}
+\label{tab:backend_tests}
+\begin{tabularx}{\textwidth}{|X|c|c|}
+\hline
+\textbf{Archivo de Prueba} & \textbf{Resultado} & \textbf{Detalles} \\ \hline
+auth.test.js & \estadofailed & Suite fallida \\ \hline
+performance.test.js & \estadofailed & Suite fallida \\ \hline
+security.test.js & \estadofailed & Suite fallida \\ \hline
+trips.test.js & \estadofailed & Suite fallida \\ \hline
+trips.coverage.test.js & \estadofailed & Suite fallida \\ \hline
+users.test.js & \estadofailed & Suite fallida \\ \hline
+destinations.test.js & \estadofailed & Suite fallida \\ \hline
+weather.test.js & \estadofailed & Suite fallida \\ \hline
+itineraries.test.js & \estadofailed & Suite fallida \\ \hline
+favoriteRoutes.test.js & \estadofailed & Suite fallida \\ \hline
+\textbf{TOTAL} & \textbf{10 failed, 10 total} & \textbf{13 failed, 13 total tests} \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{Business Rules - Pruebas Ejecutadas con Fallos}
+
+\begin{table}[H]
+\centering
+\caption{Pruebas Business Rules Ejecutadas}
+\label{tab:business_rules_tests}
+\begin{tabularx}{\textwidth}{|X|c|c|}
+\hline
+\textbf{Archivo de Prueba} & \textbf{Resultado} & \textbf{Detalles} \\ \hline
+businessRules.test.js & \estadofailed & Suite fallida \\ \hline
+itinerary.test.js & \estadofailed & Suite fallida \\ \hline
+performance.test.js & \estadofailed & Suite fallida \\ \hline
+security.test.js & \estadofailed & Suite fallida \\ \hline
+trip.coverage.test.js & \estadofailed & Suite fallida \\ \hline
+\textbf{TOTAL} & \textbf{5 failed, 5 total} & \textbf{4 failed, 4 total tests} \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Pruebas E2E Ejecutadas Exitosamente}
+
+\begin{table}[H]
+\centering
+\caption{Pruebas E2E Cypress Completadas}
+\label{tab:e2e_tests}
+\begin{tabularx}{\textwidth}{|X|c|c|}
+\hline
+\textbf{Prueba E2E} & \textbf{Resultado} & \textbf{Descripción} \\ \hline
+Carga la página principal & \estadook & Verifica texto "TRAVELBRAIN" \\ \hline
+Login exitoso & \estadook & Credenciales: test@test.com / admin1234 \\ \hline
+Login fallido & \estadook & Manejo de credenciales incorrectas \\ \hline
+Crear un viaje & \estadook & Viaje a Paris con datos completos \\ \hline
+Navegar al dashboard & \estadook & Acceso post-login \\ \hline
+Acceder a destinos & \estadook & Navegación a página de destinos \\ \hline
+Acceder al clima & \estadook & Navegación a página de clima \\ \hline
+Acceder a perfil & \estadook & Navegación a página de perfil \\ \hline
+Protección de rutas & \estadook & Redirección a /login sin auth \\ \hline
+\end{tabularx}
+\end{table}
+
+% ============================================================
+% 9. ANÁLISIS DE ISSUES Y PROBLEMAS DETECTADOS
+% ============================================================
+\section{Análisis de Issues y Problemas Detectados}
+
+\subsection{Issues Críticos Identificados}
+
+\begin{table}[H]
+\centering
+\caption{Issues Críticos por Categoría}
+\label{tab:issues_criticos}
+\begin{tabularx}{\textwidth}{|l|c|p{8cm}|}
+\hline
+\textbf{Categoría} & \textbf{Cantidad} & \textbf{Descripción} \\ \hline
+Confiabilidad & 94 & Issues que pueden causar fallos en producción. Prioridad alta de corrección. \\ \hline
+Mantenibilidad & 286 & Problemas que dificultan el mantenimiento del código. \\ \hline
+Seguridad & 1 & Vulnerabilidades de seguridad detectadas. \\ \hline
+Cobertura Insuficiente & - & Cobertura del 15.3\% está muy por debajo del estándar del 70\%. \\ \hline
+Pruebas Fallidas & 17 suites & Todas las suites de backend y business rules fallan. \\ \hline
+Duplicación & 2.6\% & Código duplicado que aumenta complejidad. \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Áreas Problemáticas Específicas}
+
+\subsubsection{Backend Project - Cobertura por Servicio}
+\begin{itemize}
+    \item \textbf{Services (1.12\%):} Muy baja cobertura en lógica de negocio
+    \begin{itemize}
+        \item destinationBusinessRules.js: 1.4\%
+        \item itineraryBusinessRules.js: 1.53\%
+        \item routeBusinessRules.js: 0.79\%
+        \item tripBusinessRules.js: 1.05\%
+        \item userBusinessRules.js: 1.13\%
+    \end{itemize}
+    
+    \item \textbf{Controllers (22.64\%):} Cobertura insuficiente en controladores
+    \item \textbf{Utils (13.46\%):} Funciones auxiliares poco probadas
+    \item \textbf{Middlewares (24.29\%):} Módulos de seguridad con cobertura baja
+\end{itemize}
+
+\subsubsection{Problemas en Pruebas Unitarias}
+\begin{enumerate}
+    \item \textbf{Configuración de Jest:} Posibles problemas con mocks
+    \item \textbf{Base de datos de prueba:} Configuración incorrecta
+    \item \textbf{Imports:} Errores en rutas de módulos
+    \item \textbf{Variables de entorno:} No configuradas para entorno de prueba
+\end{enumerate}
+
+\subsection{Recomendaciones de Corrección Inmediata}
+
+\begin{table}[H]
+\centering
+\caption{Plan de Corrección de Issues}
+\label{tab:plan_correccion}
+\begin{tabularx}{\textwidth}{|l|p{8cm}|c|}
+\hline
+\textbf{Prioridad} & \textbf{Acción Correctiva} & \textbf{Estimado} \\ \hline
+P1 (Crítico) & Corregir configuración de pruebas Jest en backend & 4 horas \\ \hline
+P1 (Crítico) & Implementar pruebas para services (al menos 70\%) & 8 horas \\ \hline
+P1 (Crítico) & Resolver issues de confiabilidad más graves & 6 horas \\ \hline
+P2 (Alta) & Ejecutar pruebas de integración con Postman & 4 horas \\ \hline
+P2 (Alta) & Ejecutar pruebas de seguridad con OWASP ZAP & 6 horas \\ \hline
+P3 (Media) & Reducir duplicación de código & 4 horas \\ \hline
+P3 (Media) & Mejorar cobertura de controllers y middlewares & 6 horas \\ \hline
+\end{tabularx}
+\end{table}
+
+% ============================================================
+% 10. MATRIZ RESUMEN DE CASOS DE PRUEBA
+% ============================================================
+\section{Matriz Resumen de Casos de Prueba}
+
+\begin{table}[H]
+\centering
+\caption{Resumen de Casos de Prueba por Nivel}
+\label{tab:resumen_casos}
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}
+\hline
+\textbf{Nivel de Prueba} & \textbf{Total Casos} & \textbf{Ejecutados} & \textbf{Exitosa} & \textbf{Fallida} & \textbf{Pendiente} \\ \hline
+Unitarias (Backend) & 18 & 10+ & 0 & 10+ & 8 \\ \hline
+Unitarias (Frontend) & 15 & 21+ & 21+ & 0 & 0 \\ \hline
+Integración (APIs) & 28 & 0 & 0 & 0 & 28 \\ \hline
+E2E (Cypress) & 16 & 9 & 9 & 0 & 7 \\ \hline
+Seguridad (ZAP) & 10 & 0 & 0 & 0 & 10 \\ \hline
+\textbf{TOTAL} & \textbf{87} & \textbf{40+} & \textbf{30+} & \textbf{10+} & \textbf{53} \\ \hline
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Distribución por Módulo con Estado Actual}
+\label{tab:casos_modulo}
+\begin{tabularx}{\textwidth}{|X|c|c|c|}
+\hline
+\textbf{Módulo} & \textbf{Casos Diseñados} & \textbf{Cobertura Estimada} & \textbf{Estado} \\ \hline
+Autenticación Tradicional & 12 & 85\% & \estadowarning \\ \hline
+Autenticación Biométrica & 18 & 80\% & \estadopending \\ \hline
+Gestión de Viajes (CRUD) & 16 & 90\% & \estadowarning \\ \hline
+Clima & 8 & 70\% & \estadopending \\ \hline
+Administración & 6 & 75\% & \estadopending \\ \hline
+Seguridad General & 10 & Variable & \estadopending \\ \hline
+Microservicio Facial & 9 & 80\% & \estadopending \\ \hline
+Middlewares & 8 & 85\% & \estadowarning \\ \hline
+\textbf{TOTAL} & \textbf{87} & \textbf{82\% promedio} & \textbf{Mixto} \\ \hline
+\end{tabularx}
+\end{table}
+
+% ============================================================
+% 11. PLAN DE ACCIÓN PARA SPRINT DE CALIDAD 3
+% ============================================================
+\section{Plan de Acción para Sprint de Calidad 3}
+
+\subsection{Objetivos del Sprint 3}
+
+\begin{table}[H]
+\centering
+\caption{Objetivos y Métricas Objetivo}
+\label{tab:objetivos_sprint3}
+\begin{tabularx}{\textwidth}{|l|c|c|c|}
+\hline
+\textbf{Métrica} & \textbf{Actual} & \textbf{Objetivo} & \textbf{Mejora} \\ \hline
+Cobertura de Código & 15.3\% & >=70\% & +54.7\% \\ \hline
+Issues de Confiabilidad & 94 & <=20 & -74 \\ \hline
+Issues de Seguridad & 1 & 0 & -1 \\ \hline
+Tasa de Pase de Tests & 34.5\% & >=90\% & +55.5\% \\ \hline
+Pruebas E2E Completadas & 9/16 & 16/16 & +7 \\ \hline
+Pruebas Integración & 0/28 & 28/28 & +28 \\ \hline
+Pruebas Seguridad & 0/10 & 10/10 & +10 \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Cronograma de Actividades}
+
+\begin{table}[H]
+\centering
+\caption{Cronograma Sprint de Calidad 3}
+\label{tab:cronograma_sprint3}
+\begin{tabularx}{\textwidth}{|l|p{8cm}|c|c|}
+\hline
+\textbf{Semana} & \textbf{Actividades Principales} & \textbf{Horas} & \textbf{Responsable} \\ \hline
+Semana 1 & 
+1. Corrección de pruebas unitarias backend\newline
+2. Mejorar cobertura de services a >70\%\newline
+3. Resolver 20 issues de confiabilidad & 20 & Cáceres \\ \hline
+Semana 2 & 
+1. Ejecutar pruebas de integración (28 casos)\newline
+2. Ejecutar pruebas de seguridad OWASP ZAP\newline
+3. Implementar pruebas de rendimiento & 18 & Anthony \\ \hline
+Semana 3 & 
+1. Completar pruebas E2E faltantes (7 casos)\newline
+2. Generar reporte final de calidad\newline
+3. Validación final con SonarQube & 15 & Ambos \\ \hline
+\textbf{TOTAL} & & \textbf{53 horas} & \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Recursos Necesarios}
+
+\begin{itemize}
+    \item \textbf{Herramientas:}
+    \begin{itemize}
+        \item OWASP ZAP para pruebas de seguridad
+        \item Postman para pruebas de integración
+        \item Cypress para pruebas E2E adicionales
+        \item Jest para mejorar pruebas unitarias
+    \end{itemize}
+    
+    \item \textbf{Entornos:}
+    \begin{itemize}
+        \item Entorno de desarrollo para correcciones
+        \item Entorno de staging para pruebas integración
+        \item Base de datos de prueba para pruebas unitarias
+    \end{itemize}
+    
+    \item \textbf{Datos de Prueba:}
+    \begin{itemize}
+        \item Usuarios de prueba con diferentes roles
+        \item Datos de viajes, destinos, itinerarios
+        \item Casos de prueba para autenticación biométrica
+    \end{itemize}
+\end{itemize}
+
+% ============================================================
+% 12. CONCLUSIONES Y RECOMENDACIONES
+% ============================================================
+\section{Conclusiones y Recomendaciones}
+
+\subsection{Logros Alcanzados}
+
+\begin{enumerate}
+    \item \estadook \textbf{Infraestructura de Pruebas:} Configurada completamente
+    \item \estadook \textbf{Automatización E2E:} 9 flujos críticos automatizados y funcionando
+    \item \estadook \textbf{Pruebas Frontend:} Componentes y servicios validados exitosamente
+    \item \estadook \textbf{Integración Continua:} SonarQube configurado y monitoreando calidad
+    \item \estadook \textbf{Documentación:} Diseño completo de 87 casos de prueba
+\end{enumerate}
+
+\subsection{Áreas de Mejora Críticas}
+
+\begin{enumerate}
+    \item \estadofailed \textbf{Cobertura de Código:} 15.3\% es insuficiente para producción
+    \item \estadofailed \textbf{Pruebas Backend:} 100\% de suites fallando requiere atención inmediata
+    \item \estadowarning \textbf{Issues de Confiabilidad:} 94 issues abiertos es riesgo alto
+    \item \estadopending \textbf{Pruebas de Seguridad:} No ejecutadas aún (riesgo desconocido)
+    \item \estadowarning \textbf{Duplicación de Código:} 2.6\% puede reducir mantenibilidad
+\end{enumerate}
+
+\subsection{Recomendaciones Técnicas}
+
+\subsubsection{Inmediatas (Sprint 3):}
+\begin{enumerate}
+    \item Priorizar corrección de pruebas unitarias backend
+    \item Implementar pipeline de CI/CD que bloquee con baja cobertura
+    \item Establecer estándar mínimo de 70\% de cobertura
+    \item Ejecutar pruebas de seguridad antes de próximo despliegue
+\end{enumerate}
+
+\subsubsection{Mediano Plazo:}
+\begin{enumerate}
+    \item Implementar pruebas de rendimiento y carga
+    \item Establecer métricas de calidad como KPI del equipo
+    \item Automatizar más flujos E2E críticos
+    \item Implementar mutation testing para validar calidad de pruebas
+\end{enumerate}
+
+\subsubsection{Largo Plazo:}
+\begin{enumerate}
+    \item Establecer cultura de "quality first" en el equipo
+    \item Implementar trunk-based development con calidad
+    \item Automatizar completamente el proceso de release
+    \item Establecer programa de refactoring continuo
+\end{enumerate}
+
+\subsection{Evaluación General}
+
+\begin{table}[H]
+\centering
+\caption{Evaluación General del Estado de Calidad}
+\label{tab:evaluacion_general}
+\begin{tabularx}{\textwidth}{|X|c|c|}
+\hline
+\textbf{Aspecto} & \textbf{Calificación} & \textbf{Comentarios} \\ \hline
+Diseño de Pruebas & 8/10 & 87 casos bien documentados \\ \hline
+Ejecución de Pruebas & 4/10 & Muchas pruebas pendientes o fallidas \\ \hline
+Cobertura de Código & 2/10 & Muy por debajo del estándar \\ \hline
+Automatización & 7/10 & Buena infraestructura, pero incompleta \\ \hline
+Seguridad & 5/10 & 1 issue detectado, pruebas pendientes \\ \hline
+Documentación & 9/10 & Excelente documentación de pruebas \\ \hline
+\textbf{PROMEDIO} & \textbf{5.8/10} & \textbf{Requiere mejora significativa} \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Conclusión Final}
+
+El proyecto TravelBrain cuenta con una \textbf{excelente base de diseño de pruebas} (87 casos documentados) y \textbf{infraestructura de automatización} configurada. Sin embargo, la \textbf{ejecución real de pruebas} ha revelado problemas críticos que deben atenderse urgentemente:
+
+1. \textbf{Las pruebas unitarias del backend están completamente fallando} - Esto impide validar la lógica central del sistema.
+
+2. \textbf{La cobertura del 15.3\% es inaceptable} para un sistema que maneja datos sensibles de usuarios.
+
+3. \textbf{Los 94 issues de confiabilidad} representan un riesgo alto para la estabilidad en producción.
+
+\textbf{Recomendación:} Concentrar todos los esfuerzos del Sprint 3 en corregir las pruebas unitarias y mejorar la cobertura antes de proceder con nuevas funcionalidades. La calidad actual del código no es suficiente para un despliegue en producción.
+
+% ============================================================
+% REFERENCIAS
+% ============================================================
+\newpage
+\printbibliography[title={Referencias Bibliográficas}]
+
+\begin{filecontents}{referencias.bib}
+@techreport{ieee829,
+author = {{IEEE}},
+title = {IEEE Standard for Software and System Test Documentation},
+institution = {Institute of Electrical and Electronics Engineers},
+year = {2008},
+number = {IEEE Std 829-2008}
+}
+
+@techreport{iso29119,
+author = {{ISO/IEC/IEEE}},
+title = {Software and systems engineering -- Software testing -- Part 3: Test documentation},
+institution = {International Organization for Standardization},
+year = {2013},
+number = {ISO/IEC/IEEE 29119-3:2013}
+}
+
+@book{jorgensen2013,
+author = {Jorgensen, Paul C.},
+title = {Software Testing: A Craftsman's Approach},
+edition = {4th},
+publisher = {CRC Press},
+year = {2013},
+isbn = {978-1466560680}
+}
+
+@misc{owasp2021,
+author = {{OWASP Foundation}},
+title = {OWASP Top 10 - 2021},
+year = {2021},
+url = {https://owasp.org/Top10/},
+note = {Accessed: 2026-01-21}
+}
+
+@misc{sonarqube2026,
+author = {{SonarSource}},
+title = {SonarQube Documentation},
+year = {2026},
+url = {https://docs.sonarqube.org/},
+note = {Accessed: 2026-01-21}
+}
+
+@misc{cypress2026,
+author = {{Cypress.io}},
+title = {Cypress Documentation},
+year = {2026},
+url = {https://docs.cypress.io/},
+note = {Accessed: 2026-01-21}
+}
+\end{filecontents}
+
+% ============================================================
+% ANEXOS
+% ============================================================
+\newpage
+\appendix
+\section{Anexos}
+
+\subsection{Anexo A: Configuración de Cypress}
+
+\begin{lstlisting}[language=JavaScript, caption={cypress.config.js - Configuración Real}]
+const { defineConfig } = require("cypress");
+
+module.exports = defineConfig({
+  e2e: {
+    baseUrl: "https://travelbrain.ddns.net",
+    specPattern: "cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
+    supportFile: "cypress/support/e2e.js",
+    video: true,
+    screenshotOnRunFailure: true,
+    viewportWidth: 1280,
+    viewportHeight: 720,
+    defaultCommandTimeout: 10000,
+    requestTimeout: 10000,
+    responseTimeout: 10000,
+    env: {
+      apiUrl: "https://travelbrain.ddns.net/api"
+    }
+  }
+});
+\end{lstlisting}
+
+\subsection{Anexo B: Comandos Personalizados Cypress Ejecutados}
+
+\begin{lstlisting}[language=JavaScript, caption={cypress/support/commands.js - Comandos Reales}]
+// Login command usado en pruebas
+Cypress.Commands.add("login", (email, password) => {
+  cy.session([email, password], () => {
+    cy.visit('/login')
+    cy.get('input[name="email"]').type(email)
+    cy.get('input[type="password"]').type(password)
+    cy.get('button[type="submit"]').click()
+    cy.url().should('include', '/dashboard')
+  })
+})
+
+// Comando para crear viaje
+Cypress.Commands.add("createTrip", (tripData) => {
+  cy.visit('/trips')
+  cy.contains('New Trip').click()
+  
+  cy.get('input[name="title"]').type(tripData.title)
+  cy.get('input[name="destination"]').type(tripData.destination)
+  cy.get('input[name="startDate"]').type(tripData.startDate)
+  cy.get('input[name="endDate"]').type(tripData.endDate)
+  cy.get('input[name="budget"]').type(tripData.budget)
+  
+  cy.get('button[type="submit"]').click()
+  cy.contains('Trip created successfully').should('be.visible')
+})
+\end{lstlisting}
+
+\subsection{Anexo C: Configuración de Jest para Backend}
+
+\begin{lstlisting}[language=JavaScript, caption={jest.config.js - Backend Project}]
+module.exports = {
+  testEnvironment: 'node',
+  roots: ['<rootDir>/tests'],
+  testMatch: ['**/*.test.js'],
+  collectCoverage: true,
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'html'],
+  collectCoverageFrom: [
+    'src/**/*.js',
+    '!src/**/*.test.js',
+    '!src/**/index.js'
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 70,
+      functions: 70,
+      lines: 70,
+      statements: 70
+    }
+  },
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.js']
+};
+\end{lstlisting}
+
+\subsection{Anexo D: Reporte de SonarQube (Extracto)}
+
+\begin{lstlisting}[caption={Resultados SonarQube - Extracto}]
+QUALITY GATE: PASSED (with warnings)
+
+=== METRICS ===
+Lines of Code: 19,001
+Coverage: 15.3%
+Duplications: 2.6%
+Issues: 381
+  - Security: 1
+  - Reliability: 94 (C - Critical)
+  - Maintainability: 286 (A - Acceptable)
+
+=== MODULE ANALYSIS ===
+backend-project/src:
+  Lines: 3,064
+  Coverage: 17.2%
+  Issues: 31
+
+business-rules-backend/src:
+  Lines: 1,505
+  Coverage: 7.5%
+  Issues: 108
+
+frontend-react/src:
+  Lines: 14,432
+  Coverage: 17.1%
+  Issues: 242
+
+=== RECOMMENDATIONS ===
+1. Increase code coverage to at least 70%
+2. Fix critical reliability issues
+3. Reduce code duplication
+4. Implement security testing
+\end{lstlisting}
+
+\subsection{Anexo E: Pruebas E2E Ejecutadas - Evidencia}
+
+\begin{lstlisting}[caption={Resumen Pruebas E2E Ejecutadas}]
+Tests Ejecutados: 9
+Passed: 9
+Failed: 0
+Duration: ~3 minutos
+
+Detalle de pruebas:
+1. [OK] travelbrain.e2e.cy.js
+   - Carga la página principal
+   - Login de usuario exitoso
+   - Login fallido con credenciales incorrectas
+
+2. [OK] trips.e2e.cy.js
+   - Crear un viaje exitosamente
+   - Navegar al dashboard después del login
+
+3. [OK] navigation.e2e.cy.js
+   - Acceder a la página de destinos
+   - Acceder a la página del clima
+   - Acceder a la página de perfil
+   - Verificar protección de rutas sin autenticación
+
+URLs probadas:
+- https://travelbrain.ddns.net/
+- https://travelbrain.ddns.net/login
+- https://travelbrain.ddns.net/dashboard
+- https://travelbrain.ddns.net/trips
+- https://travelbrain.ddns.net/destinations
+- https://travelbrain.ddns.net/weather
+- https://travelbrain.ddns.net/profile
+
+Credenciales usadas:
+- Email: test@test.com
+- Password: admin1234
+\end{lstlisting}
+
+\subsection{Anexo F: Issues de SonarQube - Ejemplos}
+
+\begin{table}[H]
+\centering
+\caption{Ejemplos de Issues Detectados por SonarQube}
+\label{tab:issues_ejemplos}
+\begin{tabularx}{\textwidth}{|l|p{10cm}|c|}
+\hline
+\textbf{Tipo} & \textbf{Descripción} & \textbf{Severidad} \\ \hline
+Vulnerabilidad & Hardcoded credentials in configuration file & MEDIUM \\ \hline
+Bug & Possible null pointer dereference in userController & MAJOR \\ \hline
+Code Smell & Function has too many parameters (8) & MINOR \\ \hline
+Duplicación & Same logic found in tripService and itineraryService & MAJOR \\ \hline
+Cobertura & Method calculateBudget() has 0\% coverage & CRITICAL \\ \hline
+Seguridad & Missing input validation in register endpoint & MAJOR \\ \hline
+\end{tabularx}
+\end{table}
+
+\end{document}

@@ -495,3 +495,269 @@
 .btn-secondary.loading::after {
   border-top-color: white;
 }
+
+/* ========== Face Login Specific Styles ========== */
+
+/* Back Link */
+.face-back-link {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.face-back-link:hover {
+  color: var(--color-primary-light);
+  transform: translateX(-5px);
+}
+
+/* Step Content Container */
+.face-step-content {
+  width: 100%;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Form Styles */
+.face-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.face-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.face-form-label {
+  font-weight: 600;
+  color: white;
+  font-size: 0.9rem;
+  letter-spacing: 0.3px;
+}
+
+.face-form-input {
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+}
+
+.face-form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(71, 245, 154, 0.15), 0 0 20px rgba(71, 245, 154, 0.2);
+  transform: translateY(-2px);
+}
+
+.face-form-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.face-form-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Button Group */
+.face-button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* Face-specific Button Variants */
+.face-btn {
+  padding: 0.95rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  text-transform: none;
+  letter-spacing: 0.3px;
+  width: 100%;
+}
+
+.face-btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #3ad689 100%);
+  color: var(--color-neutral-black);
+  box-shadow: 0 4px 15px rgba(71, 245, 154, 0.3);
+  font-weight: 700;
+}
+
+.face-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3ad689 0%, var(--color-primary) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 25px rgba(71, 245, 154, 0.5);
+}
+
+.face-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-neutral-light);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.face-btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--color-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 25px rgba(71, 245, 154, 0.2);
+}
+
+.face-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.face-btn:disabled:hover {
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Success and Error Messages */
+.face-success {
+  background: rgba(71, 245, 154, 0.15);
+  border: 1px solid rgba(71, 245, 154, 0.4);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+.face-success-icon {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.face-success-text {
+  color: white;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.face-error {
+  background: rgba(229, 74, 122, 0.15);
+  border: 1px solid rgba(229, 74, 122, 0.4);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+.face-error-icon {
+  font-size: 1.5rem;
+  color: #ff6b9d;
+  flex-shrink: 0;
+}
+
+.face-error-text {
+  color: white;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments for Face Login */
+@media (max-width: 640px) {
+  .face-back-link {
+    top: 1rem;
+    left: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .face-form-input {
+    padding: 0.75rem;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .face-btn {
+    padding: 0.85rem;
+  }
+}
+
+/* Loading Container & Spinner */
+.face-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+  min-height: 300px;
+}
+
+.face-spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+@keyframes spin {
+  to { 
+    transform: rotate(360deg); 
+  }
+}
+
+.face-loading-text {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.face-loading-subtext {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  margin: 0;
+}

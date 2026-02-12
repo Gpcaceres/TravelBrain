@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
+import FaceLogin from './pages/FaceLogin'
 import Register from './pages/Register'
 import FaceRegistration from './pages/FaceRegistration'
 import Dashboard from './pages/Dashboard'
@@ -19,6 +20,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/face-login" element={<FaceLogin />} />
       <Route path="/register" element={<Register />} />
       <Route path="/face-registration" element={<FaceRegistration />} />
       <Route path="/auth/success" element={<AuthSuccess />} />

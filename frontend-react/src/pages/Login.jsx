@@ -15,6 +15,22 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    // Validar que los campos no estén vacíos
+    if (!formData.email || !formData.password) {
+      setError('Por favor ingresa tu correo y contraseña')
+      return
+    }
+    // Redirigir a Face Login con credenciales para autenticación biométrica
+    navigate('/face-login', {
+      state: {
+        email: formData.email,
+        password: formData.password
+      }
+    })
+  }
+
+  const handleGuestLogin = async (e) => {
+    e.preventDefault()
     setError('')
     setLoading(true)
 
@@ -22,6 +38,7 @@ export default function Login() {
       const response = await api.post(API_CONFIG.ENDPOINTS.LOGIN, formData)
       
       if (response.data.success && response.data.token) {
+        // Login directo solo para desarrollo/testing
         saveAuth(response.data.token, response.data.user)
         navigate('/dashboard')
       } else {
@@ -83,16 +100,25 @@ export default function Login() {
             </div>
 
             <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-              {loading ? 'Signing In...' : 'Sign In'}
+              🔐 Iniciar Sesión con Reconocimiento Facial
             </button>
           </form>
 
           <div className="auth-divider">
-            <span>or</span>
+            <span>o</span>
           </div>
 
           {/* Google Login Button */}
           <GoogleLoginButton text="Continuar con Google" />
+
+          <button 
+            onClick={handleGuestLogin} 
+            className="btn btn-secondary btn-block" 
+            disabled={loading}
+            style={{ marginTop: '1rem' }}
+          >
+            {loading ? 'Signing In...' : '⚠️ Login Sin Verificación (Solo Testing)'}
+          </button>
 
           <div className="auth-footer">
             <p className="auth-footer-text">Don't have an account?</p>
