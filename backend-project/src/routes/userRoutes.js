@@ -23,8 +23,8 @@ router.post('/users', authenticate, isAdmin, userController.createUser);
 // PUT /users/:id - Update user by ID (Admin or Owner)
 router.put('/users/:id', authenticate, isAdminOrOwner, userController.updateUser);
 
-// DELETE /users/:id - Delete user by ID (Admin only)
-router.delete('/users/:id', authenticate, isAdmin, userController.deleteUser);
+// DELETE /users/:id - Delete user by ID (Admin or own account)
+router.delete('/users/:id', authenticate, isAdminOrOwner, userController.deleteUser);
 
 // PATCH /users/:id/activate - Activate user (Admin only)
 router.patch('/users/:id/activate', authenticate, isAdmin, userController.activateUser);

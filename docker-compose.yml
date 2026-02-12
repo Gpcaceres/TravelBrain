@@ -37,10 +37,10 @@ services:
     expose:
       - "3005"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV}
       - PORT=3005
-      - APP_TIMEZONE=America/Guayaquil
-      - CORS_ORIGINS=https://travelbrain.ddns.net,http://localhost:5173
+      - APP_TIMEZONE=${APP_TIMEZONE}
+      - CORS_ORIGINS=${CORS_ORIGINS}
     volumes:
       - ./business-rules-backend:/app
       - /app/node_modules
@@ -56,21 +56,21 @@ services:
     expose:
       - "3004"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV}
       - PORT=3004
-      - MONGO_URI=mongodb+srv://SrJCBM:bdd2025@cluster0.tjvfmrk.mongodb.net/
-      - MONGO_DB=travel_brain
-      - OPENWEATHER_API_KEY=51355211649b0894257fe06250faa40d
-      - MAPBOX_TOKEN=pk.eyJ1Ijoic3JqY2JtIiwiYSI6ImNtZ3g0eGV5NDAwZzYya3BvdmFveWU2dnEifQ.yYCrLmlo9lW-AJf56akVCw
-      - GOOGLE_CLIENT_ID=713160370468-sb3jjg16idaaakn3n6fe870nu6cn2h4b.apps.googleusercontent.com
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB=${MONGO_DB}
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - MAPBOX_TOKEN=${MAPBOX_TOKEN}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_CALLBACK_URL=https://travelbrain.ddns.net/api/auth/google/callback
-      - FRONTEND_URL=https://travelbrain.ddns.net
-      - JWT_SECRET=travelbrain-super-secret-key-2026-production
-      - JWT_EXPIRES_IN=7d
-      - APP_TIMEZONE=America/Guayaquil
-      - CORS_ORIGINS=https://travelbrain.ddns.net,http://localhost:5173
-      - BUSINESS_RULES_API_URL=http://business-rules:3005
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+      - APP_TIMEZONE=${APP_TIMEZONE}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - BUSINESS_RULES_API_URL=${BUSINESS_RULES_API_URL}
     volumes:
       - ./backend-project:/app
       - /app/node_modules
@@ -88,7 +88,7 @@ services:
     expose:
       - "80"
     environment:
-      - VITE_API_URL=https://travelbrain.ddns.net
+      - VITE_API_URL=${FRONTEND_URL}
     volumes:
       - ./frontend-react:/app
       - /app/node_modules
@@ -98,6 +98,38 @@ services:
       - backend
     restart: unless-stopped
 
+  facial-recognition:
+    build:
+      context: ./facial-recognition-service
+      dockerfile: Dockerfile
+    container_name: travelbrain-facial-recognition
+    expose:
+      - "8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - BACKEND_API_URL=${BACKEND_API_URL}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB=${MONGO_DB}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - JWT_EXPIRES_IN=7
+      - FACE_DETECTION_BACKEND=${FACE_DETECTION_BACKEND}
+      - FACE_RECOGNITION_MODEL=${FACE_RECOGNITION_MODEL}
+      - SIMILARITY_THRESHOLD=${SIMILARITY_THRESHOLD}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - FACE_DATA_PATH=${FACE_DATA_PATH}
+      - TEMP_DATA_PATH=${TEMP_DATA_PATH}
+    volumes:
+      - ./facial-recognition-service:/app
+      - facial-recognition-data:/app/data
+    networks:
+      - travelbrain-network
+    restart: unless-stopped
+
 networks:
   travelbrain-network:
     driver: bridge
+
+volumes:
+  facial-recognition-data:

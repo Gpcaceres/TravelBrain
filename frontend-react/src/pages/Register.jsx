@@ -1,11 +1,12 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import api from '../services/api'
 import { API_CONFIG } from '../config'
 import '../styles/Auth.css'
 
 export default function Register() {
+  const location = useLocation()
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -17,6 +18,21 @@ export default function Register() {
   const [error, setError] = useState('')
   const { saveAuth } = useAuth()
   const navigate = useNavigate()
+
+  // Pre-rellenar formulario si viene con datos previos del error de registro facial
+  useEffect(() => {
+    if (location.state?.previousData) {
+      setFormData(prev => ({
+        ...prev,
+        email: location.state.previousData.email || '',
+        username: location.state.previousData.username || '',
+        name: location.state.previousData.fullName || ''
+      }))
+    }
+    if (location.state?.error) {
+      setError(location.state.error)
+    }
+  }, [location.state])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -44,8 +60,15 @@ export default function Register() {
       })
 
       if (registerResponse.data.success && registerResponse.data.token) {
-        saveAuth(registerResponse.data.token, registerResponse.data.user)
-        navigate('/dashboard')
+        // NO guardar auth todavía - debe completar registro facial primero
+        // Solo pasar token y userData para uso posterior
+        navigate('/face-registration', {
+          state: {
+            token: registerResponse.data.token,
+            userData: registerResponse.data.user,
+            isNewRegistration: true
+          }
+        })
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.')
